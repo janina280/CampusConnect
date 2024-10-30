@@ -6,7 +6,7 @@ import Logo from "../../assets/Images/logo.ico";
 import { Nav_Buttons } from "../../data";
 import { Gear } from "phosphor-react";
 import { faker } from "@faker-js/faker";
-
+import useSettings from "../../hooks/useSettings";
 
 const AntSwitch = styled(Switch)(({ theme }) => ({
   width: 40,
@@ -58,6 +58,7 @@ const AntSwitch = styled(Switch)(({ theme }) => ({
 
 const DashboardLayout = () => {
   const theme = useTheme();
+  const {onToggleMode}= useSettings();
   const [selected, setSelected] = useState(0);
   return (
     <>
@@ -115,7 +116,7 @@ const DashboardLayout = () => {
                     onClick={() => {
                       setSelected(el.index);
                     }}
-                    sx={{ width: "max-content", color: "#000" }}
+                    sx={{ width: "max-content", color: theme.palette.mode === "light" ? "#000" : theme.palette.text.primary }}
                     key={el.index}
                   >
                     {el.icon}
@@ -142,7 +143,7 @@ const DashboardLayout = () => {
                   onClick={() => {
                     setSelected(3);
                   }}
-                  sx={{ width: "max-content", color: "#000" }}
+                  sx={{ width: "max-content", color: theme.palette.mode === "light" ? "#000" : theme.palette.text.primary }}
                 >
                   <Gear />
                 </IconButton>
@@ -151,7 +152,10 @@ const DashboardLayout = () => {
           </Stack>
 
           <Stack spacing={4}>
-            <AntSwitch defaultChecked/>
+            <AntSwitch onChange={()=>{
+              onToggleMode();
+            }
+            } defaultChecked/>
             <Avatar src={faker.image.avatar()} />
           </Stack>
         </Stack>
