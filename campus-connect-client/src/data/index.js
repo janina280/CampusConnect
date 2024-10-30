@@ -163,7 +163,7 @@ const Chat_History = [
     type: "msg",
     subtype: "img",
     message: "Here You Go",
-    img: faker.image.abstract(),
+    img: faker.image.url({ category: "abstract" }),
     incoming: true,
     outgoing: false,
   },
@@ -184,7 +184,7 @@ const Chat_History = [
   {
     type: "msg",
     subtype: "link",
-    preview: faker.image.cats(),
+    preview: faker.image.url({ category: "cats" }),
     message: "Yep, I can also do that",
     incoming: true,
     outgoing: false,
