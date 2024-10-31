@@ -62,6 +62,7 @@ const DashboardLayout = () => {
   const [selected, setSelected] = useState(0);
   return (
     <>
+     <Box sx={{ display: "flex", height: "100vh" }}>
       <Box
         p={2}
         sx={{
@@ -161,6 +162,7 @@ const DashboardLayout = () => {
         </Stack>
       </Box>
       <Outlet />
+      </Box>
     </>
   );
 };
