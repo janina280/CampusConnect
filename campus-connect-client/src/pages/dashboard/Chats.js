@@ -12,11 +12,11 @@ import {
 } from "@mui/material";
 import { ArchiveBox, CircleDashed, MagnifyingGlass } from "phosphor-react";
 import { styled, alpha, useTheme } from "@mui/material/styles";
-import { faker, he } from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 import { ChatList } from "../../data";
 import { SimpleBarStyle } from "../../components/Scrollbar";
 
-const StyleBadge = styled(Badge)(({ theme }) => ({
+const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
     backgroundColor: "#44b700",
     color: "#44b700",
@@ -64,13 +64,13 @@ const ChatElement = ({ id, name, img, msg, time, unread, online }) => {
       >
         <Stack direction={"row"} spacing={2}>
           {online ? 
-            <StyleBadge
+            <StyledBadge
               overlap="circular"
               anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
               variant="dot"
             >
               <Avatar src={faker.image.avatar()} />
-            </StyleBadge>
+            </StyledBadge>
            : 
             <Avatar src={faker.image.avatar()} />
           }
@@ -159,7 +159,16 @@ const Chats = () => {
           </Stack>
           <Divider />
         </Stack>
-        <Stack spacing={2} direction="column" sx={{flexGrow:1, overflow: "scroll", height: "100%"}}>
+        <Stack spacing={2}
+  direction="column"
+  sx={{
+    flexGrow: 1,
+    overflowY: "scroll",
+    height: "100%",
+    "&::-webkit-scrollbar": { display: "none" },
+    "-ms-overflow-style": "none",
+    "scrollbar-width": "none",
+  }}>
             <SimpleBarStyle timeout={500} clickOnTrack={false}>
           <Stack spacing={2.4}>
             <Typography variant="subtitle2" sx={{ color: "#676767" }}>

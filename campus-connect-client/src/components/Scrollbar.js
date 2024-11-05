@@ -33,7 +33,8 @@ const SimpleBarStyle = styled(SimpleBarReact)(({ theme }) => ({
   },
   "& .simplebar-placeholder": {
     height: '0 !important',
-  }
+  },
+  
 }));
 
 // ----------------------------------------------------------------------

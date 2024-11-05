@@ -61,8 +61,7 @@ const DashboardLayout = () => {
   const {onToggleMode}= useSettings();
   const [selected, setSelected] = useState(0);
   return (
-    <>
-     <Box sx={{ display: "flex", height: "100vh" }}>
+    <Stack direction="row">
       <Box
         p={2}
         sx={{
@@ -162,8 +161,8 @@ const DashboardLayout = () => {
         </Stack>
       </Box>
       <Outlet />
-      </Box>
-    </>
+    
+    </Stack>
   );
 };
 
