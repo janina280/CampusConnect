@@ -4,7 +4,7 @@ import Logo from "../../assets/Images/logo.ico";
 import { Nav_Buttons } from "../../data";
 import { Gear } from "phosphor-react";
 import { faker } from "@faker-js/faker";
-import { Avatar, Box, Divider, IconButton, Stack, Switch } from "@mui/material";
+import { Avatar, Box, Divider, IconButton, Stack } from "@mui/material";
 import useSettings from "../../hooks/useSettings";
 import AntSwitch from "../../components/AntSwitch";
 
