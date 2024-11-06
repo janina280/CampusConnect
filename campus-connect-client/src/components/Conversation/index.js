@@ -1,4 +1,4 @@
-import { Stack} from "@mui/material";
+import { Box, Stack} from "@mui/material";
 import React from "react";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -11,7 +11,10 @@ const Conversation = () => {
       <Header />
 
       {/*Message*/}
+      <Box width={"100%"} sx={{flexGrow:1}}>
       <Message />
+      </Box>
+     
 
       {/*Chat footer*/}
       <Footer />
