@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Stack } from "@mui/material";
-import { MediaMsg, ReplayMsg, TextMsg, Timeline } from "./MsgTypes";
+import { DocMsg, LinkMsg, MediaMsg, ReplayMsg, TextMsg, Timeline } from "./MsgTypes";
 import { Chat_History } from "../../data";
 
 const Message = () => {
@@ -19,10 +19,10 @@ const Message = () => {
                   return <MediaMsg el={el} />;
                 case "doc":
                   //doc asg
-                  break;
+                  return <DocMsg el={el}/>
                 case "link":
                   //link msg
-                  break;
+                  return <LinkMsg el={el}/>
                 case "reply":
                   //replay msg
                   return <ReplayMsg el={el} />;

@@ -165,9 +165,6 @@ const Chats = () => {
     flexGrow: 1,
     overflowY: "scroll",
     height: "100%",
-    "&::-webkit-scrollbar": { display: "none" },
-    "-ms-overflow-style": "none",
-    "scrollbar-width": "none",
   }}>
             <SimpleBarStyle timeout={500} clickOnTrack={false}>
           <Stack spacing={2.4}>

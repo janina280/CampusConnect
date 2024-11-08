@@ -11,7 +11,7 @@ const Conversation = () => {
       <Header />
 
       {/*Message*/}
-      <Box width={"100%"} sx={{flexGrow: 1}}>
+      <Box width={"100%"} sx={{flexGrow: 1, height:"100%", overflowY:"scroll"}}>
       <Message />
       </Box>
      
