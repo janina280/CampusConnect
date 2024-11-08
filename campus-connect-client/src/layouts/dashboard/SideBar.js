@@ -5,12 +5,12 @@ import { Nav_Buttons } from "../../data";
 import { Gear } from "phosphor-react";
 import { faker } from "@faker-js/faker";
 import { Avatar, Box, Divider, IconButton, Stack } from "@mui/material";
-import useSettings from "../../hooks/useSettings";
-import AntSwitch from "../../components/AntSwitch";
+//import useSettings from "../../hooks/useSettings";
+//import AntSwitch from "../../components/AntSwitch";
 
 const SideBar = () => {
   const theme = useTheme();
-  const { onToggleMode } = useSettings();
+ // const { onToggleMode } = useSettings();
   const [selected, setSelected] = useState(0);
 
   return (
@@ -116,12 +116,7 @@ const SideBar = () => {
         </Stack>
 
         <Stack spacing={4}>
-          <AntSwitch
-            onChange={() => {
-              onToggleMode();
-            }}
-            defaultChecked
-          />
+          
           <Avatar src={faker.image.avatar()} />
         </Stack>
       </Stack>
