@@ -1,7 +1,16 @@
 import React from "react";
 import { useTheme } from "@mui/material/styles";
-import { Box, Divider, IconButton, Link, Stack, Typography } from "@mui/material";
-import { DownloadSimple, Image } from "phosphor-react";
+import {
+  Box,
+  Divider,
+  Menu,
+  MenuItem,
+  IconButton,
+  Link,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { DotsThreeVertical, DownloadSimple, Image } from "phosphor-react";
 
 const DocMsg = ({ el }) => {
   const theme = useTheme();
@@ -29,13 +38,15 @@ const DocMsg = ({ el }) => {
             }}
           >
             <Image size={48} />
-            <Typography variant="caption">
-              Abstract.png
-            </Typography>
-            <IconButton><DownloadSimple/> </IconButton>
+            <Typography variant="caption">Abstract.png</Typography>
+            <IconButton>
+              <DownloadSimple />{" "}
+            </IconButton>
           </Stack>
-          <Typography variant="body2"
-          sx={{color:el.incoming ? theme.palette.text : " #fff"}}>
+          <Typography
+            variant="body2"
+            sx={{ color: el.incoming ? theme.palette.text : " #fff" }}
+          >
             {el.message}
           </Typography>
         </Stack>
@@ -192,6 +203,17 @@ const TextMsg = ({ el }) => {
         </Typography>
       </Box>
     </Stack>
+  );
+};
+
+const MessageOprions = () => {
+  return (
+    <>
+      <DotsThreeVertical size={20} />
+      <Menu>
+        
+      </Menu>
+    </>
   );
 };
 
