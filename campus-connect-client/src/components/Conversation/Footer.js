@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Stack,
   Box,
   TextField,
   IconButton,
   InputAdornment,
+  Fab,
+  Tooltip,
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
-import { LinkSimple, Smiley, PaperPlaneTilt } from "phosphor-react";
+import {
+  LinkSimple,
+  Smiley,
+  PaperPlaneTilt,
+  Sticker,
+  Camera,
+  Image,
+  File,
+  User,
+} from "phosphor-react";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 
@@ -18,7 +29,41 @@ const StyledInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const ChatInput = ({setOpenPicker}) => {
+const Actions = [
+  {
+    color: "#4da5fe",
+    icon: <Image size={24} />,
+    y: 102,
+    title: "Photo/Video",
+  },
+  {
+    color: "#4da5fe",
+    icon: <Sticker size={24} />,
+    y: 172,
+    title: "Stickers",
+  },
+  {
+    color: "#4da5fe",
+    icon: <Camera size={24} />,
+    y: 242,
+    title: "Image",
+  },
+  {
+    color: "#4da5fe",
+    icon: <File size={24} />,
+    y: 312,
+    title: "PDF",
+  },
+  {
+    color: "#4da5fe",
+    icon: <User size={24} />,
+    y: 382,
+    title: "Contact",
+  },
+];
+
+const ChatInput = ({ setOpenPicker }) => {
+  const [openActions, setOpenActions] = useState(false);
   return (
     <StyledInput
       fullWidth
@@ -27,17 +72,45 @@ const ChatInput = ({setOpenPicker}) => {
       InputProps={{
         disableUnderline: true,
         startAdornment: (
-          <InputAdornment>
-            <IconButton>
-              <LinkSimple />
-            </IconButton>
-          </InputAdornment>
+          <Stack sx={{ width: "max-content" }}>
+            <Stack
+              sx={{
+                position: "relative",
+                display: openActions ? "inline" : "none",
+              }}
+            >
+              {Actions.map((el) => (
+                <Tooltip title={el.title} placement="right">
+                  <Fab
+                    sx={{
+                      position: "absolute",
+                      top: -el.y,
+                      backgroundColor: el.color,
+                    }}
+                  >
+                    {el.icon}
+                  </Fab>
+                </Tooltip>
+              ))}
+            </Stack>
+            <InputAdornment>
+              <IconButton
+                onClick={() => {
+                  setOpenActions((prev) => !prev);
+                }}
+              >
+                <LinkSimple />
+              </IconButton>
+            </InputAdornment>
+          </Stack>
         ),
         endAdornment: (
           <InputAdornment>
-            <IconButton onClick={()=>
-              {setOpenPicker((prev)=> !prev);
-            }}>
+            <IconButton
+              onClick={() => {
+                setOpenPicker((prev) => !prev);
+              }}
+            >
               <Smiley />
             </IconButton>
           </InputAdornment>
@@ -49,7 +122,7 @@ const ChatInput = ({setOpenPicker}) => {
 
 const Footer = () => {
   const theme = useTheme();
-  const [ openPicker, setOpenPicker ] = React.useState(false);
+  const [openPicker, setOpenPicker] = React.useState(false);
   return (
     <Box
       p={2}
