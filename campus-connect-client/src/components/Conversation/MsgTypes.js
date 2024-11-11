@@ -9,7 +9,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import MenuItem from '@mui/material/MenuItem';
+import MenuItem from "@mui/material/MenuItem";
 import { DotsThreeVertical, DownloadSimple, Image } from "phosphor-react";
 import { Message_options } from "../../data";
 
@@ -21,7 +21,9 @@ const DocMsg = ({ el }) => {
         p={1.5}
         sx={{
           backgroundColor: el.incoming
-            ? theme.palette.background.default
+            ? theme.palette.mode === "light"
+              ? theme.palette.background.default
+              : "transparent"
             : theme.palette.primary.main,
           borderRadius: 1.5,
           width: "max-content",
@@ -65,7 +67,9 @@ const ReplayMsg = ({ el }) => {
         p={1.5}
         sx={{
           backgroundColor: el.incoming
-            ? theme.palette.background.default
+            ? theme.palette.mode === "light"
+              ? theme.palette.background.default
+              : "transparent"
             : theme.palette.primary.main,
           borderRadius: 1.5,
           width: "max-content",
@@ -107,7 +111,9 @@ const LinkMsg = ({ el }) => {
         p={1.5}
         sx={{
           backgroundColor: el.incoming
-            ? theme.palette.background.default
+            ? theme.palette.mode === "light"
+              ? theme.palette.background.default
+              : "transparent"
             : theme.palette.primary.main,
           borderRadius: 1.5,
           width: "max-content",
@@ -161,7 +167,9 @@ const MediaMsg = ({ el }) => {
         p={1.5}
         sx={{
           backgroundColor: el.incoming
-            ? theme.palette.background.default
+            ? theme.palette.mode === "light"
+              ? theme.palette.background.default
+              : "transparent"
             : theme.palette.primary.main,
           borderRadius: 1.5,
           width: "max-content",
@@ -194,7 +202,9 @@ const TextMsg = ({ el }) => {
         p={1.5}
         sx={{
           backgroundColor: el.incoming
-            ? theme.palette.background.default
+            ? theme.palette.mode === "light"
+              ? theme.palette.background.default
+              : "transparent"
             : theme.palette.primary.main,
           borderRadius: 1.5,
           width: "max-content",
@@ -226,9 +236,9 @@ const MessageOptions = () => {
     <>
       <DotsThreeVertical
         id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
+        aria-controls={open ? "basic-menu" : undefined}
         aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
+        aria-expanded={open ? "true" : undefined}
         onClick={handleClick}
         size={20}
       />
@@ -238,7 +248,7 @@ const MessageOptions = () => {
         open={open}
         onClose={handleClose}
         MenuListProps={{
-          'aria-labelledby': 'basic-button',
+          "aria-labelledby": "basic-button",
         }}
       >
         <Stack spacing={1} px={1}>

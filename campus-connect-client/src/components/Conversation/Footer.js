@@ -129,9 +129,9 @@ const Footer = () => {
       sx={{
         width: "100%",
         backgroundColor:
-          theme.palette.node === "light"
+          theme.palette.mode === "light"
             ? "#F8FAFF"
-            : theme.palette.background.paper,
+            :  "transparent",
         boxShadow: "0px 0px 2px rgba(0,0,0,0.25)",
       }}
     >

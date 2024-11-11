@@ -78,6 +78,7 @@ const ChatHeader = () => {
   };
 
   return (
+  
     <Box
       p={2}
       sx={{
@@ -86,7 +87,7 @@ const ChatHeader = () => {
         backgroundColor:
           theme.palette.mode === "light"
             ? "#F8FAFF"
-            : theme.palette.background,
+            : "transparent",
       }}
     >
       <Stack

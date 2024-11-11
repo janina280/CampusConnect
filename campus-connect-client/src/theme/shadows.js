@@ -6,7 +6,7 @@ import palette from './palette';
 // ----------------------------------------------------------------------
 
 const LIGHT_MODE = palette.light.grey[500];
-const DARK_MODE = '#000000';
+//const DARK_MODE = '#000000';
 
 const createShadow = (color) => {
   const transparent1 = alpha(color, 0.2);
@@ -66,12 +66,12 @@ const createCustomShadow = (color) => {
 
 export const customShadows = {
   light: createCustomShadow(LIGHT_MODE),
-  dark: createCustomShadow(DARK_MODE),
+  //dark: createCustomShadow(DARK_MODE),
 };
 
 const shadows = {
   light: createShadow(LIGHT_MODE),
-  dark: createShadow(DARK_MODE),
+ // dark: createShadow(DARK_MODE),
 };
 
 export default shadows;

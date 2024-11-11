@@ -15,7 +15,7 @@ const Contact = () => {
             backgroundColor:
               theme.palette.mode === "light"
                 ? "#F8FAFF"
-                : theme.palette.background,
+                : "transparent",
           }}
         >
           <Stack
