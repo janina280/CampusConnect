@@ -126,7 +126,7 @@ const Chats = () => {
       sx={{
         position: "relative",
         width: 320,
-        backgroundColor: theme.palette.mode === "light" ? "#F8FAFF": theme.palette.background.paper,
+        backgroundColor: theme.palette.mode === "light" ? "#F8FAFF": "transparent",
         boxShadow: "0px 0px 2px rgba(o, 0, 0, 0.25)",
       }}
     >
