@@ -9,7 +9,16 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Bell, CaretRight, Phone, Prohibit, Star, Trash, VideoCamera, X } from "phosphor-react";
+import {
+  Bell,
+  CaretRight,
+  Phone,
+  Prohibit,
+  Star,
+  Trash,
+  VideoCamera,
+  X,
+} from "phosphor-react";
 import { useDispatch } from "react-redux";
 import { ToggleSidebar, UpdateSidebarType } from "../redux/slices/app";
 import { faker } from "@faker-js/faker";
@@ -104,9 +113,14 @@ const Contact = () => {
             justifyContent={"space-between"}
           >
             <Typography variant="subtitle2">Media, Links & Docs</Typography>
-            <Button onClick={()=> {
-              dispatch(UpdateSidebarType("SHARED"));
-            }} endIcon={<CaretRight />}>301</Button>
+            <Button
+              onClick={() => {
+                dispatch(UpdateSidebarType("SHARED"));
+              }}
+              endIcon={<CaretRight />}
+            >
+              301
+            </Button>
           </Stack>
           <Stack direction={"row"} spacing={2} alignItems={"center"}>
             {[1, 2, 3].map((el) => (
@@ -125,9 +139,11 @@ const Contact = () => {
               <Star size={21} />
               <Typography variant="subtitle2">Starred Messages</Typography>
             </Stack>
-            <IconButton onClick={()=>{
-              dispatch(UpdateSidebarType("STARRED"));
-            }}>
+            <IconButton
+              onClick={() => {
+                dispatch(UpdateSidebarType("STARRED"));
+              }}
+            >
               <CaretRight />
             </IconButton>
           </Stack>
@@ -154,10 +170,10 @@ const Contact = () => {
             </Stack>
           </Stack>
           <Stack direction={"row"} alignItems={"center"} spacing={2}>
-            <Button startIcon={<Prohibit/>} fullWidth variant="outlined">
+            <Button startIcon={<Prohibit />} fullWidth variant="outlined">
               Block
             </Button>
-            <Button startIcon={<Trash/>} fullWidth variant="outlined">
+            <Button startIcon={<Trash />} fullWidth variant="outlined">
               Delete
             </Button>
           </Stack>
