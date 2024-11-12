@@ -1,9 +1,20 @@
 import React from "react";
-import { Box, IconButton, Stack, Tab, Tabs, Typography } from "@mui/material";
+import {
+  Box,
+  Grid,
+  IconButton,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { CaretLeft } from "phosphor-react";
 import { useDispatch } from "react-redux";
 import { UpdateSidebarType } from "../redux/slices/app";
+import { faker } from "@faker-js/faker";
+import { SHARED_LINKS } from "../data";
+import { LinkMsg } from "./Conversation/MsgTypes";
 
 const SharedMessages = () => {
   const theme = useTheme();
@@ -41,10 +52,15 @@ const SharedMessages = () => {
           </Stack>
         </Box>
 
-        <Tabs value={value} onChange={handleChange} centered>
-          <Tab label="Item One" />
-          <Tab label="Item Two" />
-          <Tab label="Item Three" />
+        <Tabs
+          sx={{ px: 2, pt: 2 }}
+          value={value}
+          onChange={handleChange}
+          centered
+        >
+          <Tab label="Media" />
+          <Tab label="Links" />
+          <Tab label="Docs" />
         </Tabs>
 
         <Stack
@@ -56,7 +72,40 @@ const SharedMessages = () => {
           }}
           p={3}
           spacing={3}
-        ></Stack>
+        >
+          {(() => {
+            switch (value) {
+              case 0:
+                //Images
+                return (
+                  <Grid container spacing={2}>
+                    {[0, 1, 2, 3, 4, 5, 6].map((el) => {
+                      return (
+                        <Grid item xs={4}>
+                          <img
+                            src={faker.image.avatar()}
+                            alt={faker.name.fullName()}
+                          />
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
+                );
+
+              case 1:
+                //Links
+                return SHARED_LINKS.map((el)=><LinkMsg/>)
+                break;
+
+              case 2:
+                //Docs
+                break;
+
+              default:
+                break;
+            }
+          })()}
+        </Stack>
       </Stack>
     </Box>
   );
