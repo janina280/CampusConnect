@@ -13,8 +13,8 @@ import { CaretLeft } from "phosphor-react";
 import { useDispatch } from "react-redux";
 import { UpdateSidebarType } from "../redux/slices/app";
 import { faker } from "@faker-js/faker";
-import { SHARED_LINKS } from "../data";
-import { LinkMsg } from "./Conversation/MsgTypes";
+import { SHARED_DOCS, SHARED_LINKS } from "../data";
+import { DocMsg, LinkMsg } from "./Conversation/MsgTypes";
 
 const SharedMessages = () => {
   const theme = useTheme();
@@ -71,7 +71,7 @@ const SharedMessages = () => {
             overflowY: "scroll",
           }}
           p={3}
-          spacing={3}
+          spacing={value === 1 ? 1 : 3}
         >
           {(() => {
             switch (value) {
@@ -94,12 +94,11 @@ const SharedMessages = () => {
 
               case 1:
                 //Links
-                return SHARED_LINKS.map((el)=><LinkMsg/>)
-                break;
+                return SHARED_LINKS.map((el) => <LinkMsg el={el} />);
 
               case 2:
                 //Docs
-                break;
+                return SHARED_DOCS.map((el) => <DocMsg el={el} />);
 
               default:
                 break;
