@@ -116,7 +116,7 @@ const Settings = () => {
                   <Stack
                     sx={{ cursor: "pointer" }}
                     spacing={2}
-                    onclick={onclick}
+                    onClick={onclick}
                   >
                     <Stack direction={"row"} spacing={2} alignItems={"center"}>
                       {icon}

@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Box,
   Button,
   Dialog,
   DialogActions,
@@ -114,7 +113,7 @@ const list = [
   },
 ];
 
-const Shortcuts = (open, handleClose) => {
+const Shortcuts = ({open, handleClose}) => {
   return (
     <>
       <Dialog
