@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
   Box,
@@ -17,9 +17,16 @@ import {
 import { SimpleBarStyle } from "../../components/Scrollbar";
 import { ChatList } from "../../data";
 import ChatElement from "../../components/ChatElement";
+import CreateGroup from "../../sections/main/CreateGroup";
 
 const Group = () => {
   const theme = useTheme();
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
   return (
     <>
       <Stack direction="row" sx={{ width: "100%" }}>
@@ -59,7 +66,9 @@ const Group = () => {
               <Typography variant="subtitle2" component={Link}>
                 Create New Group
               </Typography>
-              <IconButton>
+              <IconButton onClick={()=>{
+                setOpenDialog(true);
+              }}>
                 <Plus
                   style={{ color: (theme) => theme.palette.primary.main }}
                 />
@@ -96,6 +105,7 @@ const Group = () => {
         {/* Right */}
        
       </Stack>
+      {openDialog && <CreateGroup open={openDialog} handleClose={handleCloseDialog}/>}
     </>
   );
 };
