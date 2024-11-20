@@ -8,16 +8,11 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { MagnifyingGlass, Phone } from "phosphor-react";
-import {
-  Search,
-  SearchIconWrapper,
-  StyledInputBase,
-} from "../../components/Search";
+import { Plus } from "phosphor-react";
 import { SimpleBarStyle } from "../../components/Scrollbar";
-import CreateGroup from "../../sections/main/CreateGroup";
 import { CallLogElement } from "../../components/CallElement";
 import { CallLogs } from "../../data";
+import StartCall from "../../sections/main/StartCall";
 
 const Call = () => {
   const theme = useTheme();
@@ -46,31 +41,21 @@ const Call = () => {
             <Stack>
               <Typography variant="h5">Call Logs</Typography>
             </Stack>
-            <Stack sx={{ width: "100%" }}>
-              <Search>
-                <SearchIconWrapper>
-                  <MagnifyingGlass color="#709CE6" />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search"
-                  inputProps={{ "aria-label": "search" }}
-                />
-              </Search>
-            </Stack>
+            
             <Stack
               direction={"row"}
               justifyContent={"space-between"}
               alignItems={"center"}
             >
               <Typography variant="subtitle2" component={Link}>
-                Start New Conversation
+                Start Conversation
               </Typography>
               <IconButton
                 onClick={() => {
                   setOpenDialog(true);
                 }}
               >
-                <Phone
+                <Plus
                   style={{ color: (theme) => theme.palette.primary.main }}
                 />
               </IconButton>
@@ -82,10 +67,6 @@ const Call = () => {
             >
               <SimpleBarStyle timeout={500} clickOnTrack={false}>
                 <Stack spacing={2.5}>
-                  {/* */}
-                  <Typography variant="subtitle2" sx={{ color: "#676667" }}>
-                    Pinned
-                  </Typography>
                   {/* Chat List */}
                   {CallLogs.map((el) => <CallLogElement  {...el}/>)}
                 </Stack>
@@ -96,7 +77,7 @@ const Call = () => {
         {/* Right */}
       </Stack>
       {openDialog && (
-        <CreateGroup open={openDialog} handleClose={handleCloseDialog} />
+        <StartCall open={openDialog} handleClose={handleCloseDialog} />
       )}
     </>
   );

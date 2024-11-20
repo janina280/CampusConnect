@@ -38,6 +38,46 @@ const Nav_Buttons = [
     icon: <Phone />,
   },
 ];
+
+const MembersList=[
+  {
+    id: 0,
+    img: faker.image.avatar(),
+    name: faker.person.firstName(),
+    online:true,
+  },
+  {
+    id: 1,
+    img: faker.image.avatar(),
+    name: faker.person.firstName(),
+    online:false,
+  },
+  {
+    id: 2,
+    img: faker.image.avatar(),
+    name: faker.person.firstName(),
+    online:true,
+  },
+  {
+    id: 3,
+    img: faker.image.avatar(),
+    name: faker.person.firstName(),
+    online:true,
+  },
+  {
+    id: 4,
+    img: faker.image.avatar(),
+    name: faker.person.firstName(),
+    online:false,
+  },
+  {
+    id: 5,
+    img: faker.image.avatar(),
+    name: faker.person.firstName(),
+    online:false,
+  }
+];
+
 const CallLogs = [
   {
     id: 0,
@@ -303,4 +343,5 @@ export {
   SHARED_DOCS,
   SHARED_LINKS,
   CallLogs,
+  MembersList,
 };
