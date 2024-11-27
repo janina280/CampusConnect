@@ -7,7 +7,7 @@ import ResetPasswordForm from "../../sections/auth/ResetPasswordForm";
 const ResetPassword = () => {
   return (
     <>
-      <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>
+      <Stack spacing={2} sx={{ mb: 5,mt:5, position: "relative" }}>
         <Typography variant="h3" paragraph>
           Forgot your Password?
         </Typography>

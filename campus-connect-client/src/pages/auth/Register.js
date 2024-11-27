@@ -6,7 +6,7 @@ import AuthSocial from "../../sections/auth/AuthSocial";
 
 const Register = () => {
   return (
-    <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>
+    <Stack spacing={2} sx={{ mb: 5, mt:5, position: "relative" }}>
       <Typography variant="h4">Get Started With CampusConnect</Typography>
       <Stack direction={"row"} spacing={0.5}>
         <Typography variant="body2">Already have an account?</Typography>

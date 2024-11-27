@@ -25,20 +25,20 @@ ThemeProvider.propTypes = {
 export default function ThemeProvider({ children }) {
   const { themeMode, themeDirection } = useSettings();
 
-  const isLight = themeMode === "light";
 
   const themeOptions = useMemo(
     () => ({
-      palette: isLight ? palette.light : palette.dark,
+      palette: palette.light, 
       typography,
       breakpoints,
       shape: { borderRadius: 8 },
       direction: themeDirection,
-      shadows: isLight ? shadows.light : shadows.dark,
-      customShadows: isLight ? customShadows.light : customShadows.dark,
+      shadows: shadows.light,
+      customShadows: customShadows.light,
     }),
-    [isLight, themeDirection]
+    [themeDirection] 
   );
+  
 
   const theme = createTheme(themeOptions);
 

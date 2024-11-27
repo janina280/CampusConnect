@@ -7,7 +7,7 @@ import NewPasswordForm from "../../sections/auth/NewPasswordForm";
 const NewPassword = () => {
   return (
     <>
-      <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>
+      <Stack spacing={2} sx={{ mb: 5,mt:5, position: "relative" }}>
         <Typography variant="h3" paragraph>
           Reset Password
         </Typography>
