@@ -1,40 +1,82 @@
 package chat.campusconnectserver.controllers;
 
-import chat.campusconnectserver.models.AuthenticationCallbackRequest;
-import chat.campusconnectserver.models.AuthenticationRequest;
-import chat.campusconnectserver.models.AuthenticationResponse;
-import chat.campusconnectserver.services.AuthenticationService;
-import lombok.Data;
+import chat.campusconnectserver.exception.BadRequestException;
+import chat.campusconnectserver.model.AuthProvider;
+import chat.campusconnectserver.model.User;
+import chat.campusconnectserver.payload.ApiResponse;
+import chat.campusconnectserver.payload.AuthResponse;
+import chat.campusconnectserver.payload.LoginRequest;
+import chat.campusconnectserver.payload.SignUpRequest;
+import chat.campusconnectserver.repositories.UserRepository;
+import chat.campusconnectserver.security.TokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-@Controller
-@Data
-@RequestMapping(value = "api/auth")
+import java.net.URI;
+
+@RestController
+@RequestMapping("/auth")
 public class AuthController {
-    private AuthenticationService authenticationService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-   /* @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody AuthenticationRequest request
-    ) {
-        return ResponseEntity.ok(authenticationService.register(request));
-    }*/
+    @Autowired
+    private UserRepository userRepository;
 
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
-    ) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private TokenProvider tokenProvider;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String token = tokenProvider.createToken(authentication);
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 
-    @PostMapping("/authenticate-callback")
-    public ResponseEntity<AuthenticationResponse> authenticateCallback(
-            @RequestBody AuthenticationCallbackRequest request
-    ) {
-        return ResponseEntity.ok(authenticationService.authenticateWithExternalTenant(request));
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@RequestBody SignUpRequest signUpRequest) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            throw new BadRequestException("Email address already in use.");
+        }
+
+        // Creating user's account
+        User user = new User();
+        user.setName(signUpRequest.getName());
+        user.setEmail(signUpRequest.getEmail());
+        user.setPassword(signUpRequest.getPassword());
+        user.setProvider(AuthProvider.local);
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        User result = userRepository.save(user);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/user/me")
+                .buildAndExpand(result.getId()).toUri();
+
+        return ResponseEntity.created(location)
+                .body(new ApiResponse(true, "User registered successfully@"));
     }
 }
