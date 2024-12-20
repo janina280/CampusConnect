@@ -17,8 +17,7 @@ import { Link } from "react-router-dom";
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const RegisterSchema = Yup.object().shape({
-    firstName: Yup.string().required("First Name is required"),
-    lastName: Yup.string().required("Last Name is required"),
+    name: Yup.string().required("Name is required"),
     email: Yup.string()
       .required("Email is required")
       .email("Email must be a valid email address"),
@@ -26,8 +25,7 @@ const RegisterForm = () => {
   });
 
   const defaultValues = {
-    firstName: "Demo",
-    lastName: "Demo",
+    name: "Demo",
     email: "demo@yahoo.com",
     password: "demo1234",
   };
@@ -64,10 +62,7 @@ const RegisterForm = () => {
           <Alert severity="error">{errors.afterSubmit.message} </Alert>
         )}
 
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-          <RHFTextField name="firstName" label="First Name" />
-          <RHFTextField name="lastName" label="Last Name" />
-        </Stack>
+        <RHFTextField name="name" label="Name" />
         <RHFTextField name="email" label="Email address" />
         <RHFTextField
           name="password"
