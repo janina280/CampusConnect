@@ -21,12 +21,19 @@ spring:
       client:
         registration:
           google:
-            clientId: 5014057553-8gm9um6vnli3cle5rgigcdjpdrid14m9.apps.googleusercontent.com
-            clientSecret: tWZKVLxaD_ARWsriiiUFYoIk
-            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
-            scope:
-              - email
-              - profile
+            - client-id: 342833311760-ld5bv7u2nsocr1k7uncm12hh8hq6hp7s.apps.googleusercontent.com
+            - client-secret: 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
+            - scope:
+                - profile
+                - email
+            - redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            - authorization-grant-type: authorization_code
+            - client-name: Google
+        provider:
+            google:
+              authorization-uri: https://accounts.google.com/o/oauth2/auth
+              token-uri: https://oauth2.googleapis.com/token
+              user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
 
 app:
   auth:
