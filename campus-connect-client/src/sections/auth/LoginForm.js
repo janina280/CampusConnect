@@ -7,16 +7,21 @@ import { Alert, Button, IconButton, InputAdornment, Stack } from "@mui/material"
 import RHFTextField from "../../components/hook-form/RHFTextField";
 import { Eye, EyeSlash } from "phosphor-react";
 import { Link } from "react-router-dom";
-import {Link as RouterLink} from 'react-router-dom';
+import { Link as RouterLink } from "react-router-dom";
+import axios from "axios"; 
+import { API_BASE_URL } from "../../constants";  
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false); 
+  const [error, setError] = useState(""); 
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
       .required("Email is required")
       .email("Email must be a valid email address"),
     password: Yup.string().required("Password is required"),
   });
+
   const defaultValues = {
     email: "demo@yahoo.com",
     password: "demo1234",
@@ -29,30 +34,36 @@ const LoginForm = () => {
 
   const {
     reset,
-    setError,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
 
   const onSubmit = async (data) => {
+    setLoading(true); 
+    setError("");  
+
     try {
-      //submit
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, data);
+
+      if (response.status === 200) {
+        const { token } = response.data;
+
+        localStorage.setItem("token", token);
+
+        window.location.href = "/app";  
+      }
     } catch (error) {
       console.log(error);
-      reset();
-      setError("afterSubmit", {
-        ...error,
-        message: error.message,
-      });
+      setError("Authentication failed. Please try again.");
+    } finally {
+      setLoading(false); 
     }
   };
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
-        {!!errors.afterSubmit && (
-          <Alert severity="error">{errors.afterSubmit.message} </Alert>
-        )}
+        {!!error && <Alert severity="error">{error}</Alert>} 
 
         <RHFTextField name="email" label="Email address" />
         <RHFTextField
@@ -61,7 +72,7 @@ const LoginForm = () => {
           type={showPassword ? "text" : "password"}
           InputProps={{
             endAdornment: (
-              <InputAdornment>
+              <InputAdornment position="end">
                 <IconButton
                   onClick={() => {
                     setShowPassword(!showPassword);
@@ -79,13 +90,23 @@ const LoginForm = () => {
           Forgot Password?
         </Link>
       </Stack>
-      <Button fullWidth color="inherit" size="large" type="submit" variant="contained" sx={{bgcolor:"text.primary", color: (theme)=> theme.palette.mode==="light" ? "common.white" : "grey.800",
-        '&:hover': {
-          bgcolor:"text.primary",
-          color:(theme)=>theme.palette.mode === 'light' ? "common.white":"grey.800"
-        }
-      }}>
-        Login
+      <Button
+        fullWidth
+        color="inherit"
+        size="large"
+        type="submit"
+        variant="contained"
+        sx={{
+          bgcolor: "text.primary",
+          color: (theme) => (theme.palette.mode === "light" ? "common.white" : "grey.800"),
+          "&:hover": {
+            bgcolor: "text.primary",
+            color: (theme) => (theme.palette.mode === "light" ? "common.white" : "grey.800"),
+          },
+        }}
+        disabled={loading} 
+      >
+        {loading ? "Loading..." : "Login"} 
       </Button>
     </FormProvider>
   );
