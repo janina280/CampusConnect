@@ -42,6 +42,10 @@ export default function Router() {
       ],
     },
     {
+      path: "/welcome",
+      element: <Welcome />, 
+    },
+    {
       path: "/",
       element: <DashboardLayout />,
       children: [
@@ -58,7 +62,9 @@ export default function Router() {
     { path: "*", element: <Navigate to="/404" replace /> },
   ]);
 }
-
+const Welcome = Loadable(
+  lazy(() => import("../pages/dashboard/Welcome"))
+);
 const GeneralApp = Loadable(
   lazy(() => import("../pages/dashboard/GeneralApp"))
 );
