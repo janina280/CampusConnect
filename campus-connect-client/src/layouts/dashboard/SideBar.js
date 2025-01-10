@@ -136,9 +136,7 @@ const SideBar = () => {
                     borderRadius: 1.5,
                   }}
                 >
-                  <IconButton
-                    sx={{ width: "max-content", color: "#fff" }}
-                  >
+                  <IconButton sx={{ width: "max-content", color: "#fff" }}>
                     {el.icon}
                   </IconButton>
                 </Box>
@@ -233,11 +231,11 @@ const SideBar = () => {
                   key={idx}
                   onClick={() => {
                     if (idx === 2) {
-                      handleLogout(navigate); // Apelăm handleLogout doar pentru logout
+                      handleLogout(navigate);
                     } else {
-                      navigate(getMenuPath(idx)); // Navigăm către celelalte meniuri
+                      navigate(getMenuPath(idx));
                     }
-                    handleClose(); // Închidem meniul
+                    handleClose();
                   }}
                 >
                   <Stack
