@@ -7,6 +7,7 @@ import chat.campusconnectserver.security.oauth2.CustomOAuth2UserService;
 import chat.campusconnectserver.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import chat.campusconnectserver.security.oauth2.OAuth2AuthenticationFailureHandler;
 import chat.campusconnectserver.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,9 +79,10 @@ public class SecurityConfig {
                         exceptionHandling.authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/oauth2/**").permitAll()
+                        .requestMatchers("/auth/**", "/oauth2/**", "/logout/**").permitAll()
                         .anyRequest().authenticated()
                 )
+
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorizationEndpoint ->
                                 authorizationEndpoint.baseUri("/oauth2/authorize")
@@ -91,6 +93,17 @@ public class SecurityConfig {
                                 userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                         .failureHandler(oAuth2AuthenticationFailureHandler)
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.getWriter().write("Logout successful!");
+                            response.getWriter().flush();
+                        })
+                        .deleteCookies("JSESSIONID")
+                        .clearAuthentication(true)
+                        .invalidateHttpSession(true)
                 )
                 // Configurare politică pentru sesiuni fără a folosi `sessionManagement()`
                 .securityContext(securityContext -> securityContext.requireExplicitSave(false))
