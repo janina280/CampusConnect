@@ -15,6 +15,33 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+const handleLogout = async (navigate) => {
+  try {
+    const token = localStorage.getItem("token"); // Obține tokenul salvat în localStorage
+
+    const response = await fetch("http://localhost:8080/auth/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Adaugă token-ul în header
+      },
+    });
+
+    if (response.ok) {
+      console.log("Logout successful");
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+
+      // După ce se face logout-ul, navighează utilizatorul către pagina de login
+      navigate("/auth/login");
+    } else {
+      console.error("Logout failed. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error during logout:", error);
+  }
+};
+
 const getMenuPath = (index) => {
   switch (index) {
     case 0:
@@ -22,8 +49,8 @@ const getMenuPath = (index) => {
     case 1:
       return "/settings";
     case 2:
-      // TODO Update token and set isAuth=false
-      return "/auth/login";
+      // Apelăm funcția handleLogout doar când este selectat logout
+      return null; // Acesta va fi interceptat în meniul principal
     default:
       return "/";
   }
@@ -205,8 +232,12 @@ const SideBar = () => {
                 <MenuItem
                   key={idx}
                   onClick={() => {
-                    navigate(getMenuPath(idx)); // Navigate to the menu path
-                    handleClose(); // Close the menu
+                    if (idx === 2) {
+                      handleLogout(navigate); // Apelăm handleLogout doar pentru logout
+                    } else {
+                      navigate(getMenuPath(idx)); // Navigăm către celelalte meniuri
+                    }
+                    handleClose(); // Închidem meniul
                   }}
                 >
                   <Stack

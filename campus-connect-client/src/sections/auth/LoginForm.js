@@ -3,18 +3,24 @@ import FormProvider from "../../components/hook-form/FormProvider";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Alert, Button, IconButton, InputAdornment, Stack } from "@mui/material";
+import {
+  Alert,
+  Button,
+  IconButton,
+  InputAdornment,
+  Stack,
+} from "@mui/material";
 import RHFTextField from "../../components/hook-form/RHFTextField";
 import { Eye, EyeSlash } from "phosphor-react";
 import { Link } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
-import axios from "axios"; 
-import { API_BASE_URL } from "../../constants";  
+import axios from "axios";
+import { API_BASE_URL } from "../../constants";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false); 
-  const [error, setError] = useState(""); 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
       .required("Email is required")
@@ -39,31 +45,37 @@ const LoginForm = () => {
   } = methods;
 
   const onSubmit = async (data) => {
-    setLoading(true); 
-    setError("");  
+    setLoading(true);
+    setError("");
 
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, data);
 
+      console.log(response.data);
+
       if (response.status === 200) {
-        const { token } = response.data;
+        const { accessToken } = response.data;
 
-        localStorage.setItem("token", token);
-
-        window.location.href = "/app";  
+        if (accessToken) {
+          console.log("Access Token received:", accessToken);
+          localStorage.setItem("token", accessToken);
+          window.location.href = "/app";
+        } else {
+          setError("Token is missing in the response");
+        }
       }
     } catch (error) {
-      console.log(error);
+      console.error("Login error:", error);
       setError("Authentication failed. Please try again.");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
-        {!!error && <Alert severity="error">{error}</Alert>} 
+        {!!error && <Alert severity="error">{error}</Alert>}
 
         <RHFTextField name="email" label="Email address" />
         <RHFTextField
@@ -86,7 +98,13 @@ const LoginForm = () => {
         />
       </Stack>
       <Stack alignItems={"flex-end"} sx={{ my: 2 }}>
-        <Link component={RouterLink} to="/auth/reset-password" variant="body2" color="inherit" underline="always">
+        <Link
+          component={RouterLink}
+          to="/auth/reset-password"
+          variant="body2"
+          color="inherit"
+          underline="always"
+        >
           Forgot Password?
         </Link>
       </Stack>
@@ -98,15 +116,17 @@ const LoginForm = () => {
         variant="contained"
         sx={{
           bgcolor: "text.primary",
-          color: (theme) => (theme.palette.mode === "light" ? "common.white" : "grey.800"),
+          color: (theme) =>
+            theme.palette.mode === "light" ? "common.white" : "grey.800",
           "&:hover": {
             bgcolor: "text.primary",
-            color: (theme) => (theme.palette.mode === "light" ? "common.white" : "grey.800"),
+            color: (theme) =>
+              theme.palette.mode === "light" ? "common.white" : "grey.800",
           },
         }}
-        disabled={loading} 
+        disabled={loading}
       >
-        {loading ? "Loading..." : "Login"} 
+        {loading ? "Loading..." : "Login"}
       </Button>
     </FormProvider>
   );
