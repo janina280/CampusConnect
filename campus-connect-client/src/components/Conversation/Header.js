@@ -23,9 +23,7 @@ function Header() {
       sx={{
         width: "100%",
         backgroundColor:
-          theme.palette.mode === "light"
-            ? "#F8FAFF"
-            :  "transparent",
+          theme.palette.mode === "light" ? "#F8FAFF" : "transparent",
         boxShadow: "0px 0px 2px rgba(0,0,0,0.25)",
       }}
     >
@@ -60,12 +58,6 @@ function Header() {
           </Stack>
         </Stack>
         <Stack direction="row" alignItems={"center"} spacing={3}>
-          <IconButton>
-            <VideoCamera />
-          </IconButton>
-          <IconButton>
-            <Phone />
-          </IconButton>
           <IconButton>
             <MagnifyingGlass />
           </IconButton>
