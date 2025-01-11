@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class CampusConnectServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CampusConnectServerApplication.class, args);
+        SpringApplication app = new SpringApplication(CampusConnectServerApplication.class);
+        app.setAdditionalProfiles("dev");
+        app.run(args);
     }
 
 }
