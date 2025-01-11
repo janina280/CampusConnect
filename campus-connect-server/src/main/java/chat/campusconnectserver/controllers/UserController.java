@@ -5,21 +5,41 @@ import chat.campusconnectserver.model.User;
 import chat.campusconnectserver.repositories.UserRepository;
 import chat.campusconnectserver.security.CurrentUser;
 import chat.campusconnectserver.security.UserPrincipal;
+import chat.campusconnectserver.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class UserController {
+@Autowired
+    private final UserRepository userRepository;
+private UserService userService;
 
+public UserController(UserService userService, UserRepository userRepository){
+    this.userService=userService;
+    this.userRepository=userRepository;
+}
     @Autowired
-    private UserRepository userRepository;
-
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
     @GetMapping("/user/me")
     @PreAuthorize("hasRole('USER')")
     public User getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
         return userRepository.findById(userPrincipal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
+    }
+
+    @GetMapping("/{query}")
+    public ResponseEntity<List<User>> searchUserHandler(@PathVariable("query")String q){
+        List<User> users=userService.searchUser(q);
+        return new ResponseEntity<List<User>>(users, HttpStatus.OK);
     }
 }
