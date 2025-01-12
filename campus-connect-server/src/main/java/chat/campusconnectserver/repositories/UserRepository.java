@@ -12,7 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     Boolean existsByEmail(String email);
-    @Query( value = "SELECT * FROM users u where u.name Like %:query% or u.email Like %:query% ", nativeQuery=true)
+    @Query( value = "SELECT u FROM users u where u.name Like %:query% or u.email Like %:query% ", nativeQuery=true)
 
     public List<User>searchUser(@Param("query") String query);
 

@@ -5,10 +5,12 @@ import chat.campusconnectserver.model.User;
 import chat.campusconnectserver.repositories.UserRepository;
 import chat.campusconnectserver.security.TokenProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class UserService {
 
     private UserRepository userRepository;

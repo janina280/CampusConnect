@@ -32,6 +32,8 @@ public class Chat {
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
+    @ManyToMany
+    private Set<User> admins = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
@@ -45,8 +47,22 @@ public class Chat {
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages = new ArrayList<>();
 
-
     public Chat() {
 
+    }
+
+    public Chat(Long id, String name, String img, String time, int unread, boolean pinned, boolean online, boolean isGroup, User createdBy, Set<User> admins, Set<User> users, List<Message> messages) {
+        this.id = id;
+        this.name = name;
+        this.img = img;
+        this.time = time;
+        this.unread = unread;
+        this.pinned = pinned;
+        this.online = online;
+        this.isGroup = isGroup;
+        this.createdBy = createdBy;
+        this.admins = admins;
+        this.users = users;
+        this.messages = messages;
     }
 }
