@@ -1,0 +1,19 @@
+
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Sat Jan 11 12:47:54 2025 +0200
+#
+# interactive rebase in progress; onto 20aa7f0
+# Last command done (1 command done):
+#    edit db09d6d .
+# Next commands to do (2 remaining commands):
+#    edit 93be2d1 .
+#    pick 5248dd3 fix
+# You are currently editing a commit while rebasing branch 'main' on '20aa7f0'.
+#
+# Changes to be committed:
+#	modified:   campus-connect-server/.gitignore
+#	new file:   campus-connect-server/src/main/resources/application-dev.yml
+#

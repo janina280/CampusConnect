@@ -6,6 +6,7 @@ import chat.campusconnectserver.repositories.UserRepository;
 import chat.campusconnectserver.security.CurrentUser;
 import chat.campusconnectserver.security.UserPrincipal;
 import chat.campusconnectserver.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,20 +17,19 @@ import java.util.List;
 
 
 @RestController
+@RequestMapping("/profile")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
-@Autowired
-    private final UserRepository userRepository;
-private UserService userService;
 
-public UserController(UserService userService, UserRepository userRepository){
-    this.userService=userService;
-    this.userRepository=userRepository;
-}
+    private final UserRepository userRepository;
+    private final UserService userService;
     @Autowired
-    public UserController(UserRepository userRepository) {
+    public UserController( UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
+        this.userService=userService;
     }
-    @GetMapping("/user/me")
+
+    @GetMapping
     @PreAuthorize("hasRole('USER')")
     public User getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
         return userRepository.findById(userPrincipal.getId())
@@ -37,29 +37,31 @@ public UserController(UserService userService, UserRepository userRepository){
     }
 
     @GetMapping("/{query}")
-    public ResponseEntity<List<User>> searchUserHandler(@PathVariable("query")String q){
-        List<User> users=userService.searchUser(q);
+    public ResponseEntity<List<User>> searchUserHandler(@PathVariable("query") String q) {
+        List<User> users = userService.searchUser(q);
         return new ResponseEntity<List<User>>(users, HttpStatus.OK);
     }
 
     @PutMapping("/updateProfile")
-    public ResponseEntity<User> updateProfile(@RequestBody User updatedUser, @RequestHeader("Authorization") String token) {
-        try {
-            String authToken = token.replace("Bearer ", "");
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<User> updateProfile(
+            @Valid @RequestBody User updatedUser,
+            @CurrentUser UserPrincipal currentUser) {
 
-
-            User existingUser = userRepository.findById(updatedUser.getId())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
-            existingUser.setNickname(updatedUser.getNickname());
-            existingUser.setAbout(updatedUser.getAbout());
-
-            userRepository.save(existingUser);
-
-            return ResponseEntity.ok(existingUser);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        if (!currentUser.getId().equals(currentUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
+
+        User existingUser = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", currentUser.getId()));
+
+        existingUser.setNickname(updatedUser.getNickname());
+        existingUser.setAbout(updatedUser.getAbout());
+
+        userRepository.save(existingUser);
+
+        return ResponseEntity.ok(existingUser);
     }
+
 
 }

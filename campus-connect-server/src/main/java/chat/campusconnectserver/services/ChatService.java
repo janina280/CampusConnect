@@ -6,33 +6,36 @@ import chat.campusconnectserver.model.Chat;
 import chat.campusconnectserver.model.User;
 import chat.campusconnectserver.payload.GroupChatRequest;
 import chat.campusconnectserver.repositories.ChatRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 @Service
 public class ChatService {
-    private ChatRepository chatRepository;
-    private UserService userService;
 
+    private final ChatRepository chatRepository;
+
+    private final UserService userService;
+@Autowired
     public ChatService(ChatRepository chatRepository, UserService userService) {
         this.chatRepository = chatRepository;
         this.userService = userService;
     }
 
-  //  public Chat createChat(Optional<User> reqUser, Long userId2) throws UserException {
-   //     User user = userService.findUserById(userId2);
-     //   Chat isChatExist = chatRepository.findSingleChatByUserIds(user, reqUser);
-     //   if (isChatExist != null) {
-     //       return isChatExist;
-     //   }
-     //   Chat chat = new Chat();
-     //   chat.setCreatedBy(reqUser);
-     //   chat.getUsers().add(user);
-     //   chat.getUsers().add(reqUser);
-     //   chat.setGroup(false);
-     //   return chat;
-   // }
+   public Chat createChat(User reqUser, Long userId2) throws UserException {
+       User user = userService.findUserById(userId2);
+       Chat isChatExist = chatRepository.findSingleChatByUserIds(user, Optional.ofNullable(reqUser));
+       if (isChatExist != null) {
+            return isChatExist;
+        }
+       Chat chat = new Chat();
+        chat.setCreatedBy(reqUser);
+      chat.getUsers().add(user);
+       chat.getUsers().add(reqUser);
+        chat.setGroup(false);
+        return chat;
+    }
 
     public Chat findChatById(Long chatId) throws ChatException {
         Optional<Chat> chat = chatRepository.findById(chatId);
@@ -48,35 +51,19 @@ public class ChatService {
         return null;
     }
 
-   // public Chat createGroup(GroupChatRequest req, Optional<User> reqUser) throws UserException {
-    //    Chat group = new Chat();
-     //   group.setGroup(true);
-     //   group.setImg(req.getChat_image());
-     //   group.setName(req.getChat_name());
-      //  group.setCreatedBy(reqUser);
-      //  group.getAdmins().add(reqUser);
+    public Chat createGroup(GroupChatRequest req, User reqUser) throws UserException {
+        Chat group = new Chat();
+        group.setGroup(true);
+        group.setImg(req.getChat_image());
+        group.setName(req.getChat_name());
+        group.setCreatedBy(reqUser);
+        group.getAdmins().add(reqUser);
 
-     //   for (Long userId : req.getUserIds()) {
-     //       User user = userService.findUserById(userId);
-     //       group.getUsers().add(user);
-      //  }
-      //  return group;
-    //}
-
-    public Chat addUserToGroup(Long userId, Long chatId, User reqUser) throws UserException, ChatException {
-        Optional<Chat> opt=chatRepository.findById(chatId);
-        User user=userService.findUserById(userId);
-        if(opt.isPresent()){
-            Chat chat=opt.get();
-            if(chat.getAdmins().contains(reqUser)){
-                chat.getUsers().add(user);
-                return chatRepository.save(chat);
-            }else{
-                throw  new UserException("You are not admin");
-            }
+        for (Long userId : req.getUserIds()) {
+            User user = userService.findUserById(userId);
+            group.getUsers().add(user);
         }
-       throw new ChatException("Chat not found with id"+chatId);
-
+        return group;
     }
 
     public Chat renameGroup(Long chatId, String groupName, User reqUserId) throws UserException, ChatException {
@@ -116,6 +103,21 @@ public class ChatService {
                 }
             }
             throw  new UserException("You can't remove another user");
+        }
+        throw new ChatException("Chat not found with id"+chatId);
+    }
+
+    public Chat addUserToGroup(Long userId, Long chatId, User reqUser) throws UserException, ChatException {
+        Optional<Chat> opt=chatRepository.findById(chatId);
+        User user=userService.findUserById(userId);
+        if(opt.isPresent()){
+            Chat chat=opt.get();
+            if(chat.getAdmins().contains(reqUser)){
+                chat.getUsers().add(user);
+                return chatRepository.save(chat);
+            }else{
+                throw  new UserException("You are not admin");
+            }
         }
         throw new ChatException("Chat not found with id"+chatId);
     }

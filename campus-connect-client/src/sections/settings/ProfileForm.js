@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useState, useEffect } from "react";
 import FormProvider from "../../components/hook-form/FormProvider";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
@@ -8,13 +8,12 @@ import RHFTextField from "../../components/hook-form/RHFTextField";
 
 const ProfileForm = () => {
   const ProfileSchema = Yup.object().shape({
-    nikename: Yup.string().required("Nikename is required"),
+    nickname: Yup.string().required("Nickname is required"),
     about: Yup.string().required("About is required"),
-
-    avatarUrl: Yup.string().required("Avatar is required").nullable(true),
   });
+
   const defaultValues = {
-    nikename: "",
+    nickname: "",
     about: "",
   };
 
@@ -26,44 +25,56 @@ const ProfileForm = () => {
   const {
     reset,
     watch,
-    control,
-    setError,
     setValue,
     handleSubmit,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { errors },
   } = methods;
 
-  const values = watch();
-  const [isUpdated, setIsUpdated] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false); 
+  const [isUpdated, setIsUpdated] = useState(false); 
 
-  const handleDrop = useCallback(
-    (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      const newFile = Object.assign(file, {
-        preview: URL.createObjectURL(file),
-      });
+  
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
 
-      if (file) {
-        setValue("avatarUrl", newFile, { shouldValidate: true });
+        if (response.ok) {
+          const data = await response.json();
+          setValue("nickname", data.nickname);
+          setValue("about", data.about);
+        } else {
+          console.error("Failed to load profile data");
+        }
+      } catch (error) {
+        console.error("Error fetching profile data", error);
       }
-    },
-    [setValue]
-  );
+    };
 
-  const onSubmit = async (data) => {
+    fetchProfileData();
+  }, [setValue]);
+
+  
+  const onSave = async (data) => {
     try {
-      const response = await fetch("http://localhost:8080/updateProfile", {
+      const response = await fetch("http://localhost:8080/profile/updateProfile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Trimite token-ul
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(data), // Trimite nickname și about
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {
         console.log("Profile updated successfully!");
-        setIsUpdated(true); // Butonul se schimbă în Update
+        setIsUpdated(true);
+        setIsEditMode(false); 
       } else {
         console.error("Error updating profile");
       }
@@ -73,17 +84,24 @@ const ProfileForm = () => {
     }
   };
 
+  const onEdit = () => {
+    setIsEditMode(true);
+    setIsUpdated(false);
+  };
+
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+    <FormProvider methods={methods} onSubmit={handleSubmit(onSave)}>
       <Stack spacing={3}>
         <Stack spacing={3}>
           {!!errors.afterSubmit && (
-            <Alert severity="error">{errors.afterSubmit.message} </Alert>
+            <Alert severity="error">{errors.afterSubmit.message}</Alert>
           )}
+
           <RHFTextField
-            name="nikename"
-            label="Nikename"
-            helperText={"This nikename is visible to your contacts"}
+            name="nickname"
+            label="Nickname"
+            helperText={"This nickname is visible to your contacts"}
+            disabled={!isEditMode}
           />
           <RHFTextField
             multiline
@@ -91,17 +109,20 @@ const ProfileForm = () => {
             maxRows={5}
             name="about"
             label="About"
+            disabled={!isEditMode} 
           />
         </Stack>
-        <Stack direction={"row"} justifyContent={"end"}>
-          <Button
-            color="primary"
-            size={"large"}
-            type="submit"
-            variant="outlined"
-          >
-            {isUpdated ? "Update" : "Save"}
-          </Button>
+
+        <Stack direction={"row"} justifyContent={"end"} spacing={2}>
+          {isEditMode ? (
+            <Button color="primary" size="large" type="submit" variant="outlined">
+              Save
+            </Button>
+          ) : (
+            <Button color="secondary" size="large" onClick={onEdit} variant="contained">
+              Edit
+            </Button>
+          )}
         </Stack>
       </Stack>
     </FormProvider>
