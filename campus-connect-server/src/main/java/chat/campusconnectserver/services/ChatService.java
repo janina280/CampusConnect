@@ -20,19 +20,19 @@ public class ChatService {
         this.userService = userService;
     }
 
-    public Chat createChat(Optional<User> reqUser, Long userId2) throws UserException {
-        User user = userService.findUserById(userId2);
-        Chat isChatExist = chatRepository.findSingleChatByUserIds(user, reqUser);
-        if (isChatExist != null) {
-            return isChatExist;
-        }
-        Chat chat = new Chat();
-        chat.setCreatedBy(reqUser);
-        chat.getUsers().add(user);
-        chat.getUsers().add(reqUser);
-        chat.setGroup(false);
-        return chat;
-    }
+  //  public Chat createChat(Optional<User> reqUser, Long userId2) throws UserException {
+   //     User user = userService.findUserById(userId2);
+     //   Chat isChatExist = chatRepository.findSingleChatByUserIds(user, reqUser);
+     //   if (isChatExist != null) {
+     //       return isChatExist;
+     //   }
+     //   Chat chat = new Chat();
+     //   chat.setCreatedBy(reqUser);
+     //   chat.getUsers().add(user);
+     //   chat.getUsers().add(reqUser);
+     //   chat.setGroup(false);
+     //   return chat;
+   // }
 
     public Chat findChatById(Long chatId) throws ChatException {
         Optional<Chat> chat = chatRepository.findById(chatId);
@@ -48,20 +48,20 @@ public class ChatService {
         return null;
     }
 
-    public Chat createGroup(GroupChatRequest req, Optional<User> reqUser) throws UserException {
-        Chat group = new Chat();
-        group.setGroup(true);
-        group.setImg(req.getChat_image());
-        group.setName(req.getChat_name());
-        group.setCreatedBy(reqUser);
-        group.getAdmins().add(reqUser);
+   // public Chat createGroup(GroupChatRequest req, Optional<User> reqUser) throws UserException {
+    //    Chat group = new Chat();
+     //   group.setGroup(true);
+     //   group.setImg(req.getChat_image());
+     //   group.setName(req.getChat_name());
+      //  group.setCreatedBy(reqUser);
+      //  group.getAdmins().add(reqUser);
 
-        for (Long userId : req.getUserIds()) {
-            User user = userService.findUserById(userId);
-            group.getUsers().add(user);
-        }
-        return group;
-    }
+     //   for (Long userId : req.getUserIds()) {
+     //       User user = userService.findUserById(userId);
+     //       group.getUsers().add(user);
+      //  }
+      //  return group;
+    //}
 
     public Chat addUserToGroup(Long userId, Long chatId, User reqUser) throws UserException, ChatException {
         Optional<Chat> opt=chatRepository.findById(chatId);

@@ -26,21 +26,21 @@ public class ChatController {
         this.userService = userService;
     }
 
-    @PostMapping("/single")
-    public ResponseEntity<Chat>createChatHandle(@RequestBody SingleChatRequest singleChatRequest, @RequestHeader("Autorization")String jwt) throws UserException {
-        Optional<User> reqUser=userService.findUserProfile(jwt);
-        Chat chat=chatService.createChat(reqUser, singleChatRequest.getUserId());
+  //  @PostMapping("/single")
+    //public ResponseEntity<Chat>createChatHandle(@RequestBody SingleChatRequest singleChatRequest, @RequestHeader("Autorization")String jwt) throws UserException {
+    //    Optional<User> reqUser=userService.findUserProfile(jwt);
+        //Chat chat=chatService.createChat(reqUser, singleChatRequest.getUserId());
 
-        return  new ResponseEntity<Chat>(chat, HttpStatus.OK);
-    }
+      //  return  new ResponseEntity<Chat>(chat, HttpStatus.OK);
+   // }
 
-    @PostMapping("/group")
-    public ResponseEntity<Chat>createGroupHandle(@RequestBody GroupChatRequest req, @RequestHeader("Autorization")String jwt) throws UserException {
-        Optional<User> reqUser=userService.findUserProfile(jwt);
-        Chat chat=chatService.createGroup(req, reqUser);
+    //@PostMapping("/group")
+   // public ResponseEntity<Chat>createGroupHandle(@RequestBody GroupChatRequest req, @RequestHeader("Autorization")String jwt) throws UserException {
+    //    Optional<User> reqUser=userService.findUserProfile(jwt);
+      //  Chat chat=chatService.createGroup(req, reqUser);
 
-        return  new ResponseEntity<Chat>(chat, HttpStatus.OK);
-    }
+      //  return  new ResponseEntity<Chat>(chat, HttpStatus.OK);
+    //}
 
     @GetMapping("/{chatId}")
     public ResponseEntity<Chat>findChatByIdHandle(@PathVariable Long chatId, @RequestHeader("Autorization")String jwt) throws UserException, ChatException {
@@ -56,11 +56,11 @@ public class ChatController {
         return  new ResponseEntity<List<Chat>>(chats, HttpStatus.OK);
     }
 
-    @PutMapping("/{chatId}/add/{userId}")
-    public ResponseEntity<List<Chat>>createGroupHandle( @PathVariable Long chatId, @PathVariable Long userId, @RequestHeader("Autorization")String jwt) throws UserException {
-        Optional<User> reqUser=userService.findUserProfile(jwt);
-        List<Chat> chats=chatService.addUserToGroup(userId, chatId, reqUser);
+    //@PutMapping("/{chatId}/add/{userId}")
+    //public ResponseEntity<List<Chat>>createGroupHandle( @PathVariable Long chatId, @PathVariable Long userId, @RequestHeader("Autorization")String jwt) throws UserException {
+      //  Optional<User> reqUser=userService.findUserProfile(jwt);
+       // List<Chat> chats=chatService.addUserToGroup(userId, chatId, reqUser);
 
-        return  new ResponseEntity<List<Chat>>(chats, HttpStatus.OK);
-    }
+       // return  new ResponseEntity<List<Chat>>(chats, HttpStatus.OK);
+   // }
 }

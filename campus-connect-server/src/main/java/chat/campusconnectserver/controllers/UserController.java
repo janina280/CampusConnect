@@ -10,11 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 public class UserController {
@@ -42,4 +41,25 @@ public UserController(UserService userService, UserRepository userRepository){
         List<User> users=userService.searchUser(q);
         return new ResponseEntity<List<User>>(users, HttpStatus.OK);
     }
+
+    @PutMapping("/updateProfile")
+    public ResponseEntity<User> updateProfile(@RequestBody User updatedUser, @RequestHeader("Authorization") String token) {
+        try {
+            String authToken = token.replace("Bearer ", "");
+
+
+            User existingUser = userRepository.findById(updatedUser.getId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            existingUser.setNickname(updatedUser.getNickname());
+            existingUser.setAbout(updatedUser.getAbout());
+
+            userRepository.save(existingUser);
+
+            return ResponseEntity.ok(existingUser);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 }

@@ -8,13 +8,13 @@ import RHFTextField from "../../components/hook-form/RHFTextField";
 
 const ProfileForm = () => {
   const ProfileSchema = Yup.object().shape({
-    name: Yup.string().required("Nikename is required"),
+    nikename: Yup.string().required("Nikename is required"),
     about: Yup.string().required("About is required"),
 
     avatarUrl: Yup.string().required("Avatar is required").nullable(true),
   });
   const defaultValues = {
-    name: "",
+    nikename: "",
     about: "",
   };
 
@@ -34,6 +34,7 @@ const ProfileForm = () => {
   } = methods;
 
   const values = watch();
+  const [isUpdated, setIsUpdated] = useState(false);
 
   const handleDrop = useCallback(
     (acceptedFiles) => {
@@ -51,15 +52,24 @@ const ProfileForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      //submit
-      console.log("Data", data);
-    } catch (error) {
-      console.log(error);
-      reset();
-      setError("afterSubmit", {
-        ...error,
-        message: error.message,
+      const response = await fetch("http://localhost:8080/updateProfile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Trimite token-ul
+        },
+        body: JSON.stringify(data), // Trimite nickname și about
       });
+
+      if (response.ok) {
+        console.log("Profile updated successfully!");
+        setIsUpdated(true); // Butonul se schimbă în Update
+      } else {
+        console.error("Error updating profile");
+      }
+    } catch (error) {
+      console.error("Error during submission", error);
+      reset();
     }
   };
 
@@ -90,7 +100,7 @@ const ProfileForm = () => {
             type="submit"
             variant="outlined"
           >
-            Save
+            {isUpdated ? "Update" : "Save"}
           </Button>
         </Stack>
       </Stack>

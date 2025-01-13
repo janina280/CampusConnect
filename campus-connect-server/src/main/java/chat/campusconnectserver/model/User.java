@@ -35,4 +35,6 @@ public class User {
     private AuthProvider provider;
 
     private String providerId;
+    private String nickname;
+    private String about;
 }
