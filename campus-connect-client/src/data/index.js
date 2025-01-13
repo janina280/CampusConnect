@@ -33,49 +33,45 @@ const Nav_Buttons = [
     index: 1,
     icon: <Users />,
   },
-  {
-    index: 2,
-    icon: <Phone />,
-  },
 ];
 
-const MembersList=[
+const MembersList = [
   {
     id: 0,
     img: faker.image.avatar(),
     name: faker.person.firstName(),
-    online:true,
+    online: true,
   },
   {
     id: 1,
     img: faker.image.avatar(),
     name: faker.person.firstName(),
-    online:false,
+    online: false,
   },
   {
     id: 2,
     img: faker.image.avatar(),
     name: faker.person.firstName(),
-    online:true,
+    online: true,
   },
   {
     id: 3,
     img: faker.image.avatar(),
     name: faker.person.firstName(),
-    online:true,
+    online: true,
   },
   {
     id: 4,
     img: faker.image.avatar(),
     name: faker.person.firstName(),
-    online:false,
+    online: false,
   },
   {
     id: 5,
     img: faker.image.avatar(),
     name: faker.person.firstName(),
-    online:false,
-  }
+    online: false,
+  },
 ];
 
 const CallLogs = [

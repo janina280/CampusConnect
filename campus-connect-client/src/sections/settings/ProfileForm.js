@@ -8,7 +8,7 @@ import RHFTextField from "../../components/hook-form/RHFTextField";
 
 const ProfileForm = () => {
   const ProfileSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
+    name: Yup.string().required("Nikename is required"),
     about: Yup.string().required("About is required"),
 
     avatarUrl: Yup.string().required("Avatar is required").nullable(true),
@@ -71,9 +71,9 @@ const ProfileForm = () => {
             <Alert severity="error">{errors.afterSubmit.message} </Alert>
           )}
           <RHFTextField
-            name="name"
-            label="Name"
-            helperText={"This name is visible to your contacts"}
+            name="nikename"
+            label="Nikename"
+            helperText={"This nikename is visible to your contacts"}
           />
           <RHFTextField
             multiline

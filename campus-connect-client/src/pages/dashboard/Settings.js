@@ -20,9 +20,11 @@ import {
 } from "phosphor-react";
 import { faker } from "@faker-js/faker";
 import Shortcuts from "../../sections/settings/Shortcuts";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const [openShortcuts, setOpenShortcuts] = useState(false);
   const handleOpenShortcuts = () => {
@@ -90,7 +92,7 @@ const Settings = () => {
           <Stack p={4} spacing={5}>
             {/* Header */}
             <Stack direction={"row"} alignItems={"center"} spacing={3}>
-              <IconButton>
+              <IconButton onClick={() => window.history.back()}>
                 <CaretLeft size={24} color="#4B4B4B" />
               </IconButton>
               <Typography variant="h6">Settings</Typography>

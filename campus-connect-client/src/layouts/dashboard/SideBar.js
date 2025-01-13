@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import Logo from "../../assets/Images/logo.ico";
 import { Nav_Buttons, Profile_Menu } from "../../data";
@@ -13,17 +13,17 @@ import {
   IconButton,
   Stack,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const handleLogout = async (navigate) => {
   try {
-    const token = localStorage.getItem("token"); // Obține tokenul salvat în localStorage
+    const token = localStorage.getItem("token");
 
     const response = await fetch("http://localhost:8080/auth/logout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Adaugă token-ul în header
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -31,8 +31,6 @@ const handleLogout = async (navigate) => {
       console.log("Logout successful");
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
-
-      // După ce se face logout-ul, navighează utilizatorul către pagina de login
       navigate("/auth/login");
     } else {
       console.error("Logout failed. Please try again.");
@@ -49,8 +47,7 @@ const getMenuPath = (index) => {
     case 1:
       return "/settings";
     case 2:
-      // Apelăm funcția handleLogout doar când este selectat logout
-      return null; // Acesta va fi interceptat în meniul principal
+      return null;
     default:
       return "/";
   }
@@ -63,8 +60,6 @@ const getPath = (index) => {
     case 1:
       return "/group";
     case 2:
-      return "/call";
-    case 3:
       return "/settings";
     default:
       return "/";
@@ -76,6 +71,7 @@ const SideBar = () => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
+  const location = useLocation();
   const open = Boolean(anchorEl);
 
   // Handle Avatar menu click
@@ -87,6 +83,23 @@ const SideBar = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    switch (location.pathname) {
+      case "/app":
+        setSelected(0);
+        break;
+      case "/group":
+        setSelected(1);
+        break;
+      case "/settings":
+        setSelected(2);
+        break;
+      default:
+        setSelected(0);
+        break;
+    }
+  }, [location]);
 
   return (
     <Box
@@ -114,6 +127,10 @@ const SideBar = () => {
               height: 64,
               width: 64,
               borderRadius: 1.5,
+            }}
+            onClick={() => {
+              setSelected(0);
+              navigate("/app");
             }}
           >
             <img src={Logo} alt="Chat App Logo" />
@@ -163,7 +180,7 @@ const SideBar = () => {
             <Divider sx={{ width: "48px" }} />
 
             {/* Gear Icon */}
-            {selected === 3 ? (
+            {selected === 2 ? (
               <Box
                 p={1}
                 sx={{
@@ -178,8 +195,8 @@ const SideBar = () => {
             ) : (
               <IconButton
                 onClick={() => {
-                  navigate(getPath(3));
-                  setSelected(3);
+                  navigate(getPath(2));
+                  setSelected(2);
                 }}
                 sx={{
                   width: "max-content",

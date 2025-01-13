@@ -21,7 +21,7 @@ const Profile = () => {
         {/* Add content here */}
         <Stack p={4} spacing={5}>
           <Stack direction={"row"} alignItems={"center"} spacing={3}>
-            <IconButton>
+            <IconButton onClick={() => window.history.back()}>
               <CaretLeft size={24} color="#4B4B4B" />
             </IconButton>
             <Typography variant="h5">Profile</Typography>
