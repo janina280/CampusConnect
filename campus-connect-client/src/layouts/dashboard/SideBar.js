@@ -4,6 +4,7 @@ import Logo from "../../assets/Images/logo.ico";
 import { Nav_Buttons, Profile_Menu } from "../../data";
 import { Gear } from "phosphor-react";
 import { faker } from "@faker-js/faker";
+import CreateAvatar from "../../utils/createAvatar";
 import {
   Avatar,
   Box,
@@ -83,6 +84,42 @@ const SideBar = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const [userData, setUserData] = useState({
+    name: "",
+    email: "",
+    imageUrl: "",
+    about: "",
+  });
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserData({
+            name: data.name || "N/A",
+            email: data.email || "N/A",
+            imageUrl: data.imageUrl || "",
+            about: data.about || "",
+          });
+        } else {
+          console.error("Failed to load profile data");
+        }
+      } catch (error) {
+        console.error("Error fetching profile data", error);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
 
   useEffect(() => {
     switch (location.pathname) {
@@ -215,14 +252,20 @@ const SideBar = () => {
         {/* Bottom Section */}
         <Stack spacing={4}>
           {/* Avatar */}
-          <Avatar
+
+          <Box
             id="basic-button"
             aria-controls={open ? "basic-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
             onClick={handleAvatarClick}
-            src={faker.image.avatar()}
-          />
+          >
+            <CreateAvatar
+              name={userData.name}
+              imageUrl={userData.imageUrl}
+              size={56}
+            />
+          </Box>
 
           {/* Menu */}
           <Menu

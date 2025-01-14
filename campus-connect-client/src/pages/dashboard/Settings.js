@@ -109,6 +109,27 @@ function Settings() {
     },
   ];
 
+  const [bubbles, setBubbles] = useState([]);
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBubbles((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          left: Math.random() * 100 + 10, 
+          size: Math.random() * 30 + 20, 
+          duration: Math.random() * 3 + 2, 
+        },
+      ]);
+
+      setBubbles((prev) => prev.filter((bubble) => Date.now() - bubble.id < 5000));
+    }, 700); 
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       <Stack direction={"row"} sx={{ width: "100%" }}>
@@ -166,6 +187,59 @@ function Settings() {
           </Stack>
         </Box>
         {/* RightPanel */}
+        <Box
+          sx={{
+            flexGrow: 1,
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            padding: 4,
+            backgroundColor: theme.palette.mode === "light" ? "#FFF" : "#121212",
+          }}
+        >
+          <Stack spacing={2}>
+            <Typography variant="h4" sx={{ fontWeight: 600 }}>
+              Settings
+            </Typography>
+            <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+            You can customize your preferences, adjust notifications, and configure account options for a better experience. 
+            </Typography>
+             {bubbles.map((bubble) => (
+                    <Box
+                      key={bubble.id}
+                      sx={{
+                        position: "absolute",
+                        bottom: 0, 
+                        left: `${bubble.left}%`,
+                        width: `${bubble.size}px`,
+                        height: `${bubble.size}px`,
+                        backgroundColor: theme.palette.primary.main, 
+                        borderRadius: "50%",
+                        animation: `bubbleUp ${bubble.duration}s ease-in-out`,
+                        opacity: 0.7,
+                      }}
+                    />
+                  ))}
+            
+                  <style>
+                    {`
+                      @keyframes bubbleUp {
+                        from {
+                          transform: translateY(0);
+                          opacity: 0.7;
+                        }
+                        to {
+                          transform: translateY(-50vh); 
+                          opacity: 0;
+                        }
+                      }
+                    `}
+                  </style>
+           
+          </Stack>
+        </Box>
       </Stack>
       {openShortcuts && (
         <Shortcuts open={openShortcuts} handleClose={handleCloseShortcuts} />

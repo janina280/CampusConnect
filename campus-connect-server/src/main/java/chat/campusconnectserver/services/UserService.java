@@ -31,15 +31,15 @@ public class UserService {
     }
 
     public User findUserProfile(String jwt) throws UserException {
-        String email = String.valueOf(tokenProvider.getUserIdFromToken(jwt));
-        if (email == null) {
+        Long userId = tokenProvider.getUserIdFromToken(jwt.substring(7));
+        if (userId == null) {
             throw new BadCredentialsException("Invalid token: unable to extract user email");
         }
-        User user = userRepository.findByEmail(email);
-        if (user==null) {
-            throw new UserException("User not found with email: " + email);
+        var user = userRepository.findById(userId);
+        if (user == null) {
+            throw new UserException("User not found with id: " + userId);
         }
-        return user;
+        return user.get();
     }
 
     public User updateProfile(User user) {
@@ -49,6 +49,10 @@ public class UserService {
     public List<User> searchUser(String query) {
         List<User> users = userRepository.searchUser(query);
         return users;
+    }
+
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
     }
 
 }
