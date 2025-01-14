@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Stack,
   Box,
   IconButton,
   Typography,
-  Avatar,
   Divider,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -18,11 +17,11 @@ import {
   Lock,
   Note,
 } from "phosphor-react";
-import { faker } from "@faker-js/faker";
-import Shortcuts from "../../sections/settings/Shortcuts";
 import { useNavigate } from "react-router-dom";
+import Shortcuts from "../../sections/settings/Shortcuts";
+import CreateAvatar from "../../utils/createAvatar";
 
-const Settings = () => {
+function Settings() {
   const theme = useTheme();
   const navigate = useNavigate();
 
@@ -33,31 +32,68 @@ const Settings = () => {
   const handleCloseShortcuts = () => {
     setOpenShortcuts(false);
   };
+
+  const [userData, setUserData] = useState({
+    name: "",
+    email: "",
+    imageUrl: "",
+    about: "",
+  });
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserData({
+            name: data.name || "N/A",
+            email: data.email || "N/A",
+            imageUrl: data.imageUrl || "", 
+            about: data.about || "", 
+          });
+        } else {
+          console.error("Failed to load profile data");
+        }
+      } catch (error) {
+        console.error("Error fetching profile data", error);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
   const list = [
     {
       key: 0,
       icon: <Bell size={20} />,
       title: "Notification",
-      onclick: () => {},
+      onclick: () => { },
     },
     {
       key: 1,
       icon: <Lock size={20} />,
       title: "Privacy",
-      onclick: () => {},
+      onclick: () => { },
     },
-    { key: 2, icon: <Key size={20} />, title: "Security", onclick: () => {} },
+    { key: 2, icon: <Key size={20} />, title: "Security", onclick: () => { } },
     {
       key: 3,
       icon: <Image size={20} />,
       title: "Chat Wallpaper",
-      onclick: () => {},
+      onclick: () => { },
     },
     {
       key: 4,
       icon: <Note size={20} />,
       title: "Request Account Info",
-      onclick: () => {},
+      onclick: () => { },
     },
     {
       key: 5,
@@ -69,7 +105,7 @@ const Settings = () => {
       key: 6,
       icon: <Info size={20} />,
       title: "Help",
-      onclick: () => {},
+      onclick: () => { },
     },
   ];
 
@@ -82,10 +118,9 @@ const Settings = () => {
             overflowY: "scroll",
             height: "100vh",
             width: 320,
-            backgroundColor:
-              theme.palette.mode === "light"
-                ? "#F8FAFF"
-                : theme.palette.background,
+            backgroundColor: theme.palette.mode === "light"
+              ? "#F8FAFF"
+              : theme.palette.background,
             boxShadow: "0px 0px 2px rgba(0,0,0,0.25)",
           }}
         >
@@ -99,22 +134,20 @@ const Settings = () => {
             </Stack>
             {/* Profile */}
             <Stack direction={"row"} spacing={3}>
-              <Avatar
-                sx={{ width: 56, height: 56 }}
-                src={faker.image.avatar()}
-                alt={faker.name.fullName()}
+              <CreateAvatar
+                name={userData.name}
+                imageUrl={userData.imageUrl} 
+                size={56} 
               />
               <Stack spacing={0.5}>
-                <Typography variant="article">
-                  {faker.name.fullName()}
-                </Typography>
-                <Typography variant="body2">{faker.name.jobArea()}</Typography>
+                <Typography variant="article">{userData.name}</Typography>
+                <Typography variant="body2">{userData.about}</Typography>
               </Stack>
             </Stack>
             {/* List of options */}
             <Stack spacing={4}>
               {list.map(({ key, icon, title, onclick }) => (
-                <>
+                <React.Fragment key={key}>
                   <Stack
                     sx={{ cursor: "pointer" }}
                     spacing={2}
@@ -127,7 +160,7 @@ const Settings = () => {
                     </Stack>
                     {key !== 6 && <Divider />}
                   </Stack>
-                </>
+                </React.Fragment>
               ))}
             </Stack>
           </Stack>
@@ -139,6 +172,6 @@ const Settings = () => {
       )}
     </>
   );
-};
+}
 
 export default Settings;

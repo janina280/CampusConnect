@@ -75,13 +75,13 @@ public class AuthController {
                 .buildAndExpand(result.getId()).toUri();
 
         return ResponseEntity.created(location)
-                .body(new ApiResponse(true, "User registered successfully@"));
+                .body(new ApiResponse( "User registered successfully@",true));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser() {
         SecurityContextHolder.clearContext();
-        return ResponseEntity.ok(new ApiResponse(true, "User logged out successfully."));
+        return ResponseEntity.ok(new ApiResponse( "User logged out successfully.",true));
     }
 
 }
