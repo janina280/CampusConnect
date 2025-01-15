@@ -3,7 +3,6 @@ import { useTheme } from "@mui/material/styles";
 import Logo from "../../assets/Images/logo.ico";
 import { Nav_Buttons, Profile_Menu } from "../../data";
 import { Gear } from "phosphor-react";
-import { faker } from "@faker-js/faker";
 import CreateAvatar from "../../utils/createAvatar";
 import {
   Avatar,
