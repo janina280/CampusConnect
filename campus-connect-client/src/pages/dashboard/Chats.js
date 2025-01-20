@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   IconButton,
@@ -9,14 +9,50 @@ import {
 } from "@mui/material";
 import { ArchiveBox, CircleDashed, MagnifyingGlass } from "phosphor-react";
 import { useTheme } from "@mui/material/styles";
-import { ChatList } from "../../data";
 import { SimpleBarStyle } from "../../components/Scrollbar";
 import { Search, SearchIconWrapper, StyledInputBase } from "../../components/Search";
 import ChatElement from "../../components/ChatElement";
 
-
 const Chats = () => {
   const theme = useTheme();
+  const [chats, setChats] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("Token is missing. Please log in.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch("http://localhost:8080/api/chats/user", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Chats data:", data); 
+          setChats(data); // Setează chaturile primite
+        } else {
+          console.error("Failed to load chats, status:", response.status);
+        }
+      } catch (error) {
+        console.error("Error fetching chats:", error);
+      } finally {
+        setLoading(false); // Indiferent de rezultat, opri loading-ul
+      }
+    };
+
+    fetchChats();
+  }, []); // Nu avem dependențe, doar la montarea componentei
+
   return (
     <Box
       sx={{
@@ -24,7 +60,7 @@ const Chats = () => {
         width: 320,
         backgroundColor:
           theme.palette.mode === "light" ? "#F8FAFF" : "transparent",
-        boxShadow: "0px 0px 2px rgba(o, 0, 0, 0.25)",
+        boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
       }}
     >
       <Stack p={3} spacing={2} sx={{ height: "100vh" }}>
@@ -65,24 +101,28 @@ const Chats = () => {
             height: "100%",
           }}
         >
-          <SimpleBarStyle timeout={500} clickOnTrack={false}>
-            <Stack spacing={2.4}>
-              <Typography variant="subtitle2" sx={{ color: "#676767" }}>
-                Pinned
-              </Typography>
-              {ChatList.filter((el) => el.pinned).map((el) => {
-                return <ChatElement {...el} />;
-              })}
-            </Stack>
-            <Stack spacing={2.4}>
-              <Typography variant="subtitle2" sx={{ color: "#676767" }}>
-                All Chats
-              </Typography>
-              {ChatList.filter((el) => !el.pinned).map((el) => {
-                return <ChatElement {...el} />;
-              })}
-            </Stack>
-          </SimpleBarStyle>
+          {loading ? (
+            <Typography variant="body2">Loading chats...</Typography>
+          ) : (
+            <SimpleBarStyle timeout={500} clickOnTrack={false}>
+              <Stack spacing={2.4}>
+                <Typography variant="subtitle2" sx={{ color: "#676767" }}>
+                  Pinned
+                </Typography>
+                {chats.filter((chat) => chat.pinned).map((chat) => (
+                  <ChatElement key={chat.id} {...chat} />
+                ))}
+              </Stack>
+              <Stack spacing={2.4}>
+                <Typography variant="subtitle2" sx={{ color: "#676767" }}>
+                  All Chats
+                </Typography>
+                {chats.filter((chat) => !chat.pinned).map((chat) => (
+                  <ChatElement key={chat.id} {...chat} />
+                ))}
+              </Stack>
+            </SimpleBarStyle>
+          )}
         </Stack>
       </Stack>
     </Box>

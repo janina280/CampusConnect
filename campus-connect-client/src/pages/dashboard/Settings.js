@@ -11,7 +11,6 @@ import {
   Lock,
   Note,
 } from "phosphor-react";
-import { useNavigate } from "react-router-dom";
 import Shortcuts from "../../sections/settings/Shortcuts";
 import message from "../../assets/Images/message.png";
 import CreateAvatar from "../../utils/createAvatar";
@@ -21,7 +20,6 @@ import Privacy from "../../sections/settings/Privacy";
 
 function Settings() {
   const theme = useTheme();
-  const navigate = useNavigate();
 
   const [openShortcuts, setOpenShortcuts] = useState(false);
   const [openPrivacy, setOpenPrivacy] = useState(false);
@@ -204,6 +202,7 @@ function Settings() {
             backgroundImage: `url(${message})`,
             backgroundSize: "82%",
             backgroundPosition: "center 20%",
+            backgroundRepeat: "no-repeat",
             backgroundColor:
               theme.palette.mode === "light" ? "#FFF" : "#121212",
           }}

@@ -5,7 +5,6 @@ import { Nav_Buttons, Profile_Menu } from "../../data";
 import { Gear } from "phosphor-react";
 import CreateAvatar from "../../utils/createAvatar";
 import {
-  Avatar,
   Box,
   Divider,
   Menu,

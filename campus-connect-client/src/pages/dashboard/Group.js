@@ -111,6 +111,7 @@ const Group = () => {
             backgroundImage: `url(${message})`,
             backgroundSize: "82%",
             backgroundPosition: "center 20%",
+            backgroundRepeat: "no-repeat",
             backgroundColor:
               theme.palette.mode === "light" ? "#FFF" : "#121212",
           }}

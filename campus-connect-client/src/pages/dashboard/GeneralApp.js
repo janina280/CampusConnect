@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Chats from "./Chats";
 import { Box, Stack } from "@mui/material";
 import Conversation from "../../components/Conversation";
@@ -11,6 +11,8 @@ import StarredMessages from "../../components/StarredMessages";
 const GeneralApp = () => {
   const theme = useTheme();
   const { sidebar } = useSelector((store) => store.app);
+  const [querys, setQuerys]=useState(null);
+  const [currentChat, setCurrentChat]=useState(null);
 
   return (
     <Stack direction={"row"} sx={{ width: "100%" }}>

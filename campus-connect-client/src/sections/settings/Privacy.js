@@ -14,7 +14,6 @@ const Privacy = ({ open, handleClose }) => {
   const [profileVisibility, setProfileVisibility] = useState(true);
   const [lastSeen, setLastSeen] = useState(true);
   const [readReceipts, setReadReceipts] = useState(true);
-  const [callsAllowed, setCallsAllowed] = useState(true);
 
   const handleChange = (event, setter) => {
     setter(event.target.checked);

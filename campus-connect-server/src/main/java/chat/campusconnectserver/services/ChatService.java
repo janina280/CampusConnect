@@ -53,8 +53,11 @@ public class ChatService {
 
     public List<Chat> findAllChatByUserId(Long userId) throws UserException {
         User user = userService.findUserById(userId);
+        if (user == null) {
+            throw new UserException("User not found with ID: " + userId);
+        }
         List<Chat> chats = chatRepository.findChatByUserIds(user.getId());
-        return null;
+        return chats;
     }
 
     public Chat createGroup(GroupChatRequest req, User reqUser) throws UserException {
