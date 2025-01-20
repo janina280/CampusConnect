@@ -11,8 +11,6 @@ import StarredMessages from "../../components/StarredMessages";
 const GeneralApp = () => {
   const theme = useTheme();
   const { sidebar } = useSelector((store) => store.app);
-  const [querys, setQuerys]=useState(null);
-  const [currentChat, setCurrentChat]=useState(null);
 
   return (
     <Stack direction={"row"} sx={{ width: "100%" }}>

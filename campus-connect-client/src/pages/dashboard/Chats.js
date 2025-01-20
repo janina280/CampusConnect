@@ -12,12 +12,15 @@ import { useTheme } from "@mui/material/styles";
 import { SimpleBarStyle } from "../../components/Scrollbar";
 import { Search, SearchIconWrapper, StyledInputBase } from "../../components/Search";
 import ChatElement from "../../components/ChatElement";
+import { getCurrentUserFromToken } from "../../sections/auth/CurrentUserFromToken";
 
 const Chats = () => {
   const theme = useTheme();
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const currentUser = getCurrentUserFromToken(); 
 
+  console.log('test')
   useEffect(() => {
     const fetchChats = async () => {
       const token = localStorage.getItem("token");
@@ -38,20 +41,19 @@ const Chats = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Chats data:", data); 
-          setChats(data); // Setează chaturile primite
+          setChats(data);
         } else {
           console.error("Failed to load chats, status:", response.status);
         }
       } catch (error) {
         console.error("Error fetching chats:", error);
       } finally {
-        setLoading(false); // Indiferent de rezultat, opri loading-ul
+        setLoading(false);
       }
     };
 
     fetchChats();
-  }, []); // Nu avem dependențe, doar la montarea componentei
+  }, []);
 
   return (
     <Box
@@ -110,7 +112,7 @@ const Chats = () => {
                   Pinned
                 </Typography>
                 {chats.filter((chat) => chat.pinned).map((chat) => (
-                  <ChatElement key={chat.id} {...chat} />
+                  <ChatElement key={chat.id} {...chat} currentUser={currentUser} />
                 ))}
               </Stack>
               <Stack spacing={2.4}>
@@ -118,7 +120,7 @@ const Chats = () => {
                   All Chats
                 </Typography>
                 {chats.filter((chat) => !chat.pinned).map((chat) => (
-                  <ChatElement key={chat.id} {...chat} />
+                  <ChatElement key={chat.id} {...chat} currentUser={currentUser} />
                 ))}
               </Stack>
             </SimpleBarStyle>

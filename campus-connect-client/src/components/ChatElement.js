@@ -2,12 +2,15 @@ import React from "react";
 import { Box, Stack, Typography, Badge, Avatar } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-const ChatElement = ({ id, createdBy, messages, unread, online }) => {
+const ChatElement = ({ id, messages,users, unread, online,  currentUser }) => {
   const theme = useTheme();
-
+  const otherUser =
+    users && currentUser
+      ? users.find((user) => user.id !== currentUser.sub)
+      : null;
   const lastMessage = messages && messages.length > 0 ? messages[messages.length - 1] : null;
   const time = lastMessage ? new Date(lastMessage.timestamp).toLocaleTimeString() : "No messages";
-
+  
   return (
     <Box
       sx={{
@@ -28,7 +31,7 @@ const ChatElement = ({ id, createdBy, messages, unread, online }) => {
           )}
 
           <Stack spacing={0.3}>
-            <Typography variant="subtitle2">{createdBy?.name || "Unknown User"}</Typography>
+            <Typography variant="subtitle2">{otherUser?.name || "Unknown User"}</Typography>
             <Typography variant="caption">{lastMessage ? lastMessage.text : "No messages yet"}</Typography>
           </Stack>
         </Stack>
