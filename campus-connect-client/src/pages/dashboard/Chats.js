@@ -32,7 +32,7 @@ const Chats = () => {
       }
 
       try {
-        const response = await fetch("http://localhost:8080/api/chats/user", {
+        const response = await fetch("http://localhost:8080/api/chat", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

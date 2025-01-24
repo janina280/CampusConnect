@@ -30,7 +30,7 @@ const ProfileForm = () => {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/profile", {
+        const response = await fetch("http://localhost:8080/api/user", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -59,7 +59,7 @@ const ProfileForm = () => {
 
   const onSave = async (data) => {
     try {
-      const response = await fetch("http://localhost:8080/profile/updateProfile", {
+      const response = await fetch("http://localhost:8080/api/user/update", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

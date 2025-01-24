@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/messages")
+@RequestMapping("/api/message")
 public class MessageController {
 
     private final MessageService messageService;
@@ -29,7 +29,7 @@ public class MessageController {
         this.userService = userService;
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<Message> sendMessageHandler(@RequestBody SendMessageRequest req, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
         User user = userService.findUserProfile(jwt);
 
@@ -39,7 +39,7 @@ public class MessageController {
         return new ResponseEntity<Message>(message, HttpStatus.OK);
     }
 
-    @GetMapping("/chat/{chatId}")
+    @GetMapping("/{chatId}")
     public ResponseEntity<List<Message>> getChatsMessagesHandler(@PathVariable Long chatId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
         User user = userService.findUserProfile(jwt);
 

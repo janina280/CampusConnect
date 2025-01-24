@@ -60,6 +60,28 @@ public class ChatService {
         return chats;
     }
 
+
+    public List<Chat> findAllGroupChats(Long userId) throws UserException {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            throw new UserException("User not found with ID: " + userId);
+        }
+        List<Chat> groupChats = chatRepository.findAllGroupChats();
+
+        return groupChats;
+    }
+    public List<Chat> searchGroupByName(String groupName, Long userId) throws UserException {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            throw new UserException("User not found with ID: " + userId);
+        }
+        return chatRepository.findAllGroupChats().stream()
+                .filter(chat -> chat.getName().toLowerCase().contains(groupName.toLowerCase()) &&
+                        chat.getUsers().contains(user))
+                .toList();
+    }
+
+
     public Chat createGroup(GroupChatRequest req, User reqUser) throws UserException {
         Chat group = new Chat();
         group.setGroup(true);

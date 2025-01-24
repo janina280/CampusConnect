@@ -17,7 +17,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/profile")
+@RequestMapping("/api/user")
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
@@ -42,7 +42,7 @@ public class UserController {
         return new ResponseEntity<List<User>>(users, HttpStatus.OK);
     }
 
-    @PutMapping("/updateProfile")
+    @PutMapping("/update")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<User> updateProfile(
             @Valid @RequestBody User updatedUser,
