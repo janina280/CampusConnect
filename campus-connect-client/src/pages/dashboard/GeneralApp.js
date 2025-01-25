@@ -10,7 +10,7 @@ import StarredMessages from "../../components/StarredMessages";
 
 const GeneralApp = () => {
   const theme = useTheme();
-  const { sidebar } = useSelector((store) => store.app);
+  const { open, type } = useSelector((store) => store.app.sideBar);
 
   return (
     <Stack direction={"row"} sx={{ width: "100%" }}>
@@ -18,16 +18,16 @@ const GeneralApp = () => {
       <Box
         sx={{
           height: "100%",
-          width: sidebar.open ? "calc(100vw - 740px)" : "calc(100vw - 420px)",
+          width: open ? "calc(100vw - 740px)" : "calc(100vw - 420px)",
           backgroundColor:
             theme.palette.mode === "light" ? "#F0F4FA" : "transparent",
         }}
       >
         <Conversation />
       </Box>
-      {sidebar.open &&
+      {open &&
         (() => {
-          switch (sidebar.type) {
+          switch (type) {
             case "CONTACT":
               return <Contact />;
 

@@ -16,6 +16,8 @@ import { Link } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../constants";
+import { showSnackbar } from "../../redux/slices/app";
+import { useDispatch } from "react-redux";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,6 +29,8 @@ const LoginForm = () => {
       .email("Email must be a valid email address"),
     password: Yup.string().required("Password is required"),
   });
+
+  const dispatch= useDispatch();
 
   const defaultValues = {
     email: "demo@yahoo.com",
@@ -60,8 +64,15 @@ const LoginForm = () => {
           console.log("Access Token received:", accessToken);
           localStorage.setItem("token", accessToken);
           window.location.href = "/app";
+          dispatch(
+            showSnackbar({ severity: "success", message: "Successfully connected!" })
+          );
         } else {
-          setError("Token is missing in the response");
+          let errorMessage = "Something went wrong! Please reconnect!"; 
+          setError(errorMessage);
+          dispatch(
+            showSnackbar({ severity: "error", message: errorMessage })
+          );
         }
       }
     } catch (error) {
