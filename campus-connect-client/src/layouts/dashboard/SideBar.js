@@ -3,7 +3,9 @@ import { useTheme } from "@mui/material/styles";
 import Logo from "../../assets/Images/logo.ico";
 import { Nav_Buttons, Profile_Menu } from "../../data";
 import { Gear } from "phosphor-react";
+import { useDispatch, useSelector } from "react-redux";
 import CreateAvatar from "../../utils/createAvatar";
+import { LogoutUser } from "../../redux/slices/auth";
 import {
   Box,
   Divider,
@@ -13,31 +15,6 @@ import {
   Stack,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
-
-const handleLogout = async (navigate) => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const response = await fetch("http://localhost:8080/auth/logout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (response.ok) {
-      console.log("Logout successful");
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token");
-      navigate("/auth/login");
-    } else {
-      console.error("Logout failed. Please try again.");
-    }
-  } catch (error) {
-    console.error("Error during logout:", error);
-  }
-};
 
 const getMenuPath = (index) => {
   switch (index) {
@@ -71,7 +48,11 @@ const SideBar = () => {
   const [selected, setSelected] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
   const location = useLocation();
+  const dispatch = useDispatch();
   const open = Boolean(anchorEl);
+
+  const token = useSelector(
+    (state) => state.auth.accessToken);
 
   // Handle Avatar menu click
   const handleAvatarClick = (event) => {
@@ -96,7 +77,7 @@ const SideBar = () => {
         const response = await fetch("http://localhost:8080/api/user", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -117,7 +98,7 @@ const SideBar = () => {
     };
 
     fetchProfileData();
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     switch (location.pathname) {
@@ -289,7 +270,8 @@ const SideBar = () => {
                   key={idx}
                   onClick={() => {
                     if (idx === 2) {
-                      handleLogout(navigate);
+                      dispatch(LogoutUser());
+                      //handleLogout(navigate);
                     } else {
                       navigate(getMenuPath(idx));
                     }

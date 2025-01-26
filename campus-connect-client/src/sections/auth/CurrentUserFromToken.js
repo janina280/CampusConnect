@@ -1,7 +1,9 @@
+import { useSelector } from "react-redux";
 import {jwtDecode} from "jwt-decode";
 
-export const getCurrentUserFromToken = () => {
-  const token = localStorage.getItem("token");
+export const useCurrentUserFromToken = () => {
+  const token = useSelector((state) => state.auth.accessToken);
+
   if (!token) return null;
 
   try {

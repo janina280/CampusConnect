@@ -12,18 +12,20 @@ import { useTheme } from "@mui/material/styles";
 import { SimpleBarStyle } from "../../components/Scrollbar";
 import { Search, SearchIconWrapper, StyledInputBase } from "../../components/Search";
 import ChatElement from "../../components/ChatElement";
-import { getCurrentUserFromToken } from "../../sections/auth/CurrentUserFromToken";
+import { useCurrentUserFromToken } from "../../sections/auth/CurrentUserFromToken";
+import { useSelector } from "react-redux";
 
 const Chats = () => {
   const theme = useTheme();
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const currentUser = getCurrentUserFromToken(); 
+  const currentUser = useCurrentUserFromToken(); 
 
-  console.log('test')
+  const token = useSelector(
+    (state) => state.auth.accessToken);
+
   useEffect(() => {
     const fetchChats = async () => {
-      const token = localStorage.getItem("token");
 
       if (!token) {
         console.error("Token is missing. Please log in.");
@@ -53,7 +55,7 @@ const Chats = () => {
     };
 
     fetchChats();
-  }, []);
+  }, [token]);
 
   return (
     <Box

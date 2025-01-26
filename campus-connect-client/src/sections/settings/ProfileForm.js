@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import * as Yup from "yup";
-import { useForm, FormProvider } from "react-hook-form"; 
+import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CreateAvatar from "../../utils/createAvatar";
 import { Button, Stack, Box, Typography, Divider, Alert } from "@mui/material";
-import RHFTextField from "../../components/hook-form/RHFTextField"; 
+import RHFTextField from "../../components/hook-form/RHFTextField";
+import { useSelector } from "react-redux";
 
 const ProfileSchema = Yup.object().shape({
   nickname: Yup.string().required("Nickname is required"),
@@ -22,10 +23,19 @@ const ProfileForm = () => {
     defaultValues,
   });
 
-  const { setValue, handleSubmit, control, formState: { errors } } = methods;
+  const {
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
 
   const [isUpdated, setIsUpdated] = useState(false);
-  const [profileData, setProfileData] = useState({ name: "", email: "", imageUrl: "" });
+  const [profileData, setProfileData] = useState({
+    name: "",
+    email: "",
+    imageUrl: "",
+  });
+  const token = useSelector((state) => state.auth.accessToken);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -33,7 +43,7 @@ const ProfileForm = () => {
         const response = await fetch("http://localhost:8080/api/user", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -55,7 +65,7 @@ const ProfileForm = () => {
     };
 
     fetchProfileData();
-  }, [setValue]);
+  }, [setValue, token]);
 
   const onSave = async (data) => {
     try {
@@ -63,7 +73,7 @@ const ProfileForm = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(data),
       });
@@ -80,15 +90,14 @@ const ProfileForm = () => {
   };
 
   return (
-    <FormProvider {...methods}> 
+    <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSave)}>
         <Stack spacing={4}>
-          
           <Box display="flex" justifyContent="center">
             <CreateAvatar
-              name={profileData.name} 
-              imageUrl={profileData.imageUrl} 
-              size={56} 
+              name={profileData.name}
+              imageUrl={profileData.imageUrl}
+              size={56}
             />
           </Box>
 
@@ -104,7 +113,9 @@ const ProfileForm = () => {
 
           <Box>
             <Stack spacing={3}>
-              {isUpdated && <Alert severity="success">Profile updated successfully!</Alert>}
+              {isUpdated && (
+                <Alert severity="success">Profile updated successfully!</Alert>
+              )}
               {!!errors.afterSubmit && (
                 <Alert severity="error">{errors.afterSubmit.message}</Alert>
               )}
@@ -125,7 +136,12 @@ const ProfileForm = () => {
           </Box>
 
           <Stack direction="row" justifyContent="end" spacing={2}>
-            <Button color="primary" size="large" type="submit" variant="contained">
+            <Button
+              color="primary"
+              size="large"
+              type="submit"
+              variant="contained"
+            >
               {isUpdated ? "Update Again" : "Save"}
             </Button>
           </Stack>

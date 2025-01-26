@@ -13,7 +13,6 @@ import {
 } from "@mui/material";
 import RHFTextField from "../../components/hook-form/RHFTextField";
 import { Eye, EyeSlash } from "phosphor-react";
-import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../constants";
 
@@ -21,7 +20,6 @@ const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false); 
   const [error, setError] = useState(""); 
-  const navigate = useNavigate();
 
   const RegisterSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),

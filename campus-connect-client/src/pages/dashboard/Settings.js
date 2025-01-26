@@ -17,6 +17,7 @@ import CreateAvatar from "../../utils/createAvatar";
 import RequestAccountInfo from "../../sections/settings/RequestAccountInfo";
 import ChatWallpaper from "../../sections/settings/ChatWallpaper";
 import Privacy from "../../sections/settings/Privacy";
+import { useSelector } from "react-redux";
 
 function Settings() {
   const theme = useTheme();
@@ -63,13 +64,16 @@ function Settings() {
     about: "",
   });
 
+  const token = useSelector(
+    (state) => state.auth.accessToken);
+
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         const response = await fetch("http://localhost:8080/api/user", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -90,7 +94,7 @@ function Settings() {
     };
 
     fetchProfileData();
-  }, []);
+  }, [token]);
 
   const list = [
     {

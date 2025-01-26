@@ -14,10 +14,8 @@ import RHFTextField from "../../components/hook-form/RHFTextField";
 import { Eye, EyeSlash } from "phosphor-react";
 import { Link } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
-import axios from "axios";
-import { API_BASE_URL } from "../../constants";
-import { showSnackbar } from "../../redux/slices/app";
 import { useDispatch } from "react-redux";
+import { LoginUser } from "../../redux/slices/auth";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +28,7 @@ const LoginForm = () => {
     password: Yup.string().required("Password is required"),
   });
 
-  const dispatch= useDispatch();
+  const dispatch = useDispatch();
 
   const defaultValues = {
     email: "demo@yahoo.com",
@@ -53,33 +51,14 @@ const LoginForm = () => {
     setError("");
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, data);
-
-      console.log(response.data);
-
-      if (response.status === 200) {
-        const { accessToken } = response.data;
-
-        if (accessToken) {
-          console.log("Access Token received:", accessToken);
-          localStorage.setItem("token", accessToken);
-          window.location.href = "/app";
-          dispatch(
-            showSnackbar({ severity: "success", message: "Successfully connected!" })
-          );
-        } else {
-          let errorMessage = "Something went wrong! Please reconnect!"; 
-          setError(errorMessage);
-          dispatch(
-            showSnackbar({ severity: "error", message: errorMessage })
-          );
-        }
-      }
+      dispatch(LoginUser(data));
     } catch (error) {
-      console.error("Login error:", error);
-      setError("Authentication failed. Please try again.");
-    } finally {
-      setLoading(false);
+      console.error(error);
+      reset();
+      setError("afterSubmit", {
+        ...error,
+        message: error.message,
+      });
     }
   };
 
