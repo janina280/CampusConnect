@@ -11,15 +11,18 @@ import {
   Stack,
   CircularProgress,
 } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 import RHFTextField from "../../components/hook-form/RHFTextField";
 import { Eye, EyeSlash } from "phosphor-react";
-import axios from "axios";
-import { API_BASE_URL } from "../../constants";
+import { RegisterUser } from "../../redux/slices/auth";
+import { useNavigate } from "react-router-dom";
 
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false); 
-  const [error, setError] = useState(""); 
+  const dispatch = useDispatch();
+  const {isLoading} = useSelector((state) => state.auth);
+
+  const navigate = useNavigate();
 
   const RegisterSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
@@ -43,39 +46,24 @@ const RegisterForm = () => {
   const {
     reset,
     handleSubmit,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { errors},
   } = methods;
 
   const onSubmit = async (data) => {
-    setLoading(true); 
-    setError(""); 
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/signup`, data);
-      
-      if (response.status === 201) {
-       
-        window.location.href = '/auth/login';  
-      } else {
-        setError("Something went wrong. Please try again."); 
-      }
+      dispatch(RegisterUser(data, navigate));
     } catch (error) {
-      if (error.response) {
-        setError(error.response.data.message || "Unknown error while recording.");
-      } else {
-        setError("Registration error. Please try again.");
-      }
-      reset(); 
-    } finally {
-      setLoading(false); 
+      console.error(error);
+      reset();
     }
   };
-
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
-        {!!error && <Alert severity="error">{error}</Alert>}
-
+      {!!errors.afterSubmit && (
+          <Alert severity="error">{errors.afterSubmit.message}</Alert>
+        )}
         <RHFTextField name="name" label="Name" />
         <RHFTextField name="email" label="Email address" />
         <RHFTextField
@@ -96,26 +84,26 @@ const RegisterForm = () => {
             ),
           }}
         />
-        <Button
-          fullWidth
-          color="inherit"
-          size="large"
-          type="submit"
-          variant="contained"
-          sx={{
+         <Button
+        fullWidth
+        color="inherit"
+        size="large"
+        type="submit"
+        variant="contained"
+        loading={isLoading}
+        sx={{
+          bgcolor: "text.primary",
+          color: (theme) =>
+            theme.palette.mode === "light" ? "common.white" : "grey.800",
+          "&:hover": {
             bgcolor: "text.primary",
             color: (theme) =>
               theme.palette.mode === "light" ? "common.white" : "grey.800",
-            "&:hover": {
-              bgcolor: "text.primary",
-              color: (theme) =>
-                theme.palette.mode === "light" ? "common.white" : "grey.800",
-            },
-          }}
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} /> : "Create Account"}
-        </Button>
+          },
+        }}
+      >
+        Create Account
+      </Button>
       </Stack>
     </FormProvider>
   );

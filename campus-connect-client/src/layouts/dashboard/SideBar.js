@@ -271,7 +271,7 @@ const SideBar = () => {
                   onClick={() => {
                     if (idx === 2) {
                       dispatch(LogoutUser());
-                      //handleLogout(navigate);
+                
                     } else {
                       navigate(getMenuPath(idx));
                     }

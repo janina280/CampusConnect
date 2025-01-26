@@ -12,6 +12,10 @@ const slice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    updateIsLoading(state, action) {
+      state.error = action.payload.error;
+      state.isLoading = action.payload.isLoading;
+    },
     logIn(state, action) {
       state.isLoggedIn = action.payload.isLoggedIn;
       state.accessToken = action.payload.accessToken;
@@ -51,11 +55,10 @@ export function LoginUser(fromValues) {
           })
         );
         dispatch(
-          showSnackbar({ severity: "success", message: response.data.message })
+          showSnackbar({ severity: "success", message: "You are connected!" })
         );
       })
       .catch(function (error) {
-        console.log(error);
         dispatch(showSnackbar({ severity: "error", message: error.message }));
       });
   };
@@ -67,3 +70,41 @@ export function LogoutUser() {
     dispatch(slice.actions.signOut());
   };
 }
+
+export function RegisterUser(formValues, navigate) {
+  return async (dispatch, getState) => {
+
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
+    await axios
+      .post(
+        "auth/register",
+        {
+          ...formValues,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then(function (response) {
+        console.log(response);
+        dispatch(
+          showSnackbar({ severity: "success", message: response.data.message })
+        );
+        dispatch(
+          slice.actions.updateIsLoading({ isLoading: false, error: false })
+        );
+
+        navigate("/auth/login")
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch(showSnackbar({ severity: "error", message: error.message }));
+        dispatch(
+          slice.actions.updateIsLoading({ error: true, isLoading: false })
+        );
+      });
+  };
+}
+

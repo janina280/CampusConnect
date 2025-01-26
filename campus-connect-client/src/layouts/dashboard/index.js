@@ -8,7 +8,7 @@ const DashboardLayout = () => {
   const { isLoggedIn } = useSelector((state) => state.auth);
 
   if (!isLoggedIn) {
-    return <Navigate to="/auth/login" />;
+    return <Navigate to="/welcome" />;
   }
 
   return (
