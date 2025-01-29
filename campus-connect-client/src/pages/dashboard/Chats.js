@@ -10,7 +10,11 @@ import {
 import { ArchiveBox, CircleDashed, MagnifyingGlass } from "phosphor-react";
 import { useTheme } from "@mui/material/styles";
 import { SimpleBarStyle } from "../../components/Scrollbar";
-import { Search, SearchIconWrapper, StyledInputBase } from "../../components/Search";
+import {
+  Search,
+  SearchIconWrapper,
+  StyledInputBase,
+} from "../../components/Search";
 import ChatElement from "../../components/ChatElement";
 import { useCurrentUserFromToken } from "../../sections/auth/CurrentUserFromToken";
 import { useSelector } from "react-redux";
@@ -18,23 +22,55 @@ import { useSelector } from "react-redux";
 const Chats = () => {
   const theme = useTheme();
   const [chats, setChats] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const currentUser = useCurrentUserFromToken(); 
+  const [loading, setLoading] = useState(false);
+  const currentUser = useCurrentUserFromToken();
+  const [queries, setQueries] = useState(null);
 
-  const token = useSelector(
-    (state) => state.auth.accessToken);
+  const token = useSelector((state) => state.auth.accessToken);
+
+  const handleSearch = async (query) => {
+    if (!token) {
+      console.error("Token is missing. Please log in.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const encodedQuery = encodeURIComponent(query);
+      const url = `http://localhost:8080/api/user/${encodedQuery}`;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Fetched chat data:", data);
+        setChats(data);
+        
+      } else {
+        console.error("Search failed, status:", response.status);
+        setChats([]);
+      }
+    } catch (error) {
+      console.error("Error performing search:", error);
+      setChats([]);
+    } finally {
+      setLoading(false); // Setează loading false când cererea se termină
+    }
+  };
 
   useEffect(() => {
     const fetchChats = async () => {
-
-      if (!token) {
+      if (!token || loading) {
         console.error("Token is missing. Please log in.");
-        setLoading(false);
         return;
       }
-
+      setLoading(true);
       try {
-        const response = await fetch("http://localhost:8080/api/chat", {
+        const response = await fetch("http://localhost:8080/api/chat/users", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -86,6 +122,16 @@ const Chats = () => {
             <StyledInputBase
               placeholder="Search"
               inputProps={{ "aria-label": "search" }}
+              onChange={(e) => {
+                const searchTerm = e.target.value;
+                setQueries(searchTerm);
+                if (searchTerm.trim() !== "") {
+                  handleSearch(searchTerm);
+                } else {
+                  setChats([]);
+                }
+              }}
+              value={queries}
             />
           </Search>
         </Stack>
@@ -109,22 +155,52 @@ const Chats = () => {
             <Typography variant="body2">Loading chats...</Typography>
           ) : (
             <SimpleBarStyle timeout={500} clickOnTrack={false}>
-              <Stack spacing={2.4}>
-                <Typography variant="subtitle2" sx={{ color: "#676767" }}>
-                  Pinned
-                </Typography>
-                {chats.filter((chat) => chat.pinned).map((chat) => (
-                  <ChatElement key={chat.id} {...chat} currentUser={currentUser} />
-                ))}
-              </Stack>
-              <Stack spacing={2.4}>
-                <Typography variant="subtitle2" sx={{ color: "#676767" }}>
-                  All Chats
-                </Typography>
-                {chats.filter((chat) => !chat.pinned).map((chat) => (
-                  <ChatElement key={chat.id} {...chat} currentUser={currentUser} />
-                ))}
-              </Stack>
+              {/* Rezultatele căutării */}
+              {queries?.trim() ? (
+                <Stack spacing={2.4}>
+                  <Typography variant="subtitle2" sx={{ color: "#676767" }}>
+                    Search Results
+                  </Typography>
+                  {chats.length > 0 ? (
+                    chats
+                      .filter(
+                        (chat) => chat.name
+                        // Filtrare pe baza numelui
+                      )
+                      .map((chat) => (
+                        <ChatElement
+                          {...chat}
+                        />
+                      ))
+                  ) : (
+                    <Typography variant="body2">No users found.</Typography>
+                  )}
+                </Stack>
+              ) : (
+                // Afișarea utilizatorilor normali (Pinned și All Chats)
+                <>
+                  <Stack spacing={2.4}>
+                    <Typography variant="subtitle2" sx={{ color: "#676767" }}>
+                      Pinned
+                    </Typography>
+                    {chats
+                      .filter((chat) => chat.pinned)
+                      .map((chat) => {
+                        return <ChatElement {...chat} />;
+                      })}
+                  </Stack>
+                  <Stack spacing={2.4}>
+                    <Typography variant="subtitle2" sx={{ color: "#676767" }}>
+                      All Chats
+                    </Typography>
+                    {chats
+                      .filter((chat) => !chat.pinned)
+                      .map((chat) => {
+                        return <ChatElement {...chat} />;
+                      })}
+                  </Stack>
+                </>
+              )}
             </SimpleBarStyle>
           )}
         </Stack>

@@ -116,27 +116,7 @@ const Group = () => {
               theme.palette.mode === "light" ? "#FFF" : "#121212",
           }}
         >
-          <Stack
-            spacing={2}
-            sx={{
-              backgroundColor: "rgba(255, 255, 255, 0.5)",
-              borderRadius: 2,
-              padding: 4,
-              boxShadow: 3,
-            }}
-          >
-            <Typography variant="h4" sx={{ fontWeight: 600 }}>
-              Create a Group to Start Collaborating!
-            </Typography>
-
-            <Typography
-              variant="body1"
-              sx={{ color: theme.palette.text.secondary }}
-            >
-              You can create a new group to connect with your friends,
-              collaborate on projects, or organize study sessions.
-            </Typography>
-          </Stack>
+         
         </Box>
       </Stack>
       {openDialog && (

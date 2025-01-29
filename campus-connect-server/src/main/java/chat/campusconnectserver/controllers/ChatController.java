@@ -57,7 +57,7 @@ public class ChatController {
         return new ResponseEntity<>(chat, HttpStatus.OK);
     }
 
-    @GetMapping()
+    @GetMapping("/users")
     public ResponseEntity<List<Chat>> findAllChatByUserHandle(@RequestHeader("Authorization") String jwt) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 

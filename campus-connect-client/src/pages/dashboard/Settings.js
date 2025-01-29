@@ -211,27 +211,6 @@ function Settings() {
               theme.palette.mode === "light" ? "#FFF" : "#121212",
           }}
         >
-          <Stack
-            spacing={2}
-            sx={{
-              backgroundColor: "rgba(255, 255, 255, 0.5)",
-              borderRadius: 2,
-              padding: 4,
-              boxShadow: 3,
-            }}
-          >
-            <Typography variant="h4" sx={{ fontWeight: 600 }}>
-              Settings
-            </Typography>
-
-            <Typography
-              variant="body1"
-              sx={{ color: theme.palette.text.secondary }}
-            >
-              You can customize your preferences, adjust notifications, and
-              configure account options for a better experience.
-            </Typography>
-          </Stack>
         </Box>
       </Stack>
       {openShortcuts && (

@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import axios from "../../utils/axios";
 // ----------------------------------------------------------------------
 
 const initialState = {
@@ -7,17 +8,35 @@ const initialState = {
     open: false,
     type: "CONTACT", // can be CONTACT, STARRED, SHARED
   },
+  isLoggedIn: true,
+  tab: 0, // [0, 1, 2, 3]
   snackbar: {
-    open: false,
+    open: null,
     severity: null,
     message: null,
   },
+  users: [], // all users of app who are not friends and not requested yet
+  all_users: [],
+  friends: [], // all friends
+  friendRequests: [], // all friend requests
+  chat_type: null,
+  room_id: null,
+  call_logs: [],
 };
 
 const slice = createSlice({
   name: "app",
   initialState,
   reducers: {
+    fetchCallLogs(state, action) {
+      state.call_logs = action.payload.call_logs;
+    },
+    fetchUser(state, action) {
+      state.user = action.payload.user;
+    },
+    updateUser(state, action) {
+      state.user = action.payload.user;
+    },
     // Toggle Sidebar
     toggleSideBar(state) {
       state.sideBar.open = !state.sideBar.open;
@@ -39,6 +58,22 @@ const slice = createSlice({
       console.log("This is getting executed");
       state.snackbar.open = false;
       state.snackbar.message = null;
+    },
+    updateUsers(state, action) {
+      state.users = action.payload.users;
+    },
+    updateAllUsers(state, action) {
+      state.all_users = action.payload.users;
+    },
+    updateFriends(state, action) {
+      state.friends = action.payload.friends;
+    },
+    updateFriendRequests(state, action) {
+      state.friendRequests = action.payload.requests;
+    },
+    selectConversation(state, action) {
+      state.chat_type = "individual";
+      state.room_id = action.payload.room_id;
     },
   },
 });
@@ -83,3 +118,27 @@ export function UpdateTab(tab) {
   };
 }
 
+export const SelectConversation = ({ room_id }) => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.selectConversation({ room_id }));
+  };
+};
+
+export const FetchUserProfile = () => {
+  return async (dispatch, getState) => {
+    axios
+      .get("/user/get-me", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getState().auth.token}`,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        dispatch(slice.actions.fetchUser({ user: response.data.data }));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+};
