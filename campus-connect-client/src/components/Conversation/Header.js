@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { faker } from "@faker-js/faker";
 import { useTheme } from "@mui/material/styles";
-import { VideoCamera, Phone, MagnifyingGlass, CaretDown } from "phosphor-react";
+import { MagnifyingGlass, CaretDown } from "phosphor-react";
 import StyledBadge from "../StyledBadge";
 import { ToggleSidebar } from "../../redux/slices/app";
 import { useDispatch } from "react-redux";

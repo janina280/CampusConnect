@@ -3,6 +3,7 @@ import {jwtDecode} from "jwt-decode";
 
 export const useCurrentUserFromToken = () => {
   const token = useSelector((state) => state.auth.accessToken);
+  console.log("Token from Redux:", token);
 
   if (!token) return null;
 

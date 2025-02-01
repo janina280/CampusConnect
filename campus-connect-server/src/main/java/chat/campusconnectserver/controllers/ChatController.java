@@ -105,13 +105,16 @@ public class ChatController {
     }
 
     @DeleteMapping("/{chatId}")
-    public ResponseEntity<ApiResponse> deleteChatHandle(@PathVariable Long chatId, @PathVariable Long userId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
+    public ResponseEntity<ApiResponse> deleteChatHandle(
+            @PathVariable Long chatId,
+            @RequestHeader("Authorization") String jwt
+    ) throws UserException, ChatException {
         User reqUser = userService.findUserProfile(jwt);
 
         chatService.deleteChat(chatId, reqUser.getId());
 
         ApiResponse res = new ApiResponse("Chat is deleted successfully", true);
-
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
 }

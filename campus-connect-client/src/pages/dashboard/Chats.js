@@ -22,6 +22,7 @@ import { useSelector } from "react-redux";
 const Chats = () => {
   const theme = useTheme();
   const [chats, setChats] = useState([]);
+  const [chat, setChat] = useState([]);
   const [loading, setLoading] = useState(false);
   const currentUser = useCurrentUserFromToken();
   const [queries, setQueries] = useState(null);
@@ -58,12 +59,12 @@ const Chats = () => {
       console.error("Error performing search:", error);
       setChats([]);
     } finally {
-      setLoading(false); // Setează loading false când cererea se termină
+      setLoading(false); 
     }
   };
 
   useEffect(() => {
-    const fetchChats = async () => {
+    const fetchChat = async () => {
       if (!token || loading) {
         console.error("Token is missing. Please log in.");
         return;
@@ -79,7 +80,7 @@ const Chats = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setChats(data);
+          setChat(data);
         } else {
           console.error("Failed to load chats, status:", response.status);
         }
@@ -90,7 +91,7 @@ const Chats = () => {
       }
     };
 
-    fetchChats();
+    fetchChat();
   }, [token]);
 
   return (
@@ -183,7 +184,7 @@ const Chats = () => {
                     <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                       Pinned
                     </Typography>
-                    {chats
+                    {chat
                       .filter((chat) => chat.pinned)
                       .map((chat) => {
                         return <ChatElement {...chat} />;
@@ -193,10 +194,14 @@ const Chats = () => {
                     <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                       All Chats
                     </Typography>
-                    {chats
+                    {chat
                       .filter((chat) => !chat.pinned)
                       .map((chat) => {
-                        return <ChatElement {...chat} />;
+                        console.log("Chat ID:", chat.id, "Users:", chat.users);
+                        console.log(currentUser.id);
+                        return <ChatElement {...chat} 
+                        name={chat.name ?? ([...chat.users].filter(user => user.id.toString() !== currentUser.sub))[0].name} />;
+                        
                       })}
                   </Stack>
                 </>
