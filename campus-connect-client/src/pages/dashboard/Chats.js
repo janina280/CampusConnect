@@ -50,7 +50,6 @@ const Chats = () => {
         const data = await response.json();
         console.log("Fetched chat data:", data);
         setChats(data);
-        
       } else {
         console.error("Search failed, status:", response.status);
         setChats([]);
@@ -59,7 +58,7 @@ const Chats = () => {
       console.error("Error performing search:", error);
       setChats([]);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -168,11 +167,7 @@ const Chats = () => {
                         (chat) => chat.name
                         // Filtrare pe baza numelui
                       )
-                      .map((chat) => (
-                        <ChatElement
-                          {...chat}
-                        />
-                      ))
+                      .map((chat) => <ChatElement {...chat} />)
                   ) : (
                     <Typography variant="body2">No users found.</Typography>
                   )}
@@ -197,11 +192,28 @@ const Chats = () => {
                     {chat
                       .filter((chat) => !chat.pinned)
                       .map((chat) => {
-                        console.log("Chat ID:", chat.id, "Users:", chat.users);
-                        console.log(currentUser.id);
-                        return <ChatElement {...chat} 
-                        name={chat.name ?? ([...chat.users].filter(user => user.id.toString() !== currentUser.sub))[0].name} />;
-                        
+                        const lastMessage =
+                          chat.messages.length > 0
+                            ? [...chat.messages]
+                                .sort(
+                                  (a, b) =>
+                                    new Date(a.createdAt) -
+                                    new Date(b.createdAt)
+                                )
+                                .pop()
+                            : null;
+                        return (
+                          <ChatElement
+                            {...chat}
+                            name={
+                              chat.name ??
+                              [...chat.users].filter(
+                                (user) => user.id.toString() !== currentUser.sub
+                              )[0].name
+                            }
+                            lastMessage={lastMessage}
+                          />
+                        );
                       })}
                   </Stack>
                 </>

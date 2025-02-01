@@ -1,5 +1,6 @@
 package chat.campusconnectserver.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class Message {
     @ManyToOne
     private  User user ;
     @ManyToOne
+    @JsonBackReference
     private Chat chat;
 
     public Message(Long id, String content, LocalDateTime timestamp, User user, Chat chat) {

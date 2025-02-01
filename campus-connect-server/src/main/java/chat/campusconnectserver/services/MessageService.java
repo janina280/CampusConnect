@@ -38,8 +38,15 @@ public class MessageService {
         message.setUser(user);
         message.setContent(req.getContent());
         message.setTimestamp(LocalDateTime.now());
+        message = messageRepository.save(message);
+
+        chat.getMessages().add(message);
+
+        chatService.saveChat(chat);
+
         return message;
     }
+
 
     public List<Message> getChatsMessages(Long chatId, User reqUser) throws ChatException, UserException {
         Chat chat = chatService.findChatById(chatId);

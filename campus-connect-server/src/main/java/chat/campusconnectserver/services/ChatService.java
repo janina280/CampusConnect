@@ -119,6 +119,10 @@ public class ChatService {
         }
     }
 
+    public Chat saveChat(Chat chat) {
+        return chatRepository.save(chat);
+    }
+
     public Chat removeFromGroup(Long chatId, Long userId, User reqUser) throws UserException, ChatException {
         Optional<Chat> opt = chatRepository.findById(chatId);
         User user = userService.findUserById(userId);
