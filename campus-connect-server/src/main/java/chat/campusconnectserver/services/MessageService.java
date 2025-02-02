@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +40,10 @@ public class MessageService {
         message.setUser(user);
         message.setContent(req.getContent());
         message.setTimestamp(LocalDateTime.now());
+
+        String formattedTime = formatMessageTime(message.getTimestamp());
+        message.setFormattedTime(formattedTime);
+
         message = messageRepository.save(message);
 
         chat.getMessages().add(message);
@@ -47,6 +53,18 @@ public class MessageService {
         return message;
     }
 
+    public String formatMessageTime(LocalDateTime timestamp) {
+        LocalDateTime now = LocalDateTime.now();
+        long hoursDiff = ChronoUnit.HOURS.between(timestamp, now);
+
+        if (hoursDiff > 24) {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return timestamp.format(dateFormatter);
+        } else {
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            return timestamp.format(timeFormatter);
+        }
+    }
 
     public List<Message> getChatsMessages(Long chatId, User reqUser) throws ChatException, UserException {
         Chat chat = chatService.findChatById(chatId);

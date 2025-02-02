@@ -23,12 +23,15 @@ public class Message {
     @JsonBackReference
     private Chat chat;
 
-    public Message(Long id, String content, LocalDateTime timestamp, User user, Chat chat) {
+    private String formattedTime;
+
+    public Message(Long id, String content,String formattedTime, LocalDateTime timestamp, User user, Chat chat) {
         this.id = id;
         this.content = content;
         this.timestamp = timestamp;
         this.user = user;
         this.chat = chat;
+        this.formattedTime=formattedTime;
     }
 
     public Message() {

@@ -42,7 +42,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const ChatElement = ({ img, name, lastMessage, time, unread, online, id }) => {
+const ChatElement = ({ img, name, lastMessage, formattedTime, unread, online, id }) => {
   const dispatch = useDispatch();
 
   const theme = useTheme();
@@ -94,7 +94,7 @@ const ChatElement = ({ img, name, lastMessage, time, unread, online, id }) => {
         </Stack>
         <Stack spacing={2} alignItems={"center"}>
           <Typography sx={{ fontWeight: 600 }} variant="caption">
-            {lastMessage ? lastMessage.time : ""}
+            {lastMessage ? lastMessage.formattedTime : "No time"}
           </Typography>
           <Badge
             className="unread-count"
