@@ -14,6 +14,7 @@ const rootPersitConfig = {
 const rootReducer = combineReducers({
   app: appReducer,
   auth: authReducer,
+ // chat: chatReducer, 
 });
 
 export { rootPersitConfig, rootReducer };

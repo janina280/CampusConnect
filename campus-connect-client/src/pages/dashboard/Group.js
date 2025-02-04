@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
-import {
-  Box,
-  Divider,
-  IconButton,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Divider, IconButton, Stack, Typography } from "@mui/material";
 import { MagnifyingGlass, Plus } from "phosphor-react";
 import {
   Search,
@@ -71,6 +65,13 @@ const Group = () => {
     }
   };
 
+  const handleGroupCreated = (newGroup) => {
+    setGroups((prevGroups) => [...prevGroups, newGroup]);
+    setFilteredGroups((prevFilteredGroups) => [
+      ...prevFilteredGroups,
+      newGroup,
+    ]);
+  };
   return (
     <>
       <Stack direction="row" sx={{ width: "100%" }}>
@@ -98,21 +99,30 @@ const Group = () => {
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </Search>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <Typography variant="subtitle2">Create New Group</Typography>
               <IconButton onClick={() => setOpenDialog(true)}>
                 <Plus style={{ color: theme.palette.primary.main }} />
               </IconButton>
             </Stack>
             <Divider />
-            <Stack spacing={3} sx={{ flexGrow: 1, overflow: "scroll", height: "100%" }}>
+            <Stack
+              spacing={3}
+              sx={{ flexGrow: 1, overflow: "scroll", height: "100%" }}
+            >
               <SimpleBarStyle timeout={500} clickOnTrack={false}>
                 <Stack spacing={2.5}>
                   <Typography variant="subtitle2" sx={{ color: "#676667" }}>
                     All Groups
                   </Typography>
                   {filteredGroups.length > 0 ? (
-                    filteredGroups.map((group) => <ChatElement key={group.id} {...group} />)
+                    filteredGroups.map((group) => (
+                      <ChatElement key={group.id} {...group} />
+                    ))
                   ) : (
                     <Typography variant="body2">No groups found.</Typography>
                   )}
@@ -122,7 +132,13 @@ const Group = () => {
           </Stack>
         </Box>
       </Stack>
-      {openDialog && <CreateGroup open={openDialog} handleClose={() => setOpenDialog(false)} />}
+      {openDialog && (
+        <CreateGroup
+          open={openDialog}
+          handleClose={() => setOpenDialog(false)}
+          handleGroupCreated={handleGroupCreated}
+        />
+      )}
     </>
   );
 };

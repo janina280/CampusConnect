@@ -90,11 +90,22 @@ public class ChatService {
         group.setCreatedBy(reqUser);
         group.getAdmins().add(reqUser);
 
+        if (req.getUserIds() == null || req.getUserIds().isEmpty()) {
+            throw new UserException("At least one user must be added to the group.");
+        }
+
         for (Long userId : req.getUserIds()) {
             User user = userService.findUserById(userId);
             group.getUsers().add(user);
         }
-        chatRepository.save(group);
+
+        try {
+            chatRepository.save(group);
+        } catch (Exception e) {
+            System.err.println("Error saving group: " + e.getMessage());
+            throw new RuntimeException("Failed to create group", e);
+        }
+
         return group;
     }
 
@@ -156,23 +167,5 @@ public class ChatService {
         }
         throw new ChatException("Chat not found with id" + chatId);
     }
-
-    public void deleteGroup(Long groupId, Long userId) throws ChatException, UserException {
-        Optional<Chat> groupOptional = chatRepository.findById(groupId);
-        if (groupOptional.isEmpty()) {
-            throw new ChatException("Group not found");
-        }
-
-        Chat group = groupOptional.get();
-
-        // Verifică dacă utilizatorul este administrator
-        if (!group.getAdmins().contains(userId)) {
-            throw new UserException("You don't have permission to delete this group");
-        }
-
-        // Șterge grupul
-        chatRepository.deleteById(groupId);
-    }
-
 
 }
