@@ -116,5 +116,17 @@ public class ChatController {
         ApiResponse res = new ApiResponse("Chat is deleted successfully", true);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+    @DeleteMapping("/group/{groupId}")
+    public ResponseEntity<ApiResponse> deleteGroupHandle(
+            @PathVariable Long groupId,
+            @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
+        User reqUser = userService.findUserProfile(jwt);
+        chatService.deleteGroup(groupId, reqUser.getId());
+
+        ApiResponse res = new ApiResponse("Group is deleted successfully", true);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+
 
 }

@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Divider,
   IconButton,
-  Link,
   Stack,
   Typography,
 } from "@mui/material";
@@ -15,27 +14,70 @@ import {
   StyledInputBase,
 } from "../../components/Search";
 import { SimpleBarStyle } from "../../components/Scrollbar";
-import { ChatList } from "../../data";
 import ChatElement from "../../components/ChatElement";
 import CreateGroup from "../../sections/main/CreateGroup";
-import message from "../../assets/Images/message.png";
+import { useSelector } from "react-redux";
 
 const Group = () => {
   const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
+  const [groups, setGroups] = useState([]);
+  const [filteredGroups, setFilteredGroups] = useState([]);
+  const [query, setQuery] = useState("");
+  const token = useSelector((state) => state.auth.accessToken);
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  useEffect(() => {
+    const fetchGroups = async () => {
+      if (!token) return;
+      try {
+        const response = await fetch("http://localhost:8080/api/chat/groups", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setGroups(data);
+          setFilteredGroups(data);
+        }
+      } catch (error) {
+        console.error("Error fetching groups:", error);
+      }
+    };
+    fetchGroups();
+  }, [token]);
+
+  const handleSearch = async (searchTerm) => {
+    setQuery(searchTerm);
+    if (!searchTerm.trim()) {
+      setFilteredGroups(groups);
+      return;
+    }
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/groups/search?name=${encodeURIComponent(
+          searchTerm
+        )}`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setFilteredGroups(data);
+      }
+    } catch (error) {
+      console.error("Error searching groups:", error);
+    }
   };
 
   return (
     <>
       <Stack direction="row" sx={{ width: "100%" }}>
-        {/* Left */}
         <Box
           sx={{
             height: "100vh",
-            backgroundColor: (theme) =>
+            backgroundColor:
               theme.palette.mode === "light"
                 ? "#F8FAFF"
                 : theme.palette.background.default,
@@ -44,84 +86,43 @@ const Group = () => {
           }}
         >
           <Stack p={3} spacing={2} sx={{ maxHeight: "100vh" }}>
-            <Stack>
-              <Typography variant="h5">Groups</Typography>
-            </Stack>
-            <Stack sx={{ width: "100%" }}>
-              <Search>
-                <SearchIconWrapper>
-                  <MagnifyingGlass color="#709CE6" />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search"
-                  inputProps={{ "aria-label": "search" }}
-                />
-              </Search>
-            </Stack>
-            <Stack
-              direction={"row"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-            >
-              <Typography variant="subtitle2" component={Link}>
-                Create New Group
-              </Typography>
+            <Typography variant="h5">Groups</Typography>
+            <Search>
+              <SearchIconWrapper>
+                <MagnifyingGlass color="#709CE6" />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search"
+                inputProps={{ "aria-label": "search" }}
+                value={query}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </Search>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Typography variant="subtitle2">Create New Group</Typography>
               <IconButton onClick={() => setOpenDialog(true)}>
-                <Plus
-                  style={{ color: (theme) => theme.palette.primary.main }}
-                />
+                <Plus style={{ color: theme.palette.primary.main }} />
               </IconButton>
             </Stack>
             <Divider />
-            <Stack
-              spacing={3}
-              sx={{ flexGrow: 1, overflow: "scroll", height: "100%" }}
-            >
+            <Stack spacing={3} sx={{ flexGrow: 1, overflow: "scroll", height: "100%" }}>
               <SimpleBarStyle timeout={500} clickOnTrack={false}>
                 <Stack spacing={2.5}>
-                  {/* Pinned Groups */}
-                  <Typography variant="subtitle2" sx={{ color: "#676667" }}>
-                    Pinned
-                  </Typography>
-                  {ChatList.filter((el) => el.pinned).map((el) => {
-                    return <ChatElement {...el} />;
-                  })}
-                  {/* All Groups */}
                   <Typography variant="subtitle2" sx={{ color: "#676667" }}>
                     All Groups
                   </Typography>
-                  {ChatList.filter((el) => !el.pinned).map((el) => {
-                    return <ChatElement {...el} />;
-                  })}
+                  {filteredGroups.length > 0 ? (
+                    filteredGroups.map((group) => <ChatElement key={group.id} {...group} />)
+                  ) : (
+                    <Typography variant="body2">No groups found.</Typography>
+                  )}
                 </Stack>
               </SimpleBarStyle>
             </Stack>
           </Stack>
         </Box>
-        {/* Right - Middle Text */}
-        <Box
-          sx={{
-            flexGrow: 1,
-            height: "100vh",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            textAlign: "center",
-            padding: 1,
-            backgroundImage: `url(${message})`,
-            backgroundSize: "82%",
-            backgroundPosition: "center 20%",
-            backgroundRepeat: "no-repeat",
-            backgroundColor:
-              theme.palette.mode === "light" ? "#FFF" : "#121212",
-          }}
-        >
-         
-        </Box>
       </Stack>
-      {openDialog && (
-        <CreateGroup open={openDialog} handleClose={handleCloseDialog} />
-      )}
+      {openDialog && <CreateGroup open={openDialog} handleClose={() => setOpenDialog(false)} />}
     </>
   );
 };

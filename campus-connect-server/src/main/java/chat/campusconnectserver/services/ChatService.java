@@ -156,4 +156,23 @@ public class ChatService {
         }
         throw new ChatException("Chat not found with id" + chatId);
     }
+
+    public void deleteGroup(Long groupId, Long userId) throws ChatException, UserException {
+        Optional<Chat> groupOptional = chatRepository.findById(groupId);
+        if (groupOptional.isEmpty()) {
+            throw new ChatException("Group not found");
+        }
+
+        Chat group = groupOptional.get();
+
+        // Verifică dacă utilizatorul este administrator
+        if (!group.getAdmins().contains(userId)) {
+            throw new UserException("You don't have permission to delete this group");
+        }
+
+        // Șterge grupul
+        chatRepository.deleteById(groupId);
+    }
+
+
 }

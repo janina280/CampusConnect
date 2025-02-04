@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Component  // Adaugă această adnotare pentru a marca clasa ca un bean
+@Component
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
     private final Auth auth = new Auth();
