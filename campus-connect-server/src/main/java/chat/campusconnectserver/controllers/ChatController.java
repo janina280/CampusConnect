@@ -79,6 +79,7 @@ public class ChatController {
     public ResponseEntity<List<Chat>> searchGroupsByName(
             @RequestHeader("Authorization") String jwt,
             @RequestParam("name") String groupName) throws UserException {
+        System.out.println("Searching for group: " + groupName);
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
         List<Chat> groups = chatService.searchGroupByName(groupName, currentUserId);

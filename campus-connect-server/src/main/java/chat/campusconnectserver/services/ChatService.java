@@ -56,8 +56,7 @@ public class ChatService {
         if (user == null) {
             throw new UserException("User not found with ID: " + userId);
         }
-        List<Chat> chats = chatRepository.findChatByUserIds(user.getId());
-        return chats;
+        return chatRepository.findChatByUserIds(user.getId());
     }
 
 
@@ -66,7 +65,7 @@ public class ChatService {
         if (user == null) {
             throw new UserException("User not found with ID: " + userId);
         }
-        List<Chat> groupChats = chatRepository.findAllGroupChats();
+        var groupChats = chatRepository.findGroupChatsByUser(user);
 
         return groupChats;
     }
@@ -75,11 +74,14 @@ public class ChatService {
         if (user == null) {
             throw new UserException("User not found with ID: " + userId);
         }
+
         return chatRepository.findAllGroupChats().stream()
-                .filter(chat -> chat.getName().toLowerCase().contains(groupName.toLowerCase()) &&
-                        chat.getUsers().contains(user))
+                .filter(chat -> chat.isGroup()
+                        && chat.getName().toLowerCase().contains(groupName.toLowerCase())
+                        && chat.getUsers().contains(user))
                 .toList();
     }
+
 
 
     public Chat createGroup(GroupChatRequest req, User reqUser) throws UserException {
@@ -94,6 +96,7 @@ public class ChatService {
             throw new UserException("At least one user must be added to the group.");
         }
 
+        group.getUsers().add(reqUser);
         for (Long userId : req.getUserIds()) {
             User user = userService.findUserById(userId);
             group.getUsers().add(user);

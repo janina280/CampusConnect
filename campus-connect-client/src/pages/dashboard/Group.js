@@ -48,22 +48,23 @@ const Group = () => {
     }
     try {
       const response = await fetch(
-        `http://localhost:8080/api/groups/search?name=${encodeURIComponent(
-          searchTerm
-        )}`,
+        `http://localhost:8080/api/chat/groups/search?name=${encodeURIComponent(searchTerm)}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      
       if (response.ok) {
         const data = await response.json();
+        console.log("Fetched chat data:", data); 
         setFilteredGroups(data);
       }
     } catch (error) {
       console.error("Error searching groups:", error);
     }
   };
+  
 
   const handleGroupCreated = (newGroup) => {
     setGroups((prevGroups) => [...prevGroups, newGroup]);

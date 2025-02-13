@@ -86,8 +86,8 @@ const CreateGroupForm = ({ handleClose, handleGroupCreated }) => {
       });
 
       if (response.ok) {
-        const newGroup = await response.json(); // Obține grupul creat
-        handleGroupCreated(newGroup); // Apelează funcția pentru a adăuga grupul în listă
+        const newGroup = await response.json(); 
+        handleGroupCreated(newGroup); 
         dispatch(
           showSnackbar({
             severity: "success",

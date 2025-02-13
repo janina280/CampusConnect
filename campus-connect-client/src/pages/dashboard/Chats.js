@@ -165,7 +165,6 @@ const Chats = () => {
                     chats
                       .filter(
                         (chat) => chat.name
-                        // Filtrare pe baza numelui
                       )
                       .map((chat) => <ChatElement {...chat} />)
                   ) : (
@@ -173,7 +172,6 @@ const Chats = () => {
                   )}
                 </Stack>
               ) : (
-                // Afișarea utilizatorilor normali (Pinned și All Chats)
                 <>
                   <Stack spacing={2.4}>
                     <Typography variant="subtitle2" sx={{ color: "#676767" }}>
@@ -190,7 +188,7 @@ const Chats = () => {
                       All Chats
                     </Typography>
                     {chat
-                      .filter((chat) => !chat.pinned)
+                      .filter((chat) => !chat.pinned && !chat.group)
                       .map((chat) => {
                         const lastMessage =
                           chat.messages.length > 0
