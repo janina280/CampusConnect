@@ -6,6 +6,8 @@ import {
   Typography,
   Button,
   Divider,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { ArchiveBox, CircleDashed, MagnifyingGlass } from "phosphor-react";
 import { useTheme } from "@mui/material/styles";
@@ -21,13 +23,15 @@ import { useSelector } from "react-redux";
 
 const Chats = () => {
   const theme = useTheme();
-  const [chats, setChats] = useState([]);
-  const [chat, setChat] = useState([]);
+  const [availableChats, setAvailableChats] = useState([]);
+  const [existingChats, setExistingChats] = useState([]);
   const [loading, setLoading] = useState(false);
   const currentUser = useCurrentUserFromToken();
   const [queries, setQueries] = useState(null);
-
   const token = useSelector((state) => state.auth.accessToken);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const handleSearch = async (query) => {
     if (!token) {
@@ -49,18 +53,74 @@ const Chats = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Fetched chat data:", data);
-        setChats(data);
+        setAvailableChats(data);
       } else {
         console.error("Search failed, status:", response.status);
-        setChats([]);
+        setAvailableChats([]);
       }
     } catch (error) {
       console.error("Error performing search:", error);
-      setChats([]);
+      setAvailableChats([]);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleCreateChat = async (userId) => {
+    if (!token) {
+      console.error("Token is missing. Please log in.");
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const existingChat = existingChats.find(
+        (chat) =>
+          chat.users.length === 2 &&
+          chat.users.some((user) => user.id === userId)
+      );
+  
+      if (existingChat) {
+        setExistingChats((prevChats) => {
+          return prevChats.map((existing) =>
+            existing.id === existingChat.id
+              ? { ...existing, lastMessage: existingChat.lastMessage }
+              : existing
+          );
+        });
+        console.log("Chat already exists with this user");
+        return;
+      }
+  
+      const createChatResponse = await fetch("http://localhost:8080/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId }),
+      });
+  
+      if (createChatResponse.ok) {
+        const newChat = await createChatResponse.json();
+        setExistingChats((prevChats) => [...prevChats, newChat]); 
+        console.log("New chat created", newChat);
+  
+        setSnackbarMessage("Chat created successfully!");
+        setSnackbarOpen(true);
+      } else {
+        console.error(
+          "Failed to create chat, status:",
+          createChatResponse.status
+        );
+      }
+    } catch (error) {
+      console.error("Error creating chat:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   useEffect(() => {
     const fetchChat = async () => {
@@ -79,7 +139,7 @@ const Chats = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setChat(data);
+          setExistingChats(data);
         } else {
           console.error("Failed to load chats, status:", response.status);
         }
@@ -128,7 +188,7 @@ const Chats = () => {
                 if (searchTerm.trim() !== "") {
                   handleSearch(searchTerm);
                 } else {
-                  setChats([]);
+                  setAvailableChats([]);
                 }
               }}
               value={queries}
@@ -161,12 +221,18 @@ const Chats = () => {
                   <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                     Search Results
                   </Typography>
-                  {chats.length > 0 ? (
-                    chats
-                      .filter(
-                        (chat) => chat.name
-                      )
-                      .map((chat) => <ChatElement {...chat} />)
+                  {availableChats.length > 0 ? (
+                    availableChats
+                      .filter((chat) => chat.name)
+                      .map((chat) => (
+                        <ChatElement
+                          key={chat.id}
+                          {...chat}
+                          handleCreateChat={() => handleCreateChat(chat.id)} 
+                          showMessageIcon={true}
+                          existingChat = {false}
+                        />
+                      ))
                   ) : (
                     <Typography variant="body2">No users found.</Typography>
                   )}
@@ -177,17 +243,24 @@ const Chats = () => {
                     <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                       Pinned
                     </Typography>
-                    {chat
+                    {existingChats
                       .filter((chat) => chat.pinned)
                       .map((chat) => {
-                        return <ChatElement {...chat} />;
+                        return (
+                          <ChatElement
+                            key={chat.id}
+                            {...chat}
+                            handleCreateChat={() => handleCreateChat(chat.id)}
+                            existingChat={true}
+                          />
+                        );
                       })}
                   </Stack>
                   <Stack spacing={2.4}>
                     <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                       All Chats
                     </Typography>
-                    {chat
+                    {existingChats
                       .filter((chat) => !chat.pinned && !chat.group)
                       .map((chat) => {
                         const lastMessage =
@@ -200,8 +273,10 @@ const Chats = () => {
                                 )
                                 .pop()
                             : null;
+
                         return (
                           <ChatElement
+                            key={chat.id}
                             {...chat}
                             name={
                               chat.name ??
@@ -210,6 +285,11 @@ const Chats = () => {
                               )[0].name
                             }
                             lastMessage={lastMessage}
+                            existingChat={true}
+                            noMessagesMessage={
+                                "You can start messaging with..."
+                            }
+                            formattedTime={lastMessage?.formattedTime}
                           />
                         );
                       })}
@@ -220,6 +300,15 @@ const Chats = () => {
           )}
         </Stack>
       </Stack>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert severity="success" sx={{ width: "100%" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

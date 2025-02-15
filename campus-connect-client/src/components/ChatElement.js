@@ -1,11 +1,15 @@
 import React from "react";
-import { Box, Badge, Stack, Avatar, Typography } from "@mui/material";
-import { styled, useTheme, alpha } from "@mui/material/styles";
-import { useSearchParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { SelectConversation } from "../redux/slices/app";
+import {
+  Box,
+  Badge,
+  Stack,
+  Avatar,
+  Typography,
+  IconButton,
+} from "@mui/material";
+import { styled, useTheme } from "@mui/material/styles";
+import { ChatCircle } from "phosphor-react";
 import CreateAvatar from "../utils/createAvatar";
-
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
   "&:hover": {
@@ -42,67 +46,125 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const ChatElement = ({ img, name, lastMessage, formattedTime, unread, online, id }) => {
-  const dispatch = useDispatch();
-
+const ChatElement = ({
+  img,
+  name,
+  lastMessage,
+  formattedTime,
+  unread,
+  online,
+  id,
+  is_Group,
+  handleCreateChat,
+  existingChat,
+  noMessagesMessage,
+}) => {
   const theme = useTheme();
 
   return (
     <StyledChatBox
       sx={{
         width: "100%",
-
         borderRadius: 1,
-
-        backgroundColor: 
-           theme.palette.mode === "light"
-          ? "#fff"
-          : theme.palette.background.paper,
+        backgroundColor:
+          theme.palette.mode === "light"
+            ? "#fff"
+            : theme.palette.background.paper,
       }}
       p={2}
     >
-      <Stack
-        direction="row"
-        alignItems={"center"}
-        justifyContent="space-between"
-      >
-        <Stack direction="row" spacing={2}>
-          {" "}
-          {online ? (
-            <StyledBadge
-              overlap="circular"
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              variant="dot"
-            >
-               <CreateAvatar
-              name={name}
-              imageUrl={img}
-              size={56}
-            />
-            </StyledBadge>
-          ) : (
-            <CreateAvatar
-            name={name}
-            imageUrl={img}
-            size={56}
-          />
-          )}
-          <Stack spacing={0.3}>
-            <Typography variant="subtitle2">{name}</Typography>
-            <Typography variant="caption">{lastMessage ? lastMessage.content : "No messages yet"}</Typography>
+      {existingChat ? (
+        <Stack
+          direction="row"
+          alignItems={"center"}
+          justifyContent="space-between"
+        >
+          <Stack direction="row" spacing={2}>
+            {online ? (
+              <StyledBadge
+                overlap="circular"
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                variant="dot"
+              >
+                <CreateAvatar name={name} imageUrl={img} size={56} />
+              </StyledBadge>
+            ) : (
+              <CreateAvatar name={name} imageUrl={img} size={56} />
+            )}
+            <Stack spacing={0.3}>
+              <Typography variant="subtitle2">{name}</Typography>
+              {lastMessage ? (
+                <Typography variant="caption">{lastMessage.content}</Typography>
+              ) : (
+                <Typography variant="caption" sx={{ color: "gray" }}>
+                  {noMessagesMessage}
+                </Typography>
+              )}
+            </Stack>
+          </Stack>
+          <Stack spacing={2} alignItems={"center"}>
+            {lastMessage ? (
+              <Typography sx={{ fontWeight: 600 }} variant="caption">
+                {formattedTime}
+              </Typography>
+            ) : (
+              <ChatCircle
+                size={20}
+                onClick={() => handleCreateChat(id)}
+                style={{
+                  cursor: "pointer",
+                  color: theme.palette.primary.main,
+                }}
+              />
+            )}
+            {lastMessage && (
+              <Badge
+                className="unread-count"
+                color="primary"
+                badgeContent={unread}
+              />
+            )}
           </Stack>
         </Stack>
-        <Stack spacing={2} alignItems={"center"}>
-          <Typography sx={{ fontWeight: 600 }} variant="caption">
-            {lastMessage ? lastMessage.formattedTime : "No time"}
-          </Typography>
-          <Badge
-            className="unread-count"
-            color="primary"
-            badgeContent={unread}
-          />
+      ) : (
+        <Stack
+          direction="row"
+          alignItems={"center"}
+          justifyContent="space-between"
+        >
+          <Stack direction="row" alignItems={"center"} spacing={2}>
+            {online ? (
+              <StyledBadge
+                overlap="circular"
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                variant="dot"
+              >
+                <CreateAvatar name={name} imageUrl={img} size={56} />
+              </StyledBadge>
+            ) : (
+              <CreateAvatar name={name} imageUrl={img} size={56} />
+            )}
+            <Stack spacing={0.4}>
+              <Typography variant="subtitle2">{name}</Typography>
+            </Stack>
+          </Stack>
+          <Stack spacing={2} direction="row" alignItems={"center"}>
+            <ChatCircle
+              size={20}
+              onClick={() => handleCreateChat(id)}
+              style={{
+                cursor: "pointer",
+                color: theme.palette.primary.main,
+              }}
+            />
+            <Badge
+              className="unread-count"
+              color="primary"
+              badgeContent={unread}
+            />
+          </Stack>
         </Stack>
-      </Stack>
+      )}
     </StyledChatBox>
   );
 };
