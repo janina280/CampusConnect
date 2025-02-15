@@ -12,7 +12,7 @@ import {
   Note,
 } from "phosphor-react";
 import Shortcuts from "../../sections/settings/Shortcuts";
-import message from "../../assets/Images/message.png";
+import NoChatSVG from "../../assets/Illustration/NoChat";
 import CreateAvatar from "../../utils/createAvatar";
 import RequestAccountInfo from "../../sections/settings/RequestAccountInfo";
 import ChatWallpaper from "../../sections/settings/ChatWallpaper";
@@ -26,6 +26,7 @@ function Settings() {
   const [openPrivacy, setOpenPrivacy] = useState(false);
   const [openRequestInfo, setOpenRequestInfo] = useState(false);
   const [openChatWallpaper, setOpenChatWallpaper] = useState(false);
+  const { open } = useSelector((store) => store.app.sideBar);
 
   const handleOpenPrivacy = () => {
     setOpenPrivacy(true);
@@ -64,8 +65,7 @@ function Settings() {
     about: "",
   });
 
-  const token = useSelector(
-    (state) => state.auth.accessToken);
+  const token = useSelector((state) => state.auth.accessToken);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -142,7 +142,7 @@ function Settings() {
         {/* LeftPanel */}
         <Box
           sx={{
-            overflowY: "scroll",
+            overflowY: "auto",
             height: "100vh",
             width: 320,
             backgroundColor:
@@ -196,21 +196,21 @@ function Settings() {
         {/* RightPanel */}
         <Box
           sx={{
-            flexGrow: 1,
-            height: "100vh",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            textAlign: "center",
-            padding: 1,
-            backgroundImage: `url(${message})`,
-            backgroundSize: "82%",
-            backgroundPosition: "center 20%",
-            backgroundRepeat: "no-repeat",
+            height: "100%",
+            width: open ? "calc(100vw - 740px)" : "calc(100vw - 420px)",
             backgroundColor:
-              theme.palette.mode === "light" ? "#FFF" : "#121212",
+              theme.palette.mode === "light" ? "#F0F4FA" : "transparent",
           }}
         >
+          <Stack
+            spacing={2}
+            sx={{ height: "100%", width: "100%" }}
+            alignItems={"center"}
+            justifyContent={"center"}
+          >
+            <NoChatSVG />
+            <Typography variant="subtitle2">Customize your experience. Adjust your settings below.</Typography>
+          </Stack>
         </Box>
       </Stack>
       {openShortcuts && (

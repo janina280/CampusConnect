@@ -3,13 +3,13 @@ import {
   Box,
   Badge,
   Stack,
-  Avatar,
-  Typography,
-  IconButton,
+  Typography
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import { ChatCircle } from "phosphor-react";
 import CreateAvatar from "../utils/createAvatar";
+import { useDispatch } from "react-redux";
+import { SelectConversation } from "../redux/slices/app";
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
   "&:hover": {
@@ -60,9 +60,13 @@ const ChatElement = ({
   noMessagesMessage,
 }) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
 
   return (
     <StyledChatBox
+      onClick={() => {
+        dispatch(SelectConversation({ room_id: id }));
+      }}
       sx={{
         width: "100%",
         borderRadius: 1,

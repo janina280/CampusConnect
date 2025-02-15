@@ -11,6 +11,7 @@ import { SimpleBarStyle } from "../../components/Scrollbar";
 import ChatElement from "../../components/ChatElement";
 import CreateGroup from "../../sections/main/CreateGroup";
 import { useSelector } from "react-redux";
+import NoChatSVG from "../../assets/Illustration/NoChat";
 
 const Group = () => {
   const theme = useTheme();
@@ -19,6 +20,7 @@ const Group = () => {
   const [filteredGroups, setFilteredGroups] = useState([]);
   const [query, setQuery] = useState("");
   const token = useSelector((state) => state.auth.accessToken);
+  const { open } = useSelector((store) => store.app.sideBar);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -48,23 +50,24 @@ const Group = () => {
     }
     try {
       const response = await fetch(
-        `http://localhost:8080/api/chat/groups/search?name=${encodeURIComponent(searchTerm)}`,
+        `http://localhost:8080/api/chat/groups/search?name=${encodeURIComponent(
+          searchTerm
+        )}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      
+
       if (response.ok) {
         const data = await response.json();
-        console.log("Fetched chat data:", data); 
+        console.log("Fetched chat data:", data);
         setFilteredGroups(data);
       }
     } catch (error) {
       console.error("Error searching groups:", error);
     }
   };
-  
 
   const handleGroupCreated = (newGroup) => {
     setGroups((prevGroups) => [...prevGroups, newGroup]);
@@ -113,9 +116,9 @@ const Group = () => {
             <Divider />
             <Stack
               spacing={3}
-              sx={{ flexGrow: 1, overflow: "scroll", height: "100%" }}
+              sx={{ flexGrow: 1, overflow: "auto", height: "100%" }}
             >
-              <SimpleBarStyle timeout={500} clickOnTrack={false}>
+              <SimpleBarStyle timeout={500}  autoHide={true}>
                 <Stack spacing={2.5}>
                   <Typography variant="subtitle2" sx={{ color: "#676667" }}>
                     All Groups
@@ -130,6 +133,26 @@ const Group = () => {
                 </Stack>
               </SimpleBarStyle>
             </Stack>
+          </Stack>
+        </Box>
+        <Box
+          sx={{
+            height: "100%",
+            width: open ? "calc(100vw - 740px)" : "calc(100vw - 420px)",
+            backgroundColor:
+              theme.palette.mode === "light" ? "#F0F4FA" : "transparent",
+          }}
+        >
+          <Stack
+            spacing={2}
+            sx={{ height: "100%", width: "100%" }}
+            alignItems={"center"}
+            justifyContent={"center"}
+          >
+            <NoChatSVG />
+            <Typography variant="subtitle2">
+              Join the discussion! Select a group or create one to get started.
+            </Typography>
           </Stack>
         </Box>
       </Stack>

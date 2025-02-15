@@ -207,14 +207,14 @@ const Chats = () => {
           direction="column"
           sx={{
             flexGrow: 1,
-            overflowY: "scroll",
+            overflowY: "auto",
             height: "100%",
           }}
         >
           {loading ? (
             <Typography variant="body2">Loading chats...</Typography>
           ) : (
-            <SimpleBarStyle timeout={500} clickOnTrack={false}>
+            <SimpleBarStyle timeout={500}  autoHide={true}>
               {/* Rezultatele căutării */}
               {queries?.trim() ? (
                 <Stack spacing={2.4}>

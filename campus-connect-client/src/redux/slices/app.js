@@ -15,22 +15,15 @@ const initialState = {
     severity: null,
     message: null,
   },
-  users: [], // all users of app who are not friends and not requested yet
   all_users: [],
-  friends: [], // all friends
-  friendRequests: [], // all friend requests
   chat_type: null,
   room_id: null,
-  call_logs: [],
 };
 
 const slice = createSlice({
   name: "app",
   initialState,
   reducers: {
-    fetchCallLogs(state, action) {
-      state.call_logs = action.payload.call_logs;
-    },
     fetchUser(state, action) {
       state.user = action.payload.user;
     },
@@ -61,15 +54,6 @@ const slice = createSlice({
     },
     updateUsers(state, action) {
       state.users = action.payload.users;
-    },
-    updateAllUsers(state, action) {
-      state.all_users = action.payload.users;
-    },
-    updateFriends(state, action) {
-      state.friends = action.payload.friends;
-    },
-    updateFriendRequests(state, action) {
-      state.friendRequests = action.payload.requests;
     },
     selectConversation(state, action) {
       state.chat_type = "individual";

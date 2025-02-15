@@ -2,11 +2,13 @@ import { Box, IconButton, Stack, Typography } from "@mui/material";
 import { CaretLeft } from "phosphor-react";
 import React from "react";
 import ProfileForm from "../../sections/settings/ProfileForm";
-import message from "../../assets/Images/message.png";
+import NoChatSVG from "../../assets/Illustration/NoChat";
 import { useTheme } from "@mui/material/styles";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
   const theme = useTheme();
+  const { open, type } = useSelector((store) => store.app.sideBar);
   return (
     <Stack direction="row" sx={{ width: "100%" }}>
       {/* Left */}
@@ -35,20 +37,24 @@ const Profile = () => {
       </Box>
       <Box
         sx={{
-          flexGrow: 1,
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          padding: 1,
-          backgroundImage: `url(${message})`,
-          backgroundSize: "82%",
-          backgroundPosition: "center 20%",
-          backgroundRepeat: "no-repeat",
-          backgroundColor: theme.palette.mode === "light" ? "#FFF" : "#121212",
+          height: "100%",
+          width: open ? "calc(100vw - 740px)" : "calc(100vw - 420px)",
+          backgroundColor:
+            theme.palette.mode === "light" ? "#F0F4FA" : "transparent",
         }}
-      ></Box>
+      >
+        <Stack
+          spacing={2}
+          sx={{ height: "100%", width: "100%" }}
+          alignItems={"center"}
+          justifyContent={"center"}
+        >
+          <NoChatSVG />
+          <Typography variant="subtitle2">
+            Your profile is your digital identity. Customize it to stand out!
+          </Typography>
+        </Stack>
+      </Box>
     </Stack>
   );
 };
