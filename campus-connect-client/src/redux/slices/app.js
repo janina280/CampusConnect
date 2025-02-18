@@ -102,11 +102,11 @@ export function UpdateTab(tab) {
   };
 }
 
-export const SelectConversation = ({ room_id }) => {
+export function SelectConversation({ room_id }) {
   return async (dispatch, getState) => {
     dispatch(slice.actions.selectConversation({ room_id }));
   };
-};
+}
 
 export const FetchUserProfile = () => {
   return async (dispatch, getState) => {

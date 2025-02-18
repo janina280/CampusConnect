@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Badge,
-  Stack,
-  Typography
-} from "@mui/material";
+import { Box, Badge, Stack, Typography } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import { ChatCircle } from "phosphor-react";
 import CreateAvatar from "../utils/createAvatar";
@@ -64,7 +59,10 @@ const ChatElement = ({
 
   return (
     <StyledChatBox
-      onClick={() => {
+      onClick={async () => {
+        if (!existingChat) {
+          handleCreateChat(id);
+        }
         dispatch(SelectConversation({ room_id: id }));
       }}
       sx={{
@@ -114,7 +112,6 @@ const ChatElement = ({
             ) : (
               <ChatCircle
                 size={20}
-                onClick={() => handleCreateChat(id)}
                 style={{
                   cursor: "pointer",
                   color: theme.palette.primary.main,
@@ -155,7 +152,6 @@ const ChatElement = ({
           <Stack spacing={2} direction="row" alignItems={"center"}>
             <ChatCircle
               size={20}
-              onClick={() => handleCreateChat(id)}
               style={{
                 cursor: "pointer",
                 color: theme.palette.primary.main,

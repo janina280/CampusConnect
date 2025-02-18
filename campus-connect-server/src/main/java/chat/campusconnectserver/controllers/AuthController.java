@@ -50,7 +50,9 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String token = tokenProvider.createToken(authentication);
-        return ResponseEntity.ok(new AuthResponse(token));
+
+        var user = userRepository.findByEmail(loginRequest.getEmail());
+        return ResponseEntity.ok(new AuthResponse(user.getId(), token));
     }
 
     @PostMapping("/register")

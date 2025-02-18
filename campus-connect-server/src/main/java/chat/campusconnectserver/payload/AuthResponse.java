@@ -11,7 +11,10 @@ public class AuthResponse {
 
     private String tokenType = "Bearer";
 
-    public AuthResponse(String accessToken) {
+    private Long userId;
+
+    public AuthResponse(Long userId, String accessToken) {
+        this.userId = userId;
         this.accessToken = accessToken;
     }
 }

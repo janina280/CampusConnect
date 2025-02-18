@@ -250,7 +250,6 @@ const Chats = () => {
                           <ChatElement
                             key={chat.id}
                             {...chat}
-                            handleCreateChat={() => handleCreateChat(chat.id)}
                             existingChat={true}
                           />
                         );

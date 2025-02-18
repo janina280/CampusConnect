@@ -65,7 +65,13 @@ const Actions = [
   },
 ];
 
-const ChatInput = ({ openPicker, setOpenPicker }) => {
+const ChatInput = ({
+  openPicker,
+  setOpenPicker,
+  setValue,
+  value,
+  inputRef,
+}) => {
   const [openActions, setOpenActions] = React.useState(false);
 
   return (
@@ -132,13 +138,39 @@ const ChatInput = ({ openPicker, setOpenPicker }) => {
 };
 
 const Footer = () => {
-  const theme = useTheme();
+  const { current_conversation } = useSelector(
+    (state) => state.conversation.direct_chat
+  );
+
+  const user_id = window.localStorage.getItem("user_id");
 
   const isMobile = useResponsive("between", "md", "xs", "sm");
 
-  const [searchParams] = useSearchParams();
+  const { sideBar, room_id } = useSelector((state) => state.app);
 
   const [openPicker, setOpenPicker] = React.useState(false);
+
+  const [value, setValue] = useState("");
+  const inputRef = useRef(null);
+
+  function handleEmojiClick(emoji) {
+    const input = inputRef.current;
+
+    if (input) {
+      const selectionStart = input.selectionStart;
+      const selectionEnd = input.selectionEnd;
+
+      setValue(
+        value.substring(0, selectionStart) +
+          emoji +
+          value.substring(selectionEnd)
+      );
+
+      // Move the cursor to the end of the inserted emoji
+      input.selectionStart = input.selectionEnd = selectionStart + 1;
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -151,9 +183,7 @@ const Footer = () => {
         width={"100%"}
         sx={{
           backgroundColor:
-            theme.palette.mode === "light"
-              ? "#F8FAFF"
-              : "transparent",
+            theme.palette.mode === "light" ? "#F8FAFF" : "transparent",
           boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
         }}
       >
@@ -175,11 +205,19 @@ const Footer = () => {
               <Picker
                 theme={theme.palette.mode}
                 data={data}
-                onEmojiSelect={console.log}
+                onEmojiSelect={(emoji) => {
+                  handleEmojiClick(emoji.native);
+                }}
               />
             </Box>
             {/* Chat Input */}
-            <ChatInput openPicker={openPicker} setOpenPicker={setOpenPicker} />
+            <ChatInput
+              openPicker={openPicker}
+              setOpenPicker={setOpenPicker}
+              inputRef={inputRef}
+              value={value}
+              setValue={setValue}
+            />
           </Stack>
           <Box
             sx={{
