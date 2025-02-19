@@ -18,12 +18,12 @@ import {
   User,
 } from "phosphor-react";
 import { useTheme, styled } from "@mui/material/styles";
-import React from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useRef, useState } from "react";
 import useResponsive from "../../hooks/useResponsive";
 
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
+import { useSelector } from "react-redux";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-input": {
@@ -76,6 +76,11 @@ const ChatInput = ({
 
   return (
     <StyledInput
+      inputRef={inputRef}
+      value={value}
+      onChange={(event) => {
+        setValue(event.target.value);
+      }}
       fullWidth
       placeholder="Write a message..."
       variant="filled"
@@ -137,7 +142,22 @@ const ChatInput = ({
   );
 };
 
+function linkify(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.replace(
+    urlRegex,
+    (url) => `<a href="${url}" target="_blank">${url}</a>`
+  );
+}
+
+function containsUrl(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return urlRegex.test(text);
+}
+
 const Footer = () => {
+  const theme = useTheme();
+
   const { current_conversation } = useSelector(
     (state) => state.conversation.direct_chat
   );
@@ -183,7 +203,9 @@ const Footer = () => {
         width={"100%"}
         sx={{
           backgroundColor:
-            theme.palette.mode === "light" ? "#F8FAFF" : "transparent",
+            theme.palette.mode === "light"
+              ? "#F8FAFF"
+              : theme.palette.background,
           boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
         }}
       >
@@ -195,11 +217,7 @@ const Footer = () => {
                 position: "fixed",
                 display: openPicker ? "inline" : "none",
                 bottom: 81,
-                right: isMobile
-                  ? 20
-                  : searchParams.get("open") === "true"
-                  ? 420
-                  : 100,
+                right: isMobile ? 20 : sideBar.open ? 420 : 100,
               }}
             >
               <Picker
@@ -212,11 +230,11 @@ const Footer = () => {
             </Box>
             {/* Chat Input */}
             <ChatInput
-              openPicker={openPicker}
-              setOpenPicker={setOpenPicker}
               inputRef={inputRef}
               value={value}
               setValue={setValue}
+              openPicker={openPicker}
+              setOpenPicker={setOpenPicker}
             />
           </Stack>
           <Box
@@ -232,7 +250,17 @@ const Footer = () => {
               alignItems={"center"}
               justifyContent="center"
             >
-              <IconButton>
+              <IconButton
+                //</Stack>onClick={() => {
+                 // socket.emit("text_message", {
+                   // message: linkify(value),
+                    //conversation_id: room_id,
+                    //from: user_id,
+                    //to: current_conversation.user_id,
+                    //type: containsUrl(value) ? "Link" : "Text",
+                //  });
+                //}}
+              >
                 <PaperPlaneTilt color="#ffffff" />
               </IconButton>
             </Stack>

@@ -293,7 +293,7 @@ const Message_options = [
   },
 ];
 
-const SHARED_LINKS = [
+const Shared_links = [
   {
     type: "msg",
     subtype: "link",
@@ -312,7 +312,7 @@ const SHARED_LINKS = [
   },
 ];
 
-const SHARED_DOCS = [
+const Shared_docs = [
   {
     type: "msg",
     subtype: "doc",
@@ -336,8 +336,8 @@ export {
   ChatList,
   Chat_History,
   Message_options,
-  SHARED_DOCS,
-  SHARED_LINKS,
+  Shared_docs,
+  Shared_links,
   CallLogs,
   MembersList,
 };
