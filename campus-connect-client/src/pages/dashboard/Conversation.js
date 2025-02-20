@@ -121,7 +121,7 @@ const ChatComponent = () => {
         sx={{
           position: "relative",
           flexGrow: 1,
-          overflow: "scroll",
+          overflow: "auto",
 
           backgroundColor:
             theme.palette.mode === "light"

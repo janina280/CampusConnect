@@ -155,25 +155,6 @@ const Contact = () => {
               </Typography>
             </Stack>
           </Stack>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent={"space-evenly"}
-          >
-            <Stack alignItems={"center"} spacing={1}>
-              <IconButton>
-                <Phone />
-              </IconButton>
-
-              <Typography variant="overline">Voice</Typography>
-            </Stack>
-            <Stack alignItems={"center"} spacing={1}>
-              <IconButton>
-                <VideoCamera />
-              </IconButton>
-              <Typography variant="overline">Video</Typography>
-            </Stack>
-          </Stack>
           <Divider />
           <Stack spacing={0.5}>
             <Typography variant="article" fontWeight={600}>

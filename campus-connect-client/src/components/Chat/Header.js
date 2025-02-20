@@ -3,14 +3,13 @@ import {
   Avatar,
   Badge,
   Box,
-  Divider,
   IconButton,
   Stack,
   styled,
   Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { CaretDown, MagnifyingGlass } from "phosphor-react";
+import { MagnifyingGlass } from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import { ToggleSidebar } from "../../redux/slices/app";
 import { SetCurrentConversation } from "../../redux/slices/conversation";
@@ -46,20 +45,6 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const Conversation_Menu = [
-  {
-    title: "Contact info",
-  },
-  {
-    title: "Mute notifications",
-  },
-  {
-    title: "Clear messages",
-  },
-  {
-    title: "Delete chat",
-  },
-];
 
 const ChatHeader = () => {
   const dispatch = useDispatch();
@@ -67,14 +52,6 @@ const ChatHeader = () => {
   const theme = useTheme();
 
   const {current_conversation} = useSelector((state) => state.conversation.direct_chat);
-
-  const [conversationMenuAnchorEl, setConversationMenuAnchorEl] =
-    React.useState(null);
-  const openConversationMenu = Boolean(conversationMenuAnchorEl);
-  const handleClickConversationMenu = () => {
-    dispatch(SetCurrentConversation(null)); // Resetează conversația curentă
-  };
-
   return (
     <>
       <Box
@@ -84,7 +61,7 @@ const ChatHeader = () => {
           backgroundColor:
             theme.palette.mode === "light"
               ? "#F8FAFF"
-              : theme.palette.background,
+              : "transparent",
           boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
         }}
       >
@@ -133,20 +110,6 @@ const ChatHeader = () => {
                 <MagnifyingGlass />
               </IconButton>
             )}
-            <Divider orientation="vertical" flexItem />
-            <IconButton
-              id="conversation-positioned-button"
-              aria-controls={
-                openConversationMenu
-                  ? "conversation-positioned-menu"
-                  : undefined
-              }
-              aria-haspopup="true"
-              aria-expanded={openConversationMenu ? "true" : undefined}
-              onClick={handleClickConversationMenu}
-            >
-              <CaretDown />
-            </IconButton>
           </Stack>
         </Stack>
       </Box>

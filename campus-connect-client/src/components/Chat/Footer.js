@@ -205,7 +205,7 @@ const Footer = () => {
           backgroundColor:
             theme.palette.mode === "light"
               ? "#F8FAFF"
-              : theme.palette.background,
+              : "transparent",
           boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
         }}
       >
@@ -246,7 +246,7 @@ const Footer = () => {
             }}
           >
             <Stack
-              sx={{ height: "100%" }}
+              sx={{ height: "100%", width:"100%" }}
               alignItems={"center"}
               justifyContent="center"
             >

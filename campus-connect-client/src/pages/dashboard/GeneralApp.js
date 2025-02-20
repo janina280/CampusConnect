@@ -28,13 +28,13 @@ const GeneralApp = () => {
               : "calc(100vw - 420px )",
             backgroundColor:
               theme.palette.mode === "light"
-                ? "#FFF"
+                ? "#F8FAFF"
                 : theme.palette.background.paper,
             borderBottom:
               searchParams.get("type") === "individual-chat" &&
               searchParams.get("id")
                 ? "0px"
-                : "6px solid #0162C4",
+                : "1px solid #F8FAFF",
           }}
       >
         {chat_type === "individual" &&
