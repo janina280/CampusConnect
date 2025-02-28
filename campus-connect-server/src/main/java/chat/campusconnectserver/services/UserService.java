@@ -1,7 +1,7 @@
 package chat.campusconnectserver.services;
 
 import chat.campusconnectserver.exception.UserException;
-import chat.campusconnectserver.model.User;
+import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.repositories.UserRepository;
 import chat.campusconnectserver.security.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package chat.campusconnectserver.controllers;
 
 import chat.campusconnectserver.exception.ResourceNotFoundException;
-import chat.campusconnectserver.model.User;
+import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.repositories.UserRepository;
 import chat.campusconnectserver.security.CurrentUser;
 import chat.campusconnectserver.security.UserPrincipal;

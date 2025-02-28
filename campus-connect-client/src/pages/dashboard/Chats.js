@@ -10,26 +10,34 @@ import {
   Alert,
 } from "@mui/material";
 import { ArchiveBox, CircleDashed, MagnifyingGlass } from "phosphor-react";
-import { useTheme } from "@mui/material/styles";
 import { SimpleBarStyle } from "../../components/Scrollbar";
+import BottomNav from "../../layouts/dashboard/BottomNav";
 import {
   Search,
   SearchIconWrapper,
   StyledInputBase,
 } from "../../components/Search";
 import ChatElement from "../../components/ChatElement";
-import { useCurrentUserFromToken } from "../../sections/auth/CurrentUserFromToken";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  FetchDirectConversations
+} from "../../redux/slices/conversation";
+import { useTheme } from "@mui/material/styles";
+import useResponsive from "../../hooks/useResponsive";
 
 const Chats = () => {
   const theme = useTheme();
   const [availableChats, setAvailableChats] = useState([]);
   const [existingChats, setExistingChats] = useState([]);
   const [loading, setLoading] = useState(false);
-  const currentUser = useCurrentUserFromToken();
   const [queries, setQueries] = useState(null);
   const token = useSelector((state) => state.auth.accessToken);
-
+  const isDesktop = useResponsive("up", "md");
+  const dispatch = useDispatch();
+  const { conversations } = useSelector(
+    (state) => state.conversation.direct_chat
+  );
+  const user_id = window.localStorage.getItem("user_id");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -71,7 +79,7 @@ const Chats = () => {
       console.error("Token is missing. Please log in.");
       return;
     }
-  
+
     setLoading(true);
     try {
       const existingChat = existingChats.find(
@@ -79,7 +87,7 @@ const Chats = () => {
           chat.users.length === 2 &&
           chat.users.some((user) => user.id === userId)
       );
-  
+
       if (existingChat) {
         setExistingChats((prevChats) => {
           return prevChats.map((existing) =>
@@ -91,7 +99,7 @@ const Chats = () => {
         console.log("Chat already exists with this user");
         return;
       }
-  
+
       const createChatResponse = await fetch("http://localhost:8080/api/chat", {
         method: "POST",
         headers: {
@@ -100,12 +108,12 @@ const Chats = () => {
         },
         body: JSON.stringify({ userId }),
       });
-  
+
       if (createChatResponse.ok) {
         const newChat = await createChatResponse.json();
-        setExistingChats((prevChats) => [...prevChats, newChat]); 
+        setExistingChats((prevChats) => [...prevChats, newChat]);
         console.log("New chat created", newChat);
-  
+
         setSnackbarMessage("Chat created successfully!");
         setSnackbarOpen(true);
       } else {
@@ -120,49 +128,27 @@ const Chats = () => {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
-    const fetchChat = async () => {
-      if (!token || loading) {
-        console.error("Token is missing. Please log in.");
-        return;
-      }
-      setLoading(true);
-      try {
-        const response = await fetch("http://localhost:8080/api/chat/users", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    //socket.emit("get_direct_conversations", { user_id }, (data) => {
+    //  console.log(data); // this data is the list of conversations
+      // dispatch action
 
-        if (response.ok) {
-          const data = await response.json();
-          setExistingChats(data);
-        } else {
-          console.error("Failed to load chats, status:", response.status);
-        }
-      } catch (error) {
-        console.error("Error fetching chats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChat();
-  }, [token]);
+      dispatch(FetchDirectConversations({ conversations: conversations }));
+  }, []);
 
   return (
     <Box
       sx={{
         position: "relative",
-        width: 320,
+        height: "100%",
+        width: isDesktop ? 320 : "100vw",
         backgroundColor:
           theme.palette.mode === "light" ? "#F8FAFF" : "transparent",
         boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
       }}
     >
+      {!isDesktop && <BottomNav />}
       <Stack p={3} spacing={2} sx={{ height: "100vh" }}>
         <Stack
           direction="row"
@@ -214,7 +200,7 @@ const Chats = () => {
           {loading ? (
             <Typography variant="body2">Loading chats...</Typography>
           ) : (
-            <SimpleBarStyle timeout={500}  autoHide={true}>
+            <SimpleBarStyle timeout={500} autoHide={true}>
               {/* Rezultatele căutării */}
               {queries?.trim() ? (
                 <Stack spacing={2.4}>
@@ -228,9 +214,9 @@ const Chats = () => {
                         <ChatElement
                           key={chat.id}
                           {...chat}
-                          handleCreateChat={() => handleCreateChat(chat.id)} 
+                          handleCreateChat={() => handleCreateChat(chat.id)}
                           showMessageIcon={true}
-                          existingChat = {false}
+                          existingChat={false}
                         />
                       ))
                   ) : (
@@ -259,38 +245,10 @@ const Chats = () => {
                     <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                       All Chats
                     </Typography>
-                    {existingChats
-                      .filter((chat) => !chat.pinned && !chat.group)
-                      .map((chat) => {
-                        const lastMessage =
-                          chat.messages.length > 0
-                            ? [...chat.messages]
-                                .sort(
-                                  (a, b) =>
-                                    new Date(a.createdAt) -
-                                    new Date(b.createdAt)
-                                )
-                                .pop()
-                            : null;
-
-                        return (
-                          <ChatElement
-                            key={chat.id}
-                            {...chat}
-                            name={
-                              chat.name ??
-                              [...chat.users].filter(
-                                (user) => user.id.toString() !== currentUser.sub
-                              )[0].name
-                            }
-                            lastMessage={lastMessage}
-                            existingChat={true}
-                            noMessagesMessage={
-                                "You can start messaging with..."
-                            }
-                            formattedTime={lastMessage?.formattedTime}
-                          />
-                        );
+                    {conversations
+                      .filter((el) => !el.pinned)
+                      .map((el, idx) => {
+                        return <ChatElement {...el} />;
                       })}
                   </Stack>
                 </>

@@ -1,8 +1,8 @@
 package chat.campusconnectserver.controllers;
 
 import chat.campusconnectserver.exception.BadRequestException;
-import chat.campusconnectserver.model.AuthProvider;
-import chat.campusconnectserver.model.User;
+import chat.campusconnectserver.modal.AuthProvider;
+import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.ApiResponse;
 import chat.campusconnectserver.payload.AuthResponse;
 import chat.campusconnectserver.payload.LoginRequest;

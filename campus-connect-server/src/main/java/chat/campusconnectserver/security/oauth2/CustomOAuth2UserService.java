@@ -1,8 +1,8 @@
 package chat.campusconnectserver.security.oauth2;
 
 import chat.campusconnectserver.exception.OAuth2AuthenticationProcessingException;
-import chat.campusconnectserver.model.AuthProvider;
-import chat.campusconnectserver.model.User;
+import chat.campusconnectserver.modal.AuthProvider;
+import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.repositories.UserRepository;
 import chat.campusconnectserver.security.UserPrincipal;
 import chat.campusconnectserver.security.oauth2.user.OAuth2UserInfo;

@@ -1,6 +1,6 @@
 package chat.campusconnectserver.security;
 
-import chat.campusconnectserver.model.User;
+import chat.campusconnectserver.modal.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;

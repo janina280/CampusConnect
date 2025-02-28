@@ -2,8 +2,8 @@ package chat.campusconnectserver.services;
 
 import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
-import chat.campusconnectserver.model.Chat;
-import chat.campusconnectserver.model.User;
+import chat.campusconnectserver.modal.Chat;
+import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.GroupChatRequest;
 import chat.campusconnectserver.repositories.ChatRepository;
 import org.springframework.beans.factory.annotation.Autowired;

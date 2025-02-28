@@ -1,4 +1,4 @@
-package chat.campusconnectserver.model;
+package chat.campusconnectserver.modal;
 
 public enum AuthProvider {
     local,

@@ -1,4 +1,4 @@
-package chat.campusconnectserver.model;
+package chat.campusconnectserver.modal;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
