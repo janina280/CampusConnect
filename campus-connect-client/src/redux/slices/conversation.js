@@ -66,24 +66,10 @@ const slice = createSlice({
       );
     },
     addDirectConversation(state, action) {
-      const this_conversation = action.payload.conversation;
-      const user = this_conversation.participants.find(
-        (elm) => elm._id.toString() !== user_id
-      );
-      state.direct_chat.conversations = state.direct_chat.conversations.filter(
-        (el) => el?.id !== this_conversation._id
-      );
-      state.direct_chat.conversations.push({
-        id: this_conversation._id._id,
-        user_id: user?._id,
-        name: `${user?.name}`,
-        online: user?.status === "Online",
-        img: faker.image.avatar(),
-        msg: faker.music.songName(),
-        time: "9:36",
-        unread: 0,
-        pinned: false,
-      });
+      const newChat = action.payload.conversation;
+      if (!state.direct_chat.conversations.find((chat) => chat.id === newChat.id)) {
+        state.direct_chat.conversations.push(newChat);
+      }
     },
     setCurrentConversation(state, action) {
       state.direct_chat.current_conversation = action.payload;
@@ -136,42 +122,41 @@ export const FetchDirectConversations = () => {
   };
 };
 
-export const AddDirectConversation = ({ userId }) => {
-  return async (dispatch, getState) => {
+export const AddDirectConversation = (userId) => async (dispatch, getState) => {
+  try {
+    const token = getState().auth.accessToken;
 
-try{
-  const token=getState().auth.accessToken;
-  const existingChat=getState().conversation.direct_chat.conversations.find(
-    (chat)=>chat.users.length === 2 && chat.users.some((user)=>user.id === userId)
-  );
-  
-  if(existingChat){
-    console.log("Chat already exists with this user");
-    return;
+    // Verificăm dacă există un chat cu utilizatorul respectiv
+    const existingChat = getState().conversation.direct_chat.conversations.find(
+      (chat) => chat.users.length === 2 && chat.users.some((user) => user.id === userId)
+    );
+
+    if (existingChat) {
+      console.log("Chat already exists with this user");
+      return;
+    }
+
+    // Creăm un nou chat
+    const response = await axios.post(
+      "/api/chat",
+      { userId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.data) {
+      dispatch(slice.actions.addDirectConversation({ conversation: response.data }));
+      console.log("New chat created", response.data);
+      return response.data;  // Întoarcem chatul creat
+    } else {
+      console.error("Failed to create chat");
+    }
+  } catch (error) {
+    console.error("Error creating chat:", error);
   }
-
-  const response= await axios.post(
-    "/api/chat",
-    {userId},
-    {headers:{
-      Authorization: `Bearer ${token}`,
-    },
-  }
-  );
-
-  if(response.data){
-    dispatch(slice.actions.addDirectConversation({conversation: response.data}));
-    console.log("New chat created", response.data);
-  }else{
-    console.error("Failed to create chat");
-  }
-
-}
-catch(error)
-{
-  console.log("Error creating chat:", error);
-}  
-  };
 };
 
 

@@ -71,20 +71,13 @@ export function LoginUser(fromValues) {
 //Search
 export function searchUser(data) {
   return async (dispatch, getState) => {
-    console.log("searchUser function called with keyword:", data.keyword);
-
     const token = getState().auth.accessToken;
-    console.log("Token:", token);
-
     if (!token) {
-      console.error("Token is missing. Please log in.");
       return;
     }
-
-    console.log("Sending request to API...");
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/user/${data.keyword}`,
+        `/api/user/${data.keyword}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -92,9 +85,6 @@ export function searchUser(data) {
           },
         }
       );
-
-      console.log("API Response:", response.data);
-
       dispatch(
         slice.actions.search({
           availableChats: response.data,
@@ -105,7 +95,6 @@ export function searchUser(data) {
     }
   };
 }
-
 
 //Log Out
 export function LogoutUser() {

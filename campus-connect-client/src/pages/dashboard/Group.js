@@ -61,7 +61,6 @@ const Group = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Fetched chat data:", data);
         setFilteredGroups(data);
       }
     } catch (error) {

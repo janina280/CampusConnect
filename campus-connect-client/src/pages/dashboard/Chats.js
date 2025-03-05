@@ -17,11 +17,10 @@ import {
   SearchIconWrapper,
   StyledInputBase,
 } from "../../components/Search";
-import NoChatSVG from "../../assets/Illustration/NoChat";
 import ChatElement from "../../components/ChatElement";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  FetchDirectConversations
+  AddDirectConversation
 } from "../../redux/slices/conversation";
 import { useTheme } from "@mui/material/styles";
 import useResponsive from "../../hooks/useResponsive";
@@ -31,6 +30,7 @@ import { useCurrentUserFromToken } from "../../sections/auth/CurrentUserFromToke
 const Chats = () => {
   const theme = useTheme();
   const [existingChats, setExistingChats] = useState([]);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState(null);
   const token = useSelector((state) => state.auth.accessToken);
@@ -52,68 +52,34 @@ const Chats = () => {
     if (value.trim() === "") {
       return;
     }
-  
-    console.log("Searching for:", value); // Debugging
     dispatch(searchUser({ keyword: value }));
-    console.log("Dispatched searchUser action!"); // Ar trebui să apară după ce faci dispatch
   };
+
+
+  const handleCreateChat = (userId) => {
+    dispatch(AddDirectConversation(userId))
+      .then((newChat) => {
+        if (newChat) {
+          setExistingChats((prevChats) => [
+            ...prevChats,
+            newChat,
+          ]);
   
-  
-
-  const handleCreateChat = async (userId) => {
-    if (!token) {
-      console.error("Token is missing. Please log in.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const existingChat = existingChats.find(
-        (chat) =>
-          chat.users.length === 2 &&
-          chat.users.some((user) => user.id === userId)
-      );
-
-      if (existingChat) {
-        setExistingChats((prevChats) => {
-          return prevChats.map((existing) =>
-            existing.id === existingChat.id
-              ? { ...existing, lastMessage: existingChat.lastMessage }
-              : existing
-          );
-        });
-        console.log("Chat already exists with this user");
-        return;
-      }
-
-      const createChatResponse = await fetch("http://localhost:8080/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ userId }),
-      });
-
-      if (createChatResponse.ok) {
-        const newChat = await createChatResponse.json();
-        setExistingChats((prevChats) => [...prevChats, newChat]);
-        console.log("New chat created", newChat);
-
-        setSnackbarMessage("Chat created successfully!");
+          setSnackbarMessage("The chat was created successfully!");
+          setSnackbarSeverity("success");
+          setSnackbarOpen(true);
+        } else {
+          setSnackbarMessage("An error occurred while creating the chat.");
+          setSnackbarOpen(true);
+        }
+      })
+      .catch((error) => {
+        setSnackbarMessage("Error creating chat.");
         setSnackbarOpen(true);
-      } else {
-        console.error(
-          "Failed to create chat, status:",
-          createChatResponse.status
-        );
-      }
-    } catch (error) {
-      console.error("Error creating chat:", error);
-    } finally {
-      setLoading(false);
-    }
+      });
   };
+  
+  
 
   useEffect(() => {
     const fetchChat = async () => {
