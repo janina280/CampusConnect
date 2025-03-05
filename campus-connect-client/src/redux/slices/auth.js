@@ -6,6 +6,7 @@ const initialState = {
   isLoggedIn: false,
   accessToken: "",
   isLoading: false,
+  availableChats: []
 };
 
 const slice = createSlice({
@@ -23,6 +24,9 @@ const slice = createSlice({
     signOut(state, action) {
       state.isLoggedIn = false;
       state.accessToken = "";
+    },
+    search(state, action) {
+      state.availableChats = action.payload.availableChats; 
     },
   },
 });
@@ -47,7 +51,6 @@ export function LoginUser(fromValues) {
         }
       )
       .then(function (response) {
-        console.log(response);
         dispatch(
           slice.actions.logIn({
             isLoggedIn: true,
@@ -64,6 +67,45 @@ export function LoginUser(fromValues) {
       });
   };
 }
+
+//Search
+export function searchUser(data) {
+  return async (dispatch, getState) => {
+    console.log("searchUser function called with keyword:", data.keyword);
+
+    const token = getState().auth.accessToken;
+    console.log("Token:", token);
+
+    if (!token) {
+      console.error("Token is missing. Please log in.");
+      return;
+    }
+
+    console.log("Sending request to API...");
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/user/${data.keyword}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("API Response:", response.data);
+
+      dispatch(
+        slice.actions.search({
+          availableChats: response.data,
+        })
+      );
+    } catch (error) {
+      console.error("Search API error:", error);
+    }
+  };
+}
+
 
 //Log Out
 export function LogoutUser() {
@@ -90,7 +132,6 @@ export function RegisterUser(formValues, navigate) {
         }
       )
       .then(function (response) {
-        console.log(response);
         dispatch(
           showSnackbar({ severity: "success", message: response.data.message })
         );

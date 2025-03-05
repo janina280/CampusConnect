@@ -109,7 +109,7 @@ export function SelectConversation({ room_id }) {
 export const FetchUserProfile = () => {
   return async (dispatch, getState) => {
     axios
-      .get("/user/get-me", {
+      .get("/profile", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getState().auth.token}`,

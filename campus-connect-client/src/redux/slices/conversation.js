@@ -4,7 +4,6 @@ import axios from "../../utils/axios"
 
 const user_id = window.localStorage.getItem("user_id");
 
-
 const initialState = {
   direct_chat: {
     conversations: [],
@@ -77,7 +76,7 @@ const slice = createSlice({
       state.direct_chat.conversations.push({
         id: this_conversation._id._id,
         user_id: user?._id,
-        name: `${user?.firstName} ${user?.lastName}`,
+        name: `${user?.name}`,
         online: user?.status === "Online",
         img: faker.image.avatar(),
         msg: faker.music.songName(),
@@ -115,7 +114,6 @@ export default slice.reducer;
 export const FetchDirectConversations = () => {
   return async (dispatch, getState) => {
     try {
-      // Obține token-ul din Redux sau localStorage
       const token = getState().auth.accessToken;
 
       if (!token) {
@@ -138,11 +136,45 @@ export const FetchDirectConversations = () => {
   };
 };
 
-export const AddDirectConversation = ({ conversation }) => {
+export const AddDirectConversation = ({ userId }) => {
   return async (dispatch, getState) => {
-    dispatch(slice.actions.addDirectConversation({ conversation }));
+
+try{
+  const token=getState().auth.accessToken;
+  const existingChat=getState().conversation.direct_chat.conversations.find(
+    (chat)=>chat.users.length === 2 && chat.users.some((user)=>user.id === userId)
+  );
+  
+  if(existingChat){
+    console.log("Chat already exists with this user");
+    return;
+  }
+
+  const response= await axios.post(
+    "/api/chat",
+    {userId},
+    {headers:{
+      Authorization: `Bearer ${token}`,
+    },
+  }
+  );
+
+  if(response.data){
+    dispatch(slice.actions.addDirectConversation({conversation: response.data}));
+    console.log("New chat created", response.data);
+  }else{
+    console.error("Failed to create chat");
+  }
+
+}
+catch(error)
+{
+  console.log("Error creating chat:", error);
+}  
   };
 };
+
+
 export const UpdateDirectConversation = ({ conversation }) => {
   return async (dispatch, getState) => {
     dispatch(slice.actions.updateDirectConversation({ conversation }));

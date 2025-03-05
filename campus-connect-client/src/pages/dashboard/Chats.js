@@ -17,6 +17,7 @@ import {
   SearchIconWrapper,
   StyledInputBase,
 } from "../../components/Search";
+import NoChatSVG from "../../assets/Illustration/NoChat";
 import ChatElement from "../../components/ChatElement";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -24,15 +25,18 @@ import {
 } from "../../redux/slices/conversation";
 import { useTheme } from "@mui/material/styles";
 import useResponsive from "../../hooks/useResponsive";
+import { searchUser } from "../../redux/slices/auth";
+import { useCurrentUserFromToken } from "../../sections/auth/CurrentUserFromToken";
 
 const Chats = () => {
   const theme = useTheme();
-  const [availableChats, setAvailableChats] = useState([]);
   const [existingChats, setExistingChats] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [queries, setQueries] = useState(null);
+  const [query, setQuery] = useState(null);
   const token = useSelector((state) => state.auth.accessToken);
+   const { open } = useSelector((store) => store.app.sideBar);
   const isDesktop = useResponsive("up", "md");
+  const currentUser = useCurrentUserFromToken();
   const dispatch = useDispatch();
   const { conversations } = useSelector(
     (state) => state.conversation.direct_chat
@@ -40,39 +44,21 @@ const Chats = () => {
   const user_id = window.localStorage.getItem("user_id");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const availableChats = useSelector((state) => state.auth.availableChats);
 
-  const handleSearch = async (query) => {
-    if (!token) {
-      console.error("Token is missing. Please log in.");
+  const handleSearch = (value) => {
+    setQuery(value);
+  
+    if (value.trim() === "") {
       return;
     }
-
-    setLoading(true);
-    try {
-      const encodedQuery = encodeURIComponent(query);
-      const url = `http://localhost:8080/api/user/${encodedQuery}`;
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Fetched chat data:", data);
-        setAvailableChats(data);
-      } else {
-        console.error("Search failed, status:", response.status);
-        setAvailableChats([]);
-      }
-    } catch (error) {
-      console.error("Error performing search:", error);
-      setAvailableChats([]);
-    } finally {
-      setLoading(false);
-    }
+  
+    console.log("Searching for:", value); // Debugging
+    dispatch(searchUser({ keyword: value }));
+    console.log("Dispatched searchUser action!"); // Ar trebui să apară după ce faci dispatch
   };
+  
+  
 
   const handleCreateChat = async (userId) => {
     if (!token) {
@@ -130,12 +116,35 @@ const Chats = () => {
   };
 
   useEffect(() => {
-    //socket.emit("get_direct_conversations", { user_id }, (data) => {
-    //  console.log(data); // this data is the list of conversations
-      // dispatch action
+    const fetchChat = async () => {
+      if (!token || loading) {
+        console.error("Token is missing. Please log in.");
+        return;
+      }
+      setLoading(true);
+      try {
+        const response = await fetch("http://localhost:8080/api/chat/users", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      dispatch(FetchDirectConversations({ conversations: conversations }));
-  }, []);
+        if (response.ok) {
+          const data = await response.json();
+          setExistingChats(data);
+        } else {
+          console.error("Failed to load chats, status:", response.status);
+        }
+      } catch (error) {
+        console.error("Error fetching chats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChat();
+  }, [token]);
 
   return (
     <Box
@@ -168,16 +177,8 @@ const Chats = () => {
             <StyledInputBase
               placeholder="Search"
               inputProps={{ "aria-label": "search" }}
-              onChange={(e) => {
-                const searchTerm = e.target.value;
-                setQueries(searchTerm);
-                if (searchTerm.trim() !== "") {
-                  handleSearch(searchTerm);
-                } else {
-                  setAvailableChats([]);
-                }
-              }}
-              value={queries}
+              onChange={(e) => handleSearch(e.target.value)}
+              value={query}
             />
           </Search>
         </Stack>
@@ -202,7 +203,7 @@ const Chats = () => {
           ) : (
             <SimpleBarStyle timeout={500} autoHide={true}>
               {/* Rezultatele căutării */}
-              {queries?.trim() ? (
+              {query?.trim() ? (
                 <Stack spacing={2.4}>
                   <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                     Search Results
@@ -245,10 +246,38 @@ const Chats = () => {
                     <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                       All Chats
                     </Typography>
-                    {conversations
-                      .filter((el) => !el.pinned)
-                      .map((el, idx) => {
-                        return <ChatElement {...el} />;
+                    {existingChats
+                      .filter((chat) => !chat.pinned && !chat.group)
+                      .map((chat) => {
+                        const lastMessage =
+                          chat.messages.length > 0
+                            ? [...chat.messages]
+                                .sort(
+                                  (a, b) =>
+                                    new Date(a.createdAt) -
+                                    new Date(b.createdAt)
+                                )
+                                .pop()
+                            : null;
+
+                        return (
+                          <ChatElement
+                            key={chat.id}
+                            {...chat}
+                            name={
+                              chat.name ??
+                              [...chat.users].filter(
+                                (user) => user.id.toString() !== currentUser.sub
+                              )[0].name
+                            }
+                            lastMessage={lastMessage}
+                            existingChat={true}
+                            noMessagesMessage={
+                                "You can start messaging with..."
+                            }
+                            formattedTime={lastMessage?.formattedTime}
+                          />
+                        );
                       })}
                   </Stack>
                 </>

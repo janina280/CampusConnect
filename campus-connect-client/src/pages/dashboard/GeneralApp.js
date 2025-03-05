@@ -8,12 +8,11 @@ import NoChatSVG from "../../assets/Illustration/NoChat";
 import StarredMessages from "../../sections/dashboard/StarredMessages";
 import Media from "../../sections/dashboard/SharedMessage";
 import ChatComponent from "./Conversation";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 const GeneralApp = () => {
   const theme = useTheme();
   const [searchParams] = useSearchParams();
- // const { sideBar, room_id, chat_type } = useSelector((state) => state.app);
   const { open, type } = useSelector((store) => store.app.sideBar);
   const { chat_type, room_id } = useSelector((store) => store.app);
 
