@@ -28,7 +28,7 @@ const slice = createSlice({
           id: el.id,
           name: `${user?.name}`,
           nickname: `${user?.nickname}`,
-          msg: el.messages.slice(-1)[0].text, 
+          msg: el.messages.slice(-1)[0]?.text, 
           time: "9:36",
           unread: 0,
           pinned: false,
@@ -112,10 +112,11 @@ export const FetchDirectConversations = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
+        console.log("test: ", response.data )
       dispatch(
-        slice.actions.fetchDirectConversations({ conversations: response.data })
-      );
+        slice.actions.fetchDirectConversations({ conversations: response.data || [] })
+);
+
     } catch (error) {
       console.error("Error fetching conversations:", error);
     }

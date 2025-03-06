@@ -20,7 +20,7 @@ import {
 import ChatElement from "../../components/ChatElement";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  AddDirectConversation
+  AddDirectConversation, FetchDirectConversations
 } from "../../redux/slices/conversation";
 import { useTheme } from "@mui/material/styles";
 import useResponsive from "../../hooks/useResponsive";
@@ -38,9 +38,7 @@ const Chats = () => {
   const isDesktop = useResponsive("up", "md");
   const currentUser = useCurrentUserFromToken();
   const dispatch = useDispatch();
-  const { conversations } = useSelector(
-    (state) => state.conversation.direct_chat
-  );
+  const conversations = useSelector((state) => state.conversation.direct_chat.conversations) || [];
   const user_id = window.localStorage.getItem("user_id");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -69,7 +67,7 @@ const Chats = () => {
           setSnackbarSeverity("success");
           setSnackbarOpen(true);
         } else {
-          setSnackbarMessage("An error occurred while creating the chat.");
+          setSnackbarMessage("Chat already exists with this user");
           setSnackbarOpen(true);
         }
       })
@@ -80,37 +78,12 @@ const Chats = () => {
   };
   
   
-
   useEffect(() => {
-    const fetchChat = async () => {
-      if (!token || loading) {
-        console.error("Token is missing. Please log in.");
-        return;
-      }
-      setLoading(true);
-      try {
-        const response = await fetch("http://localhost:8080/api/chat/users", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setExistingChats(data);
-        } else {
-          console.error("Failed to load chats, status:", response.status);
-        }
-      } catch (error) {
-        console.error("Error fetching chats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChat();
-  }, [token]);
+    if (token) {
+      dispatch(FetchDirectConversations());
+    }
+  }, []);
+  
 
   return (
     <Box
@@ -196,7 +169,7 @@ const Chats = () => {
                     <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                       Pinned
                     </Typography>
-                    {existingChats
+                    {conversations
                       .filter((chat) => chat.pinned)
                       .map((chat) => {
                         return (
@@ -212,11 +185,11 @@ const Chats = () => {
                     <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                       All Chats
                     </Typography>
-                    {existingChats
+                    {conversations
                       .filter((chat) => !chat.pinned && !chat.group)
                       .map((chat) => {
                         const lastMessage =
-                          chat.messages.length > 0
+                          chat.messages?.length > 0
                             ? [...chat.messages]
                                 .sort(
                                   (a, b) =>
