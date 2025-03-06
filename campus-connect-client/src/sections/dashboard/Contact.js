@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
-  Avatar,
   Box,
   Button,
   Divider,
@@ -15,15 +14,13 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { faker } from "@faker-js/faker";
+import CreateAvatar from "../../utils/createAvatar";
 import {
   Bell,
   CaretRight,
-  Phone,
   Prohibit,
   Star,
   Trash,
-  VideoCamera,
   X,
 } from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
@@ -141,17 +138,17 @@ const Contact = () => {
           spacing={3}
         >
           <Stack alignItems="center" direction="row" spacing={2}>
-            <Avatar
-              src={current_conversation?.img}
-              alt={current_conversation?.name}
-              sx={{ height: 64, width: 64 }}
-            />
+          <CreateAvatar
+                  name={current_conversation?.name}
+                  imageUrl={current_conversation?.img}
+                  size={56}
+                />
             <Stack spacing={0.5}>
               <Typography variant="article" fontWeight={600}>
                 {current_conversation?.name}
               </Typography>
               <Typography variant="body2" fontWeight={500}>
-                {"+91 62543 28 739"}
+                {current_conversation?.nickname}
               </Typography>
             </Stack>
           </Stack>

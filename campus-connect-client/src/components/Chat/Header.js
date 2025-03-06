@@ -14,44 +14,17 @@ import useResponsive from "../../hooks/useResponsive";
 import { ToggleSidebar } from "../../redux/slices/app";
 import { SetCurrentConversation } from "../../redux/slices/conversation";
 import { useDispatch, useSelector } from "react-redux";
-
-
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    backgroundColor: "#44b700",
-    color: "#44b700",
-    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-    "&::after": {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      borderRadius: "50%",
-      animation: "ripple 1.2s infinite ease-in-out",
-      border: "1px solid currentColor",
-      content: '""',
-    },
-  },
-  "@keyframes ripple": {
-    "0%": {
-      transform: "scale(.8)",
-      opacity: 1,
-    },
-    "100%": {
-      transform: "scale(2.4)",
-      opacity: 0,
-    },
-  },
-}));
-
+import CreateAvatar from "../../utils/createAvatar";
+import StyledBadge from "../StyledBadge";
 
 const ChatHeader = () => {
   const dispatch = useDispatch();
   const isMobile = useResponsive("between", "md", "xs", "sm");
   const theme = useTheme();
 
-  const {current_conversation} = useSelector((state) => state.conversation.direct_chat);
+  const { current_conversation } = useSelector(
+    (state) => state.conversation.direct_chat
+  );
   return (
     <>
       <Box
@@ -59,9 +32,7 @@ const ChatHeader = () => {
         width={"100%"}
         sx={{
           backgroundColor:
-            theme.palette.mode === "light"
-              ? "#F8FAFF"
-              : "transparent",
+            theme.palette.mode === "light" ? "#F8FAFF" : "transparent",
           boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
         }}
       >
@@ -87,9 +58,10 @@ const ChatHeader = () => {
                 }}
                 variant="dot"
               >
-                <Avatar
-                  alt={current_conversation?.name}
-                  src={current_conversation?.img}
+                <CreateAvatar
+                  name={current_conversation?.name}
+                  imageUrl={current_conversation?.img}
+                  size={56}
                 />
               </StyledBadge>
             </Box>
@@ -113,8 +85,6 @@ const ChatHeader = () => {
           </Stack>
         </Stack>
       </Box>
-
-      
     </>
   );
 };
