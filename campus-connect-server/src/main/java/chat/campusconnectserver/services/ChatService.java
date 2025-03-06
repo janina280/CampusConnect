@@ -56,7 +56,7 @@ public class ChatService {
         if (user == null) {
             throw new UserException("User not found with ID: " + userId);
         }
-        return chatRepository.findChatByUserIds(user.getId());
+        return chatRepository.findChatByUserIds(user);
     }
 
 
