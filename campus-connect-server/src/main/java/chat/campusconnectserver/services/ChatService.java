@@ -1,5 +1,6 @@
 package chat.campusconnectserver.services;
 
+import chat.campusconnectserver.dtos.ChatDto;
 import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Chat;
@@ -51,12 +52,12 @@ public class ChatService {
         throw new ChatException("Chat not found with id" + chatId);
     }
 
-    public List<Chat> findAllChatByUserId(Long userId) throws UserException {
+    public List<ChatDto> findAllChatByUserId(Long userId) throws UserException {
         User user = userService.findUserById(userId);
         if (user == null) {
             throw new UserException("User not found with ID: " + userId);
         }
-        return chatRepository.findChatByUserIds(user);
+        return chatRepository.findChatByUserIds(user).stream().map(ChatDto::new).toList();
     }
 
 

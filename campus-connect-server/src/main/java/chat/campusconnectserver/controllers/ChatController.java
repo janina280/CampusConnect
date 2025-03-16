@@ -1,5 +1,6 @@
 package chat.campusconnectserver.controllers;
 
+import chat.campusconnectserver.dtos.ChatDto;
 import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Chat;
@@ -13,12 +14,16 @@ import chat.campusconnectserver.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/chat")
+@Controller
 public class ChatController {
     private final ChatService chatService;
     private final UserService userService;
@@ -57,13 +62,15 @@ public class ChatController {
         return new ResponseEntity<>(chat, HttpStatus.OK);
     }
 
-    @GetMapping("/users")
-    public ResponseEntity<List<Chat>> findAllChatByUserHandle(@RequestHeader("Authorization") String jwt) throws UserException {
+    @Transactional
+    @MessageMapping("/chats")
+    @SendTo("/chat/chats-response")
+    public List<ChatDto> findAllChatByUserHandle(@RequestHeader("Authorization") String jwt) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
-        List<Chat> chats = chatService.findAllChatByUserId(currentUserId);
+        List<ChatDto> chats = chatService.findAllChatByUserId(currentUserId);
 
-        return new ResponseEntity<>(chats, HttpStatus.OK);
+        return chats;
     }
 
     @GetMapping("/groups")
@@ -109,7 +116,7 @@ public class ChatController {
     public ResponseEntity<ApiResponse> deleteChatHandle(
             @PathVariable Long chatId,
             @RequestHeader("Authorization") String jwt
-    ) throws UserException{
+    ) throws UserException {
         User reqUser = userService.findUserProfile(jwt);
 
         chatService.deleteChat(chatId, reqUser.getId());

@@ -26,6 +26,7 @@ import { useTheme } from "@mui/material/styles";
 import useResponsive from "../../hooks/useResponsive";
 import { searchUser } from "../../redux/slices/auth";
 import { useCurrentUserFromToken } from "../../sections/auth/CurrentUserFromToken";
+import socket from "../../socket";
 
 const Chats = () => {
   const theme = useTheme();
@@ -83,15 +84,17 @@ const Chats = () => {
       });
   };
   
-
-
-
-  
   useEffect(() => {
-    if (token) {
+    socket.emit("/app/chats", "Bearer " + token)
+
+    socket.on("/chat/chats-response",(data) =>{
+      dispatch(FetchDirectConversations(data));
+    })
+
+    /*if (token) {
       dispatch(FetchDirectConversations());
-    }
-  }, []);
+    }*/
+  }, [socket.isConnected]);
   
 
   return (

@@ -1,5 +1,6 @@
 package chat.campusconnectserver.controllers;
 
+import chat.campusconnectserver.dtos.Greeting;
 import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Message;
@@ -8,12 +9,13 @@ import chat.campusconnectserver.services.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 
-@RestController
+@Controller
 public class ChatWebSocketController {
 
     private final SimpMessagingTemplate messagingTemplate;
@@ -36,4 +38,12 @@ public class ChatWebSocketController {
                 message
         );
     }
+
+    //todo: for testing
+    @MessageMapping("/hello")
+    @SendTo("/topic/greetings")
+    public Greeting greeting(String name) {
+        return new Greeting("Hello, " + name + "!");
+    }
+
 }

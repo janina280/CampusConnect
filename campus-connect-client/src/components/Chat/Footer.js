@@ -158,7 +158,7 @@ const Footer = () => {
   const inputRef = useRef(null);
   const [stompClient, setStompClient] = useState(null);
 
-  useEffect(() => {
+  /*useEffect(() => {
     // Inițializează conexiunea WebSocket
     const socket = new SockJS("http://localhost:8080/ws");
     const client = new Client({
@@ -187,7 +187,7 @@ const Footer = () => {
     return () => {
       client.deactivate();
     };
-  }, []);
+  }, []);*/
 
   const handleSendMessage = () => {
     if (stompClient && stompClient.connected && receiver_id && value.trim() !== "") {

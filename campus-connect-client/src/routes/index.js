@@ -8,6 +8,7 @@ import DashboardLayout from "../layouts/dashboard";
 import { DEFAULT_PATH } from "../config";
 import LoadingScreen from "../components/LoadingScreen";
 import MainLayout from "../layouts/main";
+import Test from "../layouts/dashboard/index-test";
 
 const Loadable = (Component) => (props) => {
   return (
@@ -51,6 +52,10 @@ export default function Router() {
         { path: "group", element: <GroupPage /> },
         { path: "profile", element: <ProfilePage /> },
         { path: "*", element: <Navigate to="/404" replace /> },
+        {
+          path: "/test",
+          element: <Test />
+        },
       ],
     },
     { path: "*", element: <Navigate to="/404" replace /> },
