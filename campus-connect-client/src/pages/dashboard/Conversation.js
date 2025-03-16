@@ -19,27 +19,37 @@ import {
   FetchCurrentMessages,
   SetCurrentConversation,
 } from "../../redux/slices/conversation";
-//import { socket } from "../../socket";
+import SockJS from "sockjs-client";
+import { Client } from '@stomp/stompjs';
+
+//const socket = new SockJS("http://localhost:8080/ws");  // URL-ul serverului tău
+//const stompClient = Client(socket);
 
 const Conversation = ({ isMobile, menu }) => {
   const dispatch = useDispatch();
-
-  const { conversations, current_messages } = useSelector(
-    (state) => state.conversation.direct_chat
-  );
+  const { conversations, current_messages } = useSelector((state) => state.conversation.direct_chat);
   const { room_id } = useSelector((state) => state.app);
 
   useEffect(() => {
     const current = conversations.find((el) => el?.id === room_id);
 
-    //socket.emit("get_messages", { conversation_id: current?.id }, (data) => {
-      // data => list of messages
-     // console.log(data, "List of messages");
-      //dispatch(FetchCurrentMessages({ messages: data }));
-    //});
+    if (current) {
+      dispatch(SetCurrentConversation(current));
 
-    dispatch(SetCurrentConversation(current));
-  }, []);
+     // stompClient.connect({}, () => {
+       // stompClient.subscribe(`/topic/messages/${room_id}`, (message) => {
+        //  const newMessage = JSON.parse(message.body);
+         // dispatch(FetchCurrentMessages({ messages: newMessage }));
+       // });
+    //  });
+    }
+
+   // return () => {
+    //  if (stompClient) {
+    //    stompClient.disconnect();
+    //  }
+  //  };
+  }, [room_id, conversations]);
   return (
     <Box p={isMobile ? 1 : 3}>
       <Stack spacing={3}>

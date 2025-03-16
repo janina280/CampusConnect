@@ -3,17 +3,21 @@ package chat.campusconnectserver.payload;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 public class SendMessageRequest {
-    private  Long userId;
-    private Long chatId;
+    private Long userId;  // Expeditor
+    private Long receiverId; // Destinatar
     private String content;
-    public SendMessageRequest(Long userId, Long chatId, String content) {
+    private Long chatId;
+
+    public SendMessageRequest() {}
+
+    public SendMessageRequest(Long userId, Long receiverId, String content, Long chatId) {
         this.userId = userId;
-        this.chatId = chatId;
+        this.receiverId = receiverId;
         this.content = content;
+        this.chatId=chatId;
     }
-public  SendMessageRequest(){}
 
 }

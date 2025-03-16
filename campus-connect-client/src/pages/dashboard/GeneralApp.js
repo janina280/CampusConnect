@@ -1,5 +1,6 @@
 import React from "react";
 import Chats from "./Chats";
+import { useEffect, useState } from "react";
 import { Box, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useSelector } from "react-redux";
@@ -15,31 +16,34 @@ const GeneralApp = () => {
   const [searchParams] = useSearchParams();
   const { open, type } = useSelector((store) => store.app.sideBar);
   const { chat_type, room_id } = useSelector((store) => store.app);
+  const [selectedChat, setSelectedChat] = useState(null);
+  useEffect(() => {
+    if (room_id !== null) {
+      setSelectedChat(room_id); // Actualizează chat-ul curent
+    }
+  }, [room_id]);
 
   return (
     <Stack direction={"row"} sx={{ width: "100%" }}>
       <Chats />
       <Box
-          sx={{
-            height: "100%",
-            width: open
-              ? `calc(100vw - 740px )`
-              : "calc(100vw - 420px )",
-            backgroundColor:
-              theme.palette.mode === "light"
-                ? "#F8FAFF"
-                : theme.palette.background.paper,
-            borderBottom:
-              searchParams.get("type") === "individual-chat" &&
-              searchParams.get("id")
-                ? "0px"
-                : "1px solid #F8FAFF",
-          }}
+        sx={{
+          height: "100%",
+          width: open ? `calc(100vw - 740px )` : "calc(100vw - 420px )",
+          backgroundColor:
+            theme.palette.mode === "light"
+              ? "#F8FAFF"
+              : theme.palette.background.paper,
+          borderBottom:
+            searchParams.get("type") === "individual-chat" &&
+            searchParams.get("id")
+              ? "0px"
+              : "1px solid #F8FAFF",
+        }}
       >
-        {chat_type === "individual" &&
-          room_id !== null ? (
-            <ChatComponent />
-          ) : (
+        {chat_type === "individual" && selectedChat ? (
+          <ChatComponent key={selectedChat} />
+        ) : (
           <Stack
             spacing={2}
             sx={{ height: "100%", width: "100%" }}
@@ -53,7 +57,7 @@ const GeneralApp = () => {
           </Stack>
         )}
       </Box>
-      
+
       {open &&
         (() => {
           switch (type) {

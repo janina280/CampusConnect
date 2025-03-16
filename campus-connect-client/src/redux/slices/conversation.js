@@ -19,27 +19,31 @@ const slice = createSlice({
   reducers: {
     fetchDirectConversations(state, action) {
       const list = action.payload.conversations.map((el) => {
-        const user = el.users?.find((elm) => {
-          console.log('Checking user', elm);
-          return elm.id.toString() !== user_id;
-        });
-     
+        const user = el.users?.find((elm) => elm.id.toString() !== user_id);
+        
+        const lastMessage = el.messages?.length
+          ? [...el.messages]
+              .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+              .pop()
+          : null;
+    
         return {
           id: el.id,
-          name: `${user?.name}`,
-          nickname: `${user?.nickname}`,
-          msg: el.messages.slice(-1)[0]?.text, 
-          time: "9:36",
+          name: user?.name,
+          nickname: user?.nickname,
+          msg: lastMessage?.text, 
+          time: lastMessage ? new Date(lastMessage.createdAt).toLocaleTimeString() : "9:36",  
           unread: 0,
           pinned: false,
           about: user?.about,
           online: user?.status === "Online",
           urlImg: faker.image.avatar(),
+          lastMessage,
         };
       });
-
       state.direct_chat.conversations = list;
     },
+
     updateDirectConversation(state, action) {
       const this_conversation = action.payload.conversation;
       state.direct_chat.conversations = state.direct_chat.conversations.map(
@@ -65,12 +69,28 @@ const slice = createSlice({
         }
       );
     },
+    
     addDirectConversation(state, action) {
-      const newChat = action.payload.conversation;
-      if (!state.direct_chat.conversations.find((chat) => chat.id === newChat.id)) {
-        state.direct_chat.conversations.push(newChat);
-      }
+      const this_conversation = action.payload.conversation;
+      const user = this_conversation.participants.find(
+        (elm) => elm._id.toString() !== user_id
+      );
+      state.direct_chat.conversations = state.direct_chat.conversations.filter(
+        (el) => el?.id !== this_conversation._id
+      );
+      state.direct_chat.conversations.push({
+        id: this_conversation._id._id,
+        user_id: user?._id,
+        name: `${user?.firstName} ${user?.lastName}`,
+        online: user?.status === "Online",
+        img: faker.image.avatar(),
+        msg: faker.music.songName(),
+        time: "9:36",
+        unread: 0,
+        pinned: false,
+      });
     },
+    
     setCurrentConversation(state, action) {
       state.direct_chat.current_conversation = action.payload;
     },
@@ -88,7 +108,7 @@ const slice = createSlice({
     },
     addDirectMessage(state, action) {
       state.direct_chat.current_messages.push(action.payload.message);
-    }
+    } 
   },
 });
 
@@ -123,43 +143,11 @@ export const FetchDirectConversations = () => {
   };
 };
 
-export const AddDirectConversation = (userId) => async (dispatch, getState) => {
-  try {
-    const token = getState().auth.accessToken;
-
-    // Verificăm dacă există un chat cu utilizatorul respectiv
-    const existingChat = getState().conversation.direct_chat.conversations.find(
-      (chat) => chat.users.length === 2 && chat.users.some((user) => user.id === userId)
-    );
-
-    if (existingChat) {
-      console.log("Chat already exists with this user");
-      return;
-    }
-
-    // Creăm un nou chat
-    const response = await axios.post(
-      "/api/chat",
-      { userId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (response.data) {
-      dispatch(slice.actions.addDirectConversation({ conversation: response.data }));
-      console.log("New chat created", response.data);
-      return response.data;  // Întoarcem chatul creat
-    } else {
-      console.error("Failed to create chat");
-    }
-  } catch (error) {
-    console.error("Error creating chat:", error);
-  }
+export const AddDirectConversation = ({ conversation }) => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.addDirectConversation({ conversation }));
+  };
 };
-
 
 export const UpdateDirectConversation = ({ conversation }) => {
   return async (dispatch, getState) => {

@@ -55,28 +55,37 @@ const Chats = () => {
 
 
   const handleCreateChat = (userId) => {
+    // Verifică dacă există deja un chat cu acest utilizator
+    const chatExists = conversations.some((chat) => chat.user_id === userId);
+  
+    if (chatExists) {
+      setSnackbarMessage("Chat already exists with this user");
+      setSnackbarOpen(true);
+      return;
+    }
+  
     dispatch(AddDirectConversation(userId))
       .then((newChat) => {
         if (newChat) {
-          setExistingChats((prevChats) => [
-            ...prevChats,
-            newChat,
-          ]);
-  
           setSnackbarMessage("The chat was created successfully!");
           setSnackbarSeverity("success");
           setSnackbarOpen(true);
         } else {
-          setSnackbarMessage("Chat already exists with this user");
+          setSnackbarMessage("Error creating chat.");
+          setSnackbarSeverity("error");
           setSnackbarOpen(true);
         }
       })
       .catch((error) => {
         setSnackbarMessage("Error creating chat.");
+        setSnackbarSeverity("error");
         setSnackbarOpen(true);
       });
   };
   
+
+
+
   
   useEffect(() => {
     if (token) {
