@@ -9,6 +9,7 @@ import { DEFAULT_PATH } from "../config";
 import LoadingScreen from "../components/LoadingScreen";
 import MainLayout from "../layouts/main";
 import Test from "../layouts/dashboard/index-test";
+import AuthLayout from "../layouts/auth";
 
 const Loadable = (Component) => (props) => {
   return (
@@ -22,7 +23,7 @@ export default function Router() {
   return useRoutes([
     {
       path: "/auth",
-      element: <MainLayout />,
+      element: <AuthLayout />,
       children: [
         {
           element: <LoginPage />,
@@ -33,10 +34,6 @@ export default function Router() {
           path: "register",
         },
       ],
-    },
-    {
-      path: "/welcome",
-      element: <Welcome />, 
     },
     {
       path: "/404",
@@ -50,6 +47,8 @@ export default function Router() {
         { path: "app", element: <GeneralApp /> },
         { path: "settings", element: <Settings /> },
         { path: "group", element: <GroupPage /> },
+        { path: "chats", element: <Chats /> },
+        { path: "conversation", element: <Conversation /> },
         { path: "profile", element: <ProfilePage /> },
         { path: "*", element: <Navigate to="/404" replace /> },
         {
@@ -61,12 +60,14 @@ export default function Router() {
     { path: "*", element: <Navigate to="/404" replace /> },
   ]);
 }
-const Welcome = Loadable(
-  lazy(() => import("../pages/dashboard/Welcome"))
-);
+
 const GeneralApp = Loadable(
   lazy(() => import("../pages/dashboard/GeneralApp"))
 );
+const Conversation = Loadable(
+    lazy(() => import("../pages/dashboard/Conversation"))
+);
+const Chats = Loadable(lazy(() => import("../pages/dashboard/Chats")));
 const Settings = Loadable(lazy(() => import("../pages/dashboard/Settings")));
 const GroupPage = Loadable(lazy(() => import("../pages/dashboard/Group")));
 const LoginPage = Loadable(lazy(() => import("../pages/auth/Login")));

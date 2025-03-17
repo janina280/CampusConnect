@@ -7,6 +7,6 @@ const ROOTS_DASHBOARD = "/";
 export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
   general: {
-    welcome: path(ROOTS_DASHBOARD, "welcome"),  
+    welcome: path(ROOTS_DASHBOARD, "app"),
   },
 };

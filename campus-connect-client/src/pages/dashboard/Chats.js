@@ -25,36 +25,36 @@ import {
 import { useTheme } from "@mui/material/styles";
 import useResponsive from "../../hooks/useResponsive";
 import { searchUser } from "../../redux/slices/auth";
-import { useCurrentUserFromToken } from "../../sections/auth/CurrentUserFromToken";
-import socket from "../../socket";
+import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const Chats = () => {
   const theme = useTheme();
-  const [existingChats, setExistingChats] = useState([]);
-  const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [loading, setLoading] = useState(false);
-  const [query, setQuery] = useState(null);
-  const token = useSelector((state) => state.auth.accessToken);
    const { open } = useSelector((store) => store.app.sideBar);
   const isDesktop = useResponsive("up", "md");
-  const dispatch = useDispatch();
-  const conversations = useSelector((state) => state.conversation.direct_chat.conversations);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const currentUser = useCurrentUserFromToken();
-  const availableChats = useSelector((state) => state.auth.availableChats);
+  const {isConnected, socket} = useWebSocket();
 
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.accessToken);
+
+  const [queryChat, setQueryChat] = useState(null);
+  const {conversations} = useSelector((state) => state.conversation.direct_chat);
+
+  const users = useSelector((state) => state.auth.availableChats);
+
+  //todo: check if it still needed
   const handleSearch = (value) => {
-    setQuery(value);
+    setQueryChat(value);
     if (value.trim() === "") {
       return;
     }
     dispatch(searchUser({ keyword: value }));
   };
 
-
+  //todo: later
   const handleCreateChat = (userId) => {
-    // Verifică dacă există deja un chat cu acest utilizator
     const chatExists = conversations.some((chat) => chat.user_id === userId);
   
     if (chatExists) {
@@ -67,28 +67,28 @@ const Chats = () => {
       .then((newChat) => {
         if (newChat) {
           setSnackbarMessage("The chat was created successfully!");
-          setSnackbarSeverity("success");
           setSnackbarOpen(true);
         } else {
           setSnackbarMessage("Error creating chat.");
-          setSnackbarSeverity("error");
           setSnackbarOpen(true);
         }
       })
       .catch((error) => {
         setSnackbarMessage("Error creating chat.");
-        setSnackbarSeverity("error");
         setSnackbarOpen(true);
       });
   };
   
   useEffect(() => {
+
+    if (!isConnected) return;
+
     socket.emit("/app/chats", "Bearer " + token)
 
     socket.on("/chat/chats-response",(data) =>{
       dispatch(FetchDirectConversations(data));
-    })
-  }, [socket.isConnected]);
+    });
+  }, [isConnected]);
   
 
   return (
@@ -123,7 +123,7 @@ const Chats = () => {
               placeholder="Search"
               inputProps={{ "aria-label": "search" }}
               onChange={(e) => handleSearch(e.target.value)}
-              value={query}
+              value={queryChat}
             />
           </Search>
         </Stack>
@@ -148,15 +148,19 @@ const Chats = () => {
           ) : (
             <SimpleBarStyle timeout={500} autoHide={true}>
               {/* Rezultatele căutării */}
-              {query?.trim() ? (
+              {queryChat?.trim() ? (
                 <Stack spacing={2.4}>
                   <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                     Search Results
                   </Typography>
-                  {availableChats.length > 0 ? (
-                    availableChats
-                      .filter((chat) => chat.name)
+                  {users.length > 0 ? (
+                    users
+                      .filter((user) => user.name)
                       .map((chat) => (
+                          //todo: display users
+                          //<UserElement onClick() -> below todo></UserElement>
+                          //todo: when user is clicked check if the chat exists
+                          // if true -> show ChatElement
                         <ChatElement
                           key={chat.id}
                           {...chat}
@@ -164,6 +168,7 @@ const Chats = () => {
                           showMessageIcon={true}
                           existingChat={false}
                         />
+                          //if false -> create new chat and show ChatElement
                       ))
                   ) : (
                     <Typography variant="body2">No users found.</Typography>
@@ -176,13 +181,11 @@ const Chats = () => {
                       Pinned
                     </Typography>
                     {conversations
-                      .filter((chat) => chat.pinned)
+                      .filter((chat) => chat.pinned && !chat.group)
                       .map((chat) => {
                         return (
                           <ChatElement
-                            key={chat.id}
                             {...chat}
-                            existingChat={true}
                           />
                         );
                       })}
@@ -196,9 +199,7 @@ const Chats = () => {
                       .map((chat) => {
                         return (
                           <ChatElement
-                              key={chat.id}
                               {...chat}
-                              existingChat={true}
                           />
                         );
                       })}

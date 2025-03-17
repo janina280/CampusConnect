@@ -14,12 +14,12 @@ import RHFTextField from "../../components/hook-form/RHFTextField";
 import { Eye, EyeSlash } from "phosphor-react";
 import { Link } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { LoginUser } from "../../redux/slices/auth";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+    const {isLoading} = useSelector((state) => state.auth);
   const [error, setError] = useState("");
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
@@ -47,7 +47,6 @@ const LoginForm = () => {
   } = methods;
 
   const onSubmit = async (data) => {
-    setLoading(true);
     setError("");
 
     try {
@@ -114,9 +113,9 @@ const LoginForm = () => {
               theme.palette.mode === "light" ? "common.white" : "grey.800",
           },
         }}
-        disabled={loading}
+        disabled={isLoading}
       >
-        {loading ? "Loading..." : "Login"}
+        {isLoading ? "Loading..." : "Login"}
       </Button>
     </FormProvider>
   );

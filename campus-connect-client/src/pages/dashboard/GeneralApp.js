@@ -16,12 +16,6 @@ const GeneralApp = () => {
   const [searchParams] = useSearchParams();
   const { open, type } = useSelector((store) => store.app.sideBar);
   const { chat_type, room_id } = useSelector((store) => store.app);
-  const [selectedChat, setSelectedChat] = useState(null);
-  useEffect(() => {
-    if (room_id !== null) {
-      setSelectedChat(room_id); // Actualizează chat-ul curent
-    }
-  }, [room_id]);
 
   return (
     <Stack direction={"row"} sx={{ width: "100%" }}>
@@ -41,8 +35,8 @@ const GeneralApp = () => {
               : "1px solid #F8FAFF",
         }}
       >
-        {chat_type === "individual" && selectedChat ? (
-          <ChatComponent key={selectedChat} />
+        {chat_type === "individual" && room_id ? (
+          <ChatComponent key={room_id} />
         ) : (
           <Stack
             spacing={2}
