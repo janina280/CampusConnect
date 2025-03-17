@@ -10,8 +10,11 @@ import {
 import { SimpleBarStyle } from "../../components/Scrollbar";
 import ChatElement from "../../components/ChatElement";
 import CreateGroup from "../../sections/main/CreateGroup";
-import { useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import NoChatSVG from "../../assets/Illustration/NoChat";
+import socket from "../../socket";
+import { FetchDirectGroups} from "../../redux/slices/conversation";
+
 
 const Group = () => {
   const theme = useTheme();
@@ -19,28 +22,18 @@ const Group = () => {
   const [groups, setGroups] = useState([]);
   const [filteredGroups, setFilteredGroups] = useState([]);
   const [query, setQuery] = useState("");
+  const allGroups = useSelector((state) => state.conversation.group_chat.groups);
   const token = useSelector((state) => state.auth.accessToken);
   const { open } = useSelector((store) => store.app.sideBar);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchGroups = async () => {
-      if (!token) return;
-      try {
-        const response = await fetch("http://localhost:8080/api/chat/groups", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setGroups(data);
-          setFilteredGroups(data);
-        }
-      } catch (error) {
-        console.error("Error fetching groups:", error);
-      }
-    };
-    fetchGroups();
-  }, [token]);
+    socket.emit("/app/groups", "Bearer " + token)
+
+    socket.on("/group/groups-response",(data) =>{
+      dispatch(FetchDirectGroups(data));
+    })
+  }, [socket.isConnected]);
 
   const handleSearch = async (searchTerm) => {
     setQuery(searchTerm);
@@ -122,13 +115,13 @@ const Group = () => {
                   <Typography variant="subtitle2" sx={{ color: "#676667" }}>
                     All Groups
                   </Typography>
-                  {filteredGroups.length > 0 ? (
-                    filteredGroups.map((group) => (
-                      <ChatElement key={group.id} {...group} />
-                    ))
-                  ) : (
-                    <Typography variant="body2">No groups found.</Typography>
-                  )}
+                  <Stack spacing={3}>
+                    {/*
+                      {allGroups.map((group) => (
+                            <ChatElement key={group.id} {...group} />
+                        ))
+                    }*/}
+                </Stack>
                 </Stack>
               </SimpleBarStyle>
             </Stack>

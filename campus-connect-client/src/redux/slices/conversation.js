@@ -10,7 +10,11 @@ const initialState = {
         current_conversation: null,
         current_messages: [],
     },
-    group_chat: {},
+    group_chat: {
+        groups: [],
+        current_groups: null,
+        current_messages: [],
+    },
 };
 
 const slice = createSlice({
@@ -19,18 +23,23 @@ const slice = createSlice({
     reducers: {
         fetchDirectConversations(state, action) {
             const list = action.payload.conversations.map((el) => {
-                const user = el.users?.find((elm) => elm.id.toString() !== user_id);
-
+                const user = el.users.find(
+                    (elm) => elm.id.toString() !== user_id
+                );
+                console.log("Current logged user ID:", user_id);
+                console.log("Users in conversation:", el.users);
                 const lastMessage = el.messages?.length
                     ? [...el.messages]
                         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                         .pop()
                     : null;
 
+                const noMessagesMessage = "You can start messaging with...";
                 return {
                     id: el.id,
+                    user_id: user?.id,
                     name: user?.name,
-                    nickname: user?.nickname,
+                    nickname: user.nickname,
                     msg: lastMessage?.text,
                     time: lastMessage ? new Date(lastMessage.createdAt).toLocaleTimeString() : "9:36",
                     unread: 0,
@@ -39,25 +48,27 @@ const slice = createSlice({
                     online: user?.status === "Online",
                     urlImg: faker.image.avatar(),
                     lastMessage,
+                    noMessagesMessage,
                 };
             });
-            state.direct_chat.conversations = list;
+            console.log("Updated conversations: ", list);
+            state.direct_chat.conversations = [...list];
         },
 
         updateDirectConversation(state, action) {
             const this_conversation = action.payload.conversation;
             state.direct_chat.conversations = state.direct_chat.conversations.map(
                 (el) => {
-                    if (el?.id !== this_conversation._id) {
+                    if (el?.id !== this_conversation.id) {
                         return el;
                     } else {
-                        const user = this_conversation.participants.find(
-                            (elm) => elm._id.toString() !== user_id
+                        const user = this_conversation.users.find(
+                            (elm) => elm.id.toString() !== user_id
                         );
                         return {
-                            id: this_conversation._id._id,
-                            user_id: user?._id,
-                            name: `${user?.firstName} ${user?.lastName}`,
+                            id: this_conversation.id,
+                            user_id: user?.id,
+                            name: user?.name,
                             online: user?.status === "Online",
                             img: faker.image.avatar(),
                             msg: faker.music.songName(),
@@ -108,7 +119,34 @@ const slice = createSlice({
         },
         addDirectMessage(state, action) {
             state.direct_chat.current_messages.push(action.payload.message);
-        }
+        },
+
+        fetchDirectGroups(state, action) {
+            const list = action.payload.groups.map((el) => {
+
+                const lastMessage = el.messages?.length
+                    ? [...el.messages]
+                        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+                        .pop()
+                    : null;
+
+                const noMessagesMessage = "You can start messaging with...";
+                return {
+                    id: el.id,
+                    name: el.name,
+                    msg: lastMessage?.text,
+                    time: lastMessage ? new Date(lastMessage.createdAt).toLocaleTimeString() : "9:36",
+                    unread: 0,
+                    pinned: false,
+                    urlImg: faker.image.avatar(),
+                    lastMessage,
+                    noMessagesMessage,
+                };
+            });
+            console.log("Updated conversations: ", list);
+            state.direct_chat.groups = [...list];
+        },
+
     },
 });
 
@@ -120,7 +158,15 @@ export default slice.reducer;
 export const FetchDirectConversations = (data) => {
     return async (dispatch, getState) => {
         dispatch(
-            slice.actions.fetchDirectConversations({conversations: data || []})
+            slice.actions.fetchDirectConversations({conversations: data})
+        );
+    };
+};
+
+export const FetchDirectGroups = (data) => {
+    return async (dispatch, getState) => {
+        dispatch(
+            slice.actions.fetchDirectGroups({conversations: data})
         );
     };
 };

@@ -61,14 +61,13 @@ public class ChatService {
     }
 
 
-    public List<Chat> findAllGroupChats(Long userId) throws UserException {
+    public List<ChatDto> findAllGroupChats(Long userId) throws UserException {
         User user = userService.findUserById(userId);
         if (user == null) {
             throw new UserException("User not found with ID: " + userId);
         }
-        var groupChats = chatRepository.findGroupChatsByUser(user);
 
-        return groupChats;
+        return chatRepository.findGroupChatsByUser(user).stream().map(ChatDto::new).toList();
     }
     public List<Chat> searchGroupByName(String groupName, Long userId) throws UserException {
         User user = userService.findUserById(userId);

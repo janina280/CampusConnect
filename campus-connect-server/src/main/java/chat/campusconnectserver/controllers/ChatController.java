@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -68,18 +67,16 @@ public class ChatController {
     public List<ChatDto> findAllChatByUserHandle(@RequestHeader("Authorization") String jwt) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
-        List<ChatDto> chats = chatService.findAllChatByUserId(currentUserId);
-
-        return chats;
+        return chatService.findAllChatByUserId(currentUserId);
     }
 
-    @GetMapping("/groups")
-    public ResponseEntity<List<Chat>> findAllGroupChatsByUserHandle(@RequestHeader("Authorization") String jwt) throws UserException {
+    @Transactional
+    @MessageMapping("/groups")
+    @SendTo("/group/groups-response")
+    public List<ChatDto> findAllGroupChatsByUserHandle(@RequestHeader("Authorization") String jwt) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
-        List<Chat> groupChats = chatService.findAllGroupChats(currentUserId);
-
-        return new ResponseEntity<>(groupChats, HttpStatus.OK);
+        return chatService.findAllGroupChats(currentUserId);
     }
 
     @GetMapping("/groups/search")

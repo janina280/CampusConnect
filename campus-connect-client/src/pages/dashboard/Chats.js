@@ -37,17 +37,15 @@ const Chats = () => {
   const token = useSelector((state) => state.auth.accessToken);
    const { open } = useSelector((store) => store.app.sideBar);
   const isDesktop = useResponsive("up", "md");
-  const currentUser = useCurrentUserFromToken();
   const dispatch = useDispatch();
-  const conversations = useSelector((state) => state.conversation.direct_chat.conversations) || [];
-  const user_id = window.localStorage.getItem("user_id");
+  const conversations = useSelector((state) => state.conversation.direct_chat.conversations);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const currentUser = useCurrentUserFromToken();
   const availableChats = useSelector((state) => state.auth.availableChats);
 
   const handleSearch = (value) => {
     setQuery(value);
-  
     if (value.trim() === "") {
       return;
     }
@@ -90,10 +88,6 @@ const Chats = () => {
     socket.on("/chat/chats-response",(data) =>{
       dispatch(FetchDirectConversations(data));
     })
-
-    /*if (token) {
-      dispatch(FetchDirectConversations());
-    }*/
   }, [socket.isConnected]);
   
 
@@ -200,33 +194,11 @@ const Chats = () => {
                     {conversations
                       .filter((chat) => !chat.pinned && !chat.group)
                       .map((chat) => {
-                        const lastMessage =
-                          chat.messages?.length > 0
-                            ? [...chat.messages]
-                                .sort(
-                                  (a, b) =>
-                                    new Date(a.createdAt) -
-                                    new Date(b.createdAt)
-                                )
-                                .pop()
-                            : null;
-
                         return (
                           <ChatElement
-                            key={chat.id}
-                            {...chat}
-                            name={
-                              chat.name ??
-                              [...chat.users].filter(
-                                (user) => user.id.toString() !== currentUser.sub
-                              )[0].name
-                            }
-                            lastMessage={lastMessage}
-                            existingChat={true}
-                            noMessagesMessage={
-                                "You can start messaging with..."
-                            }
-                            formattedTime={lastMessage?.formattedTime}
+                              key={chat.id}
+                              {...chat}
+                              existingChat={true}
                           />
                         );
                       })}
