@@ -36,69 +36,69 @@ const Conversation = ({ isMobile, menu }) => {
     if (current) {
       dispatch(SetCurrentConversation(current));
 
-     // stompClient.connect({}, () => {
-       // stompClient.subscribe(`/topic/messages/${room_id}`, (message) => {
-        //  const newMessage = JSON.parse(message.body);
-         // dispatch(FetchCurrentMessages({ messages: newMessage }));
-       // });
-    //  });
+      // stompClient.connect({}, () => {
+      // stompClient.subscribe(`/topic/messages/${room_id}`, (message) => {
+      //  const newMessage = JSON.parse(message.body);
+      // dispatch(FetchCurrentMessages({ messages: newMessage }));
+      // });
+      //  });
     }
 
-   // return () => {
+    // return () => {
     //  if (stompClient) {
     //    stompClient.disconnect();
     //  }
-  //  };
+    //  };
   }, [room_id, conversations]);
   return (
-    <Box p={isMobile ? 1 : 3}>
-      <Stack spacing={3}>
-        {current_messages.map((el, idx) => {
-          switch (el.type) {
-            case "divider":
-              return (
-                // Timeline
-                <Timeline el={el} />
-              );
+      <Box p={isMobile ? 1 : 3}>
+        <Stack spacing={3}>
+          {current_messages.map((el, idx) => {
+            switch (el.type) {
+              case "divider":
+                return (
+                    // Timeline
+                    <Timeline el={el} />
+                );
 
-            case "msg":
-              switch (el.subtype) {
-                case "img":
-                  return (
-                    // Media Message
-                    <MediaMsg el={el} menu={menu} />
-                  );
+              case "msg":
+                switch (el.subtype) {
+                  case "img":
+                    return (
+                        // Media Message
+                        <MediaMsg el={el} menu={menu} />
+                    );
 
-                case "doc":
-                  return (
-                    // Doc Message
-                    <DocMsg el={el} menu={menu} />
-                  );
-                case "Link":
-                  return (
-                    //  Link Message
-                    <LinkMsg el={el} menu={menu} />
-                  );
+                  case "doc":
+                    return (
+                        // Doc Message
+                        <DocMsg el={el} menu={menu} />
+                    );
+                  case "Link":
+                    return (
+                        //  Link Message
+                        <LinkMsg el={el} menu={menu} />
+                    );
 
-                case "reply":
-                  return (
-                    //  ReplyMessage
-                    <ReplyMsg el={el} menu={menu} />
-                  );
+                  case "reply":
+                    return (
+                        //  ReplyMessage
+                        <ReplyMsg el={el} menu={menu} />
+                    );
 
-                default:
-                  return (
-                    // Text Message
-                    <TextMsg el={el} menu={menu} />
-                  );
-              }
+                  default:
+                    return (
+                        // Text Message
+                        <TextMsg el={el} menu={menu} />
+                    );
+                }
 
-            default:
-              return <></>;
-          }
-        })}
-      </Stack>
-    </Box>
+              default:
+                return <></>;
+            }
+          })}
+        </Stack>
+      </Box>
   );
 };
 
@@ -109,7 +109,7 @@ const ChatComponent = () => {
   const messageListRef = useRef(null);
 
   const { current_messages } = useSelector(
-    (state) => state.conversation.direct_chat
+      (state) => state.conversation.direct_chat
   );
 
   useEffect(() => {
@@ -118,37 +118,37 @@ const ChatComponent = () => {
   }, [current_messages]);
 
   return (
-    <Stack
-      height={"100%"}
-      maxHeight={"100vh"}
-      width={isMobile ? "100vw" : "auto"}
-    >
-      {/*  */}
-      <ChatHeader />
-      <Box
-        ref={messageListRef}
-        width={"100%"}
-        sx={{
-          position: "relative",
-          flexGrow: 1,
-          overflow: "auto",
-
-          backgroundColor:
-            theme.palette.mode === "light"
-              ? "#F0F4FA"
-              : theme.palette.background,
-
-          boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
-        }}
+      <Stack
+          height={"100%"}
+          maxHeight={"100vh"}
+          width={isMobile ? "100vw" : "auto"}
       >
-        <SimpleBarStyle timeout={500} clickOnTrack={false}>
-          <Conversation menu={true} isMobile={isMobile} />
-        </SimpleBarStyle>
-      </Box>
+        {/*  */}
+        <ChatHeader />
+        <Box
+            ref={messageListRef}
+            width={"100%"}
+            sx={{
+              position: "relative",
+              flexGrow: 1,
+              overflow: "auto",
 
-      {/*  */}
-      <ChatFooter />
-    </Stack>
+              backgroundColor:
+                  theme.palette.mode === "light"
+                      ? "#F0F4FA"
+                      : theme.palette.background,
+
+              boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
+            }}
+        >
+          <SimpleBarStyle timeout={500} clickOnTrack={false}>
+            <Conversation menu={true} isMobile={isMobile} />
+          </SimpleBarStyle>
+        </Box>
+
+        {/*  */}
+        <ChatFooter />
+      </Stack>
   );
 };
 

@@ -8,7 +8,7 @@ const initialState = {
     direct_chat: {
         conversations: [], current_conversation: null, current_messages: [],
     }, group_chat: {
-        groups: [], current_groups: null, current_messages: [],
+        groups: [], current_groups: null, current_messages_group: [],
     },
 };
 
@@ -18,8 +18,6 @@ const slice = createSlice({
             user_id = window.localStorage.getItem("user_id");
             const list = action.payload.conversations.map((el) => {
                 const user = el.users.find((elm) => elm.id.toString() !== user_id);
-                console.log("Current logged user ID:", user_id);
-                console.log("Users in conversation:", el.users);
                 const messages = [...el.messages];
                 const lastMessage = messages?.length ? messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, messages[0]) : {
                     text: "You can start messaging with...", createdAt: null
@@ -99,28 +97,43 @@ const slice = createSlice({
             state.direct_chat.current_messages.push(action.payload.message);
         },
 
+        setCurrentGroup(state, action) {
+            state.group_chat.current_groups = action.payload;
+        }, fetchCurrentMessagesGroup(state, action) {
+            const messages = action.payload.messages;
+            const formatted_messages = messages.map((el) => ({
+                id: el.id,
+                type: "msg",
+                subtype: el.type,
+                message: el.text,
+                incoming: el.to === user_id,
+                outgoing: el.from === user_id,
+            }));
+            state.group_chat.current_messages_group = formatted_messages;
+        }, addDirectMessageGroup(state, action) {
+            state.group_chat.current_messages_group.push(action.payload.message);
+        },
+
         fetchDirectGroups(state, action) {
             user_id = window.localStorage.getItem("user_id");
             const list = action.payload.groups.map((el) => {
-                const lastMessage = el.messages?.length ? [...el.messages]
-                    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-                    .pop() : null;
+                const messages = [...el.messages];
+                const lastMessage = messages?.length ? messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, messages[0]) : {
+                    text: "You can start messaging with...", createdAt: null
+                };
 
-                const noMessagesMessage = "You can start messaging with...";
                 return {
                     id: el.id,
                     name: el.name,
                     msg: lastMessage?.text,
                     time: lastMessage ? new Date(lastMessage.createdAt).toLocaleTimeString() : "9:36",
                     unread: 0,
-                    pinned: false,
-                    urlImg: faker.image.avatar(),
-                    lastMessage,
-                    noMessagesMessage,
+                    pinned: el.pinned,
+                    img: faker.image.avatar(),
                 };
             });
             console.log("Updated conversations: ", list);
-            state.direct_chat.groups = [...list];
+            state.group_chat.groups = [...list];
         },
 
     },
@@ -139,7 +152,7 @@ export const FetchDirectConversations = (data) => {
 
 export const FetchDirectGroups = (data) => {
     return async (dispatch, getState) => {
-        dispatch(slice.actions.fetchDirectGroups({conversations: data}));
+        dispatch(slice.actions.fetchDirectGroups({groups: data}));
     };
 };
 
@@ -162,14 +175,31 @@ export const SetCurrentConversation = (current_conversation) => {
 };
 
 
+export const SetCurrentGroup = (current_group) => {
+    return async (dispatch, getState) => {
+        dispatch(slice.actions.setCurrentGroup(current_group));
+    };
+};
+
+
 export const FetchCurrentMessages = ({messages}) => {
     return async (dispatch, getState) => {
         dispatch(slice.actions.fetchCurrentMessages({messages}));
+    }
+}
+export const FetchCurrentMessagesGroup = ({messages}) => {
+    return async (dispatch, getState) => {
+        dispatch(slice.actions.fetchCurrentMessagesGroup({messages}));
     }
 }
 
 export const AddDirectMessage = (message) => {
     return async (dispatch, getState) => {
         dispatch(slice.actions.addDirectMessage({message}));
+    }
+}
+export const AddDirectMessageGroup = (message) => {
+    return async (dispatch, getState) => {
+        dispatch(slice.actions.addDirectMessageGroup({message}));
     }
 }

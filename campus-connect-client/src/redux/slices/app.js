@@ -57,6 +57,10 @@ const slice = createSlice({
       state.chat_type = "individual";
       state.room_id = action.payload.room_id;
     },
+    selectGroup(state, action) {
+      state.chat_type = "group";
+      state.room_id = action.payload.room_id;
+    },
   },
 });
 
@@ -106,6 +110,11 @@ export function SelectConversation({ room_id }) {
   };
 }
 
+export function SelectGroup({ room_id }) {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.selectGroup({ room_id }));
+  };
+}
 export const FetchUserProfile = () => {
   return async (dispatch, getState) => {
     axios

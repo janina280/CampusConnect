@@ -47,7 +47,7 @@ const DashboardLayout = () => {
                 console.log("Start chat data:", data);
 
                 // Check if the conversation already exists
-                const existingConversation = conversations.find((el) => el?.id === data._id);
+                const existingConversation = conversations.find((el) => el?.id === data.id);
                 if (existingConversation) {
                     // Update the conversation
                     dispatch(UpdateDirectConversation({conversation: data}));
@@ -55,7 +55,7 @@ const DashboardLayout = () => {
                     // Add the new conversation
                     dispatch(AddDirectConversation({conversation: data}));
                 }
-                dispatch(SelectConversation({room_id: data._id}));
+                dispatch(SelectConversation({room_id: data.id}));
             });
 
             socket.on(`/topic/request_sent/${user_id}`, (requestData) => {
