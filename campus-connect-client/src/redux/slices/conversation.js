@@ -8,7 +8,7 @@ const initialState = {
     direct_chat: {
         conversations: [], current_conversation: null, current_messages: [],
     }, group_chat: {
-        groups: [], current_groups: null, current_messages_group: [],
+        groups: [], current_group_conversation: null, current_messages_group: [],
     },
 };
 
@@ -98,7 +98,7 @@ const slice = createSlice({
         },
 
         setCurrentGroup(state, action) {
-            state.group_chat.current_groups = action.payload;
+            state.group_chat.current_group_conversation = action.payload;
         }, fetchCurrentMessagesGroup(state, action) {
             const messages = action.payload.messages;
             const formatted_messages = messages.map((el) => ({

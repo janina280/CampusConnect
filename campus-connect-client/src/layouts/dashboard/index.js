@@ -8,7 +8,7 @@ import {
     UpdateDirectConversation,
     AddDirectConversation,
 } from "../../redux/slices/conversation";
-import {showSnackbar, SelectConversation} from "../../redux/slices/app";
+import {showSnackbar, SelectConversation, SelectRoomId, SelectChatType} from "../../redux/slices/app";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const DashboardLayout = () => {
@@ -55,7 +55,8 @@ const DashboardLayout = () => {
                     // Add the new conversation
                     dispatch(AddDirectConversation({conversation: data}));
                 }
-                dispatch(SelectConversation({room_id: data.id}));
+                dispatch(SelectChatType({chat_type: "individual"}));
+                dispatch(SelectRoomId({room_id: data.id}));
             });
 
             socket.on(`/topic/request_sent/${user_id}`, (requestData) => {

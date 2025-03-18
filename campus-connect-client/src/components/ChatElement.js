@@ -4,7 +4,7 @@ import {styled, useTheme, alpha} from "@mui/material/styles";
 import {ChatCircle} from "phosphor-react";
 import CreateAvatar from "../utils/createAvatar";
 import {useDispatch, useSelector} from "react-redux";
-import {SelectConversation} from "../redux/slices/app";
+import { SelectRoomId} from "../redux/slices/app";
 
 const truncateText = (string, n) => {
     return string?.length > n ? `${string?.slice(0, n)}...` : string;
@@ -56,7 +56,7 @@ const ChatElement = ({
     }
     return (<StyledChatBox
             onClick={() => {
-                dispatch(SelectConversation({room_id: id}));
+                dispatch(SelectRoomId({room_id: id}));
             }}
             sx={{
                 width: "100%",

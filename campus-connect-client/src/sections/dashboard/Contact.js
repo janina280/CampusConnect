@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { useTheme } from "@mui/material/styles";
 import {
   Box,
@@ -82,6 +82,9 @@ const Contact = () => {
   const dispatch = useDispatch();
 
   const {current_conversation} = useSelector((state) => state.conversation.direct_chat);
+  const {current_group_conversation} = useSelector((state) => state.conversation.group_chat);
+
+  const {chat_type, room_id} = useSelector((store) => store.app);
 
   const theme = useTheme();
 
@@ -90,12 +93,23 @@ const Contact = () => {
   const [openBlock, setOpenBlock] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
+  const [conversation, setConversation] = useState(null);
+
   const handleCloseBlock = () => {
     setOpenBlock(false);
   }
   const handleCloseDelete = () => {
     setOpenDelete(false);
   }
+
+  useEffect(() => {
+      if(chat_type === "individual") {
+        setConversation(current_conversation);
+      }
+      else{
+        setConversation(current_group_conversation);
+      }
+  }, [chat_type, current_conversation, current_group_conversation])
 
   return (
     <Box sx={{ width: !isDesktop ? "100vw" : 320, maxHeight: "100vh" }}>
@@ -139,16 +153,16 @@ const Contact = () => {
         >
           <Stack alignItems="center" direction="row" spacing={2}>
           <CreateAvatar
-                  name={current_conversation?.name}
-                  imageUrl={current_conversation?.img}
+                  name={conversation?.name}
+                  imageUrl={conversation?.img}
                   size={56}
                 />
             <Stack spacing={0.5}>
               <Typography variant="article" fontWeight={600}>
-                {current_conversation?.name}
+                {conversation?.name}
               </Typography>
               <Typography variant="body2" fontWeight={500}>
-                {current_conversation?.nickname}
+                {conversation?.nickname}
               </Typography>
             </Stack>
           </Stack>
@@ -158,7 +172,7 @@ const Contact = () => {
               About
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {current_conversation?.about}
+              {conversation?.about}
             </Typography>
           </Stack>
           <Divider />
