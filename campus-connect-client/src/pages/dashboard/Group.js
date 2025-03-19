@@ -11,15 +11,11 @@ import {SimpleBarStyle} from "../../components/Scrollbar";
 import ChatElement from "../../components/ChatElement";
 import CreateGroup from "../../sections/main/CreateGroup";
 import {useDispatch, useSelector} from "react-redux";
-import NoChatSVG from "../../assets/Illustration/NoChat";
 import {FetchDirectGroups, SetCurrentGroup} from "../../redux/slices/conversation";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 import BottomNav from "../../layouts/dashboard/BottomNav";
 import useResponsive from "../../hooks/useResponsive";
-import ChatGroupComponent, {ConversationGroup} from "./ConversationGroup";
-import Contact from "../../sections/dashboard/Contact";
-import Media from "../../sections/dashboard/SharedMessage";
-import StarredMessages from "../../sections/dashboard/StarredMessages";
+
 
 const Group = () => {
     const theme = useTheme();
@@ -148,31 +144,6 @@ const Group = () => {
                     </Stack>
                 </Stack>
             </Box>
-            {/*<Box
-                    sx={{
-                        height: "100%",
-                        width: open ? "calc(100vw - 740px)" : "calc(100vw - 420px)",
-                        backgroundColor:
-                            theme.palette.mode === "light" ? "#F0F4FA" : "transparent",
-                    }}
-                >
-                    {chat_type === "group" && room_id ? (
-                        <ChatGroupComponent key={room_id} />
-                    ) : (
-                        <Stack
-                            spacing={2}
-                            sx={{ height: "100%", width: "100%" }}
-                            alignItems={"center"}
-                            justifyContent={"center"}
-                        >
-                            <NoChatSVG />
-                            <Typography variant="subtitle2">
-                                Select a conversation group or create a new one.
-                            </Typography>
-                        </Stack>
-                    )}
-                </Box>
-                */}
             {openDialog && (
                 <CreateGroup
                     open={openDialog}

@@ -1,6 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {faker} from "@faker-js/faker";
 import axios from "../../utils/axios"
+import {showSnackbar} from "./app";
 
 let user_id = window.localStorage.getItem("user_id");
 
@@ -113,7 +114,6 @@ const slice = createSlice({
         }, addDirectMessageGroup(state, action) {
             state.group_chat.current_messages_group.push(action.payload.message);
         },
-
         fetchDirectGroups(state, action) {
             user_id = window.localStorage.getItem("user_id");
             const list = action.payload.groups.map((el) => {
@@ -135,7 +135,21 @@ const slice = createSlice({
             console.log("Updated conversations: ", list);
             state.group_chat.groups = [...list];
         },
+        addDirectGroupConversation(state, action) {
+            const this_conversation_group = action.payload.conversation;
+            const user = this_conversation_group.users.find((elm) => elm.id.toString() !== user_id);
 
+            state.group_chat.groups.push({
+                id: this_conversation_group.id.id,
+                user_id: user?.id,
+                name: action.payload.name,
+                online: user?.status === "Online",
+                img: faker.image.avatar(),
+                msg: faker.music.songName(),
+                time: "9:36",
+                unread: 0,
+            });
+        },
     },
 });
 
@@ -203,3 +217,42 @@ export const AddDirectMessageGroup = (message) => {
         dispatch(slice.actions.addDirectMessageGroup({message}));
     }
 }
+export const AddDirectGroupConversation = ({ name, userIds }) => {
+    return async (dispatch, getState) => {
+        try {
+            const response = await axios.post("http://localhost:8080/group", {
+                name,
+                userIds,
+            });
+
+            if (response.status === 200) {
+                dispatch(slice.actions.addDirectGroupConversation({
+                    conversation: response.data,
+                    name
+                }));
+                dispatch(
+                    showSnackbar({
+                        severity: "success",
+                        message: "Group conversation added successfully!",
+                    })
+                );
+            } else {
+                dispatch(
+                    showSnackbar({
+                        severity: "error",
+                        message: "Failed to add group conversation.",
+                    })
+                );
+            }
+        } catch (error) {
+            console.error("Error adding group conversation:", error);
+            dispatch(
+                showSnackbar({
+                    severity: "error",
+                    message: "An error occurred while adding the group conversation.",
+                })
+            );
+        }
+    };
+};
+

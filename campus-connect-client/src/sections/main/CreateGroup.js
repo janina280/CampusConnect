@@ -12,43 +12,17 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider from "../../components/hook-form/FormProvider";
 import { RHFTextField } from "../../components/hook-form";
 import RHFAutocomplete from "../../components/hook-form/RHFAutocomplete";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { showSnackbar } from "../../redux/slices/app";
+import { useSelector, useDispatch } from "react-redux";
+import { FetchAllUsers, showSnackbar } from "../../redux/slices/app";
+import { AddDirectGroupConversation } from "../../redux/slices/conversation";
 
 const CreateGroupForm = ({ handleClose, handleGroupCreated }) => {
-  const [users, setUsers] = useState([]);
-  const token = useSelector((state) => state.auth.accessToken);
   const dispatch = useDispatch();
-
-  const fetchUsers = async () => {
-    if (!token) {
-      console.error("Token is missing. Please log in.");
-      return;
-    }
-
-    try {
-      const response = await fetch("http://localhost:8080/api/user/all", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data);
-      } else {
-        console.error("Failed to fetch users, status:", response.status);
-      }
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
+  const all_users = useSelector((state) => state.app.all_users);
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    dispatch(FetchAllUsers());
+  }, [dispatch]);
 
   const NewGroupSchema = Yup.object().shape({
     title: Yup.string().required("Title is required"),
@@ -65,75 +39,72 @@ const CreateGroupForm = ({ handleClose, handleGroupCreated }) => {
     defaultValues,
   });
 
-  const { handleSubmit, reset, setError } = methods;
+  const { handleSubmit } = methods;
 
   const onSubmit = async (data) => {
     const userIds = data.members.map((member) => member.id);
 
     const requestData = {
       name: data.title,
+      isGroup: true,
       userIds: userIds,
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/chat/group", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (response.ok) {
-        const newGroup = await response.json(); 
-        handleGroupCreated(newGroup); 
-        dispatch(
+      const newGroup=await dispatch(AddDirectGroupConversation({
+        name: data.title,
+        conversation: requestData,
+      }));
+      dispatch(
           showSnackbar({
             severity: "success",
             message: "Group created successfully!",
           })
-        );
-        handleClose();
-      } else {
-        console.error("Failed to create group, status:", response.status);
-      }
+      );
+      handleGroupCreated(newGroup);
+      handleClose();
     } catch (error) {
       console.error("Error creating group:", error);
+      dispatch(
+          showSnackbar({
+            severity: "error",
+            message: "Failed to create group.",
+          })
+      );
     }
   };
 
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={3}>
-        <RHFTextField name="title" label="Title" />
-        <RHFAutocomplete
-          name="members"
-          label="Members"
-          multiple
-          options={users}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option.id === value.id}
-        />
-        <Stack direction="row" justifyContent="end" spacing={2}>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="contained">
-            Create
-          </Button>
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={3}>
+          <RHFTextField name="title" label="Title" />
+          <RHFAutocomplete
+              name="members"
+              label="Members"
+              multiple
+              options={all_users || []}
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+          />
+          <Stack direction="row" justifyContent="end" spacing={2}>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button type="submit" variant="contained">
+              Create
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
-    </FormProvider>
+      </FormProvider>
   );
 };
 
-const CreateGroup = ({ open, handleClose, handleGroupCreated }) => {
+const CreateGroup = ({ open, handleClose }) => {
   return (
-    <Dialog fullWidth maxWidth="xs" open={open} onClose={handleClose}>
-      <DialogTitle>Create New Group</DialogTitle>
-      <DialogContent>
-        <CreateGroupForm handleClose={handleClose} handleGroupCreated={handleGroupCreated} />
-      </DialogContent>
-    </Dialog>
+      <Dialog fullWidth maxWidth="xs" open={open} onClose={handleClose} >
+        <DialogTitle>Create New Group</DialogTitle>
+        <DialogContent>
+          <CreateGroupForm handleClose={handleClose}  />
+        </DialogContent>
+      </Dialog>
   );
 };
 

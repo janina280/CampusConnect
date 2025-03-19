@@ -8,7 +8,7 @@ import {
     UpdateDirectConversation,
     AddDirectConversation,
 } from "../../redux/slices/conversation";
-import {showSnackbar, SelectConversation, SelectRoomId, SelectChatType} from "../../redux/slices/app";
+import {showSnackbar, SelectRoomId, SelectChatType} from "../../redux/slices/app";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const DashboardLayout = () => {

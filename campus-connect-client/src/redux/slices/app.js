@@ -51,7 +51,7 @@ const slice = createSlice({
             state.snackbar.message = null;
         },
         updateUsers(state, action) {
-            state.users = action.payload.users;
+            state.all_users = action.payload.users;
         },
         selectChatType(state, action) {
             state.chat_type = action.payload.chat_type;
@@ -138,3 +138,31 @@ export const FetchUserProfile = () => {
             });
     };
 };
+
+export const FetchAllUsers = (data) => {
+    return async (dispatch, getState) => {
+        const token = getState().auth.accessToken;
+
+        if (!token) {
+            console.error("Token is missing. Please log in.");
+            return;
+        }
+
+        try {
+            const response = await axios.get("api/user/all", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status === 200) {
+                dispatch(slice.actions.updateUsers({ users: response.data }));
+            } else {
+                console.error("Failed to fetch users, status:", response.status);
+            }
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    };
+};
+
