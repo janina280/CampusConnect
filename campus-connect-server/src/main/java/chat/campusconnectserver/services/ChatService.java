@@ -84,7 +84,7 @@ public class ChatService {
 
 
 
-    public Chat createGroup(GroupChatRequest req, User reqUser) throws UserException {
+    public ChatDto createGroup(GroupChatRequest req, User reqUser) throws UserException {
         Chat group = new Chat();
         group.setGroup(true);
         group.setImg(req.getChat_image());
@@ -109,7 +109,7 @@ public class ChatService {
             throw new RuntimeException("Failed to create group", e);
         }
 
-        return group;
+        return new ChatDto(group);
     }
 
     public Chat renameGroup(Long chatId, String groupName, User reqUserId) throws UserException, ChatException {

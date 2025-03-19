@@ -136,18 +136,21 @@ const slice = createSlice({
             state.group_chat.groups = [...list];
         },
         addDirectGroupConversation(state, action) {
-            const this_conversation_group = action.payload.conversation;
-            const user = this_conversation_group.users.find((elm) => elm.id.toString() !== user_id);
-
+            const this_conversation = action.payload.group;
+            state.group_chat.groups = state.group_chat.groups.filter((el) => el?.id !== this_conversation.id);
+            const lastMessage = this_conversation.messages?.length ? this_conversation.messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, this_conversation.messages[0]) : {
+                text: "You can start messaging with...", createdAt: null
+            };
             state.group_chat.groups.push({
-                id: this_conversation_group.id.id,
-                user_id: user?.id,
-                name: action.payload.name,
-                online: user?.status === "Online",
+                id: this_conversation.id,
+                users: this_conversation.users,
+                name: this_conversation.name,
+                online: this_conversation.online ? "Online" : "Offline",
                 img: faker.image.avatar(),
-                msg: faker.music.songName(),
-                time: "9:36",
-                unread: 0,
+                msg: lastMessage.text,
+                time: lastMessage.createdAt ? new Date(lastMessage.createdAt).toLocaleTimeString() : "9:36",
+                unread: this_conversation.unread,
+                pinned: this_conversation.pinned,
             });
         },
     },
@@ -217,42 +220,43 @@ export const AddDirectMessageGroup = (message) => {
         dispatch(slice.actions.addDirectMessageGroup({message}));
     }
 }
-export const AddDirectGroupConversation = ({ name, userIds }) => {
+export const AddDirectGroupConversation = (conversation) => {
     return async (dispatch, getState) => {
-        try {
-            const response = await axios.post("http://localhost:8080/group", {
-                name,
-                userIds,
-            });
+        dispatch(slice.actions.addDirectGroupConversation({group: conversation}));
+    }
+}
+/*try {
+    const response = await axios.post("http://localhost:8080/group", {
+        name,
+        userIds,
+    });
 
-            if (response.status === 200) {
-                dispatch(slice.actions.addDirectGroupConversation({
-                    conversation: response.data,
-                    name
-                }));
-                dispatch(
-                    showSnackbar({
-                        severity: "success",
-                        message: "Group conversation added successfully!",
-                    })
-                );
-            } else {
-                dispatch(
-                    showSnackbar({
-                        severity: "error",
-                        message: "Failed to add group conversation.",
-                    })
-                );
-            }
-        } catch (error) {
-            console.error("Error adding group conversation:", error);
-            dispatch(
-                showSnackbar({
-                    severity: "error",
-                    message: "An error occurred while adding the group conversation.",
-                })
-            );
-        }
-    };
-};
+    if (response.status === 200) {
+        dispatch(slice.actions.addDirectGroupConversation({
+            conversation: response.data,
+            name
+        }));
+        dispatch(
+            showSnackbar({
+                severity: "success",
+                message: "Group conversation added successfully!",
+            })
+        );
+    } else {
+        dispatch(
+            showSnackbar({
+                severity: "error",
+                message: "Failed to add group conversation.",
+            })
+        );
+    }
+} catch (error) {
+    console.error("Error adding group conversation:", error);
+    dispatch(
+        showSnackbar({
+            severity: "error",
+            message: "An error occurred while adding the group conversation.",
+        })
+    );
+}*/
 

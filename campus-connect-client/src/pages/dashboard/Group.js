@@ -22,14 +22,12 @@ const Group = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const isDesktop = useResponsive("up", "md");
     const [filteredGroups, setFilteredGroups] = useState([]);
-    const {type, open} = useSelector((store) => store.app.sideBar);
     const {isConnected, socket} = useWebSocket();
     const dispatch = useDispatch();
     const token = useSelector((state) => state.auth.accessToken);
 
     const [queryGroup, setQueryGroup] = useState("");
     const {groups} = useSelector((state) => state.conversation.group_chat);
-    const {chat_type, room_id} = useSelector((state) => state.app);
 
     useEffect(() => {
         if (!isConnected) return;
@@ -67,10 +65,6 @@ const Group = () => {
         } catch (error) {
             console.error("Error searching groups:", error);
         }
-    };
-
-    const handleGroupCreated = (newGroup) => {
-        setFilteredGroups((prevGroups) => [...prevGroups, newGroup]);
     };
 
     return (
@@ -148,7 +142,6 @@ const Group = () => {
                 <CreateGroup
                     open={openDialog}
                     handleClose={() => setOpenDialog(false)}
-                    handleGroupCreated={handleGroupCreated}
                 />
             )}
         </>

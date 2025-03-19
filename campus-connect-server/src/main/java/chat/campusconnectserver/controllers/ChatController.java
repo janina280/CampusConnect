@@ -45,15 +45,13 @@ public class ChatController {
         return new ResponseEntity<>(chat, HttpStatus.OK);
     }
 
-    @PostMapping("/group")
-    public ResponseEntity<ChatDto> createGroupHandle(@RequestBody GroupChatRequest req, @RequestHeader("Authorization") String jwt) throws UserException {
-        User reqUser = userService.findUserProfile(jwt);
+    @Transactional
+    @MessageMapping("/group-create")
+    @SendTo("/group/group-create-response")
+    public ChatDto createGroupHandle(GroupChatRequest req) throws UserException {
+        User reqUser = userService.findUserProfile(req.getJwt());
 
-        Chat chat = chatService.createGroup(req, reqUser);
-
-        ChatDto chatDto = new ChatDto(chat);
-
-        return new ResponseEntity<>(chatDto, HttpStatus.CREATED);
+        return chatService.createGroup(req, reqUser);
     }
 
 

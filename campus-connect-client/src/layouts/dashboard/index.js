@@ -6,16 +6,13 @@ import {useSelector, useDispatch} from "react-redux";
 import {
     AddDirectMessage,
     UpdateDirectConversation,
-    AddDirectConversation,
+    AddDirectConversation, AddDirectGroupConversation,
 } from "../../redux/slices/conversation";
 import {showSnackbar, SelectRoomId, SelectChatType} from "../../redux/slices/app";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const DashboardLayout = () => {
     const {isLoggedIn, user_id} = useSelector((state) => state.auth);
-    const {conversations, current_conversation} = useSelector(
-        (state) => state.conversation.direct_chat
-    );
 
     const {isConnected, socket} = useWebSocket();
 
@@ -24,7 +21,11 @@ const DashboardLayout = () => {
         if (isLoggedIn) {
             if (!isConnected) return;
 
-            socket.on(`/topic/messages/${user_id}`, (messageOutput) => {
+            socket.on("/group/group-create-response", (data) => {
+                dispatch(AddDirectGroupConversation(data));
+            })
+
+            /*socket.on(`/topic/messages/${user_id}`, (messageOutput) => {
                 const message = JSON.parse(messageOutput.body);
                 console.log("Received message:", message);
 
@@ -62,7 +63,7 @@ const DashboardLayout = () => {
             socket.on(`/topic/request_sent/${user_id}`, (requestData) => {
                 const data = JSON.parse(requestData.body);
                 dispatch(showSnackbar({severity: "success", message: data.message}));
-            });
+            });*/
         }
     }, [isLoggedIn, isConnected]);
 
