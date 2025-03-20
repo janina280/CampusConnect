@@ -1,5 +1,6 @@
 package chat.campusconnectserver.controllers;
 
+import chat.campusconnectserver.dtos.UserDto;
 import chat.campusconnectserver.exception.ResourceNotFoundException;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.repositories.UserRepository;
@@ -36,16 +37,16 @@ public class UserController {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
     }
 
-    @GetMapping("/{query}")
-    public ResponseEntity<List<User>> searchUserHandler(@PathVariable("query") String q) {
-        List<User> users = userService.searchUser(q);
-        return new ResponseEntity<List<User>>(users, HttpStatus.OK);
+    @GetMapping("/search")
+    public List<UserDto> searchUsers(@RequestParam String query) {
+        return userService.searchUser(query);
     }
+
 
     @PutMapping("/update")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<User> updateProfile(
-            @Valid @RequestBody User updatedUser,
+    public ResponseEntity<UserDto> updateProfile(
+            @Valid @RequestBody UserDto updatedUserDto,
             @CurrentUser UserPrincipal currentUser) {
 
         if (!currentUser.getId().equals(currentUser.getId())) {
@@ -55,17 +56,18 @@ public class UserController {
         User existingUser = userRepository.findById(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", currentUser.getId()));
 
-        existingUser.setNickname(updatedUser.getNickname());
-        existingUser.setAbout(updatedUser.getAbout());
+        existingUser.setNickname(updatedUserDto.getNickname());
+        existingUser.setAbout(updatedUserDto.getAbout());
 
         userRepository.save(existingUser);
 
-        return ResponseEntity.ok(existingUser);
+        UserDto updatedUserResponse = new UserDto(existingUser);
+        return ResponseEntity.ok(updatedUserResponse);
     }
+
     @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.findAllUsers();
-        return ResponseEntity.ok(users);
+    public List<UserDto> getAllUsers() {
+        return userService.findAllUsers();
     }
 
 }

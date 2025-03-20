@@ -6,11 +6,13 @@ import BottomNav from "../../layouts/dashboard/BottomNav";
 import {Search, SearchIconWrapper, StyledInputBase,} from "../../components/Search";
 import ChatElement from "../../components/ChatElement";
 import {useDispatch, useSelector} from "react-redux";
-import {AddDirectConversation, FetchDirectConversations} from "../../redux/slices/conversation";
+import {FetchDirectConversations} from "../../redux/slices/conversation";
 import {useTheme} from "@mui/material/styles";
 import useResponsive from "../../hooks/useResponsive";
 import {searchUser} from "../../redux/slices/auth";
 import {useWebSocket} from "../../contexts/WebSocketContext";
+import {UserElement} from "../../components/UserElement";
+import {showSnackbar} from "../../redux/slices/app";
 
 const Chats = () => {
   const theme = useTheme();
@@ -28,6 +30,7 @@ const Chats = () => {
   const {conversations} = useSelector((state) => state.conversation.direct_chat);
 
   const users = useSelector((state) => state.auth.availableChats);
+  const [selectedChat, setSelectedChat] = useState(null);
 
   useEffect(() => {
 
@@ -42,37 +45,49 @@ const Chats = () => {
 
   //todo: check if it still needed
   const handleSearch = (value) => {
-    setQueryChat(value);
-    if (value.trim() === "") {
-      return;
+    const trimmedValue = value.trim();
+    setQueryChat(trimmedValue);
+
+    if (trimmedValue !== "") {
+      dispatch(searchUser({keyword: trimmedValue}));
     }
-    dispatch(searchUser({ keyword: value }));
   };
+
 
   //todo: later
   const handleCreateChat = (userId) => {
-    const chatExists = conversations.some((chat) => chat.user_id === userId);
-  
-    if (chatExists) {
-      setSnackbarMessage("Chat already exists with this user");
-      setSnackbarOpen(true);
+    const existingChat = conversations.find((chat) => chat.user_id === userId);
+
+    if (existingChat) {
+      setSelectedChat(existingChat);
       return;
     }
-  
-    dispatch(AddDirectConversation(userId))
-      .then((newChat) => {
-        if (newChat) {
-          setSnackbarMessage("The chat was created successfully!");
-          setSnackbarOpen(true);
-        } else {
-          setSnackbarMessage("Error creating chat.");
-          setSnackbarOpen(true);
-        }
-      })
-      .catch((error) => {
-        setSnackbarMessage("Error creating chat.");
-        setSnackbarOpen(true);
-      });
+
+    if (!isConnected) {
+      console.error("The Socket is not connected");
+      return;
+    }
+
+    const requestData = {userId};
+
+    try {
+      socket.emit("/app/chat-create", requestData);
+
+      dispatch(
+          showSnackbar({
+            severity: "success",
+            message: "Chat created successfully!",
+          })
+      );
+    } catch (error) {
+      console.error("Error creating chat:", error);
+      dispatch(
+          showSnackbar({
+            severity: "error",
+            message: "Failed to create chat.",
+          })
+      );
+    }
   };
 
   return (
@@ -127,12 +142,14 @@ const Chats = () => {
             height: "100%",
           }}
         >
-          {loading ? (
+          {selectedChat ? (
+              <ChatElement {...selectedChat} />
+          ) : loading ? (
             <Typography variant="body2">Loading chats...</Typography>
           ) : (
             <SimpleBarStyle timeout={500} autoHide={true}>
               {/* Rezultatele căutării */}
-              {queryChat?.trim() ? (
+              {queryChat?.trim() && users.length > 0 ? (
                 <Stack spacing={2.4}>
                   <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                     Search Results
@@ -145,13 +162,15 @@ const Chats = () => {
                           //<UserElement onClick() -> below todo></UserElement>
                           //todo: when user is clicked check if the chat exists
                           // if true -> show ChatElement
-                        <ChatElement
-                          key={chat.id}
-                          {...chat}
-                          handleCreateChat={() => handleCreateChat(chat.id)}
-                          showMessageIcon={true}
-                          existingChat={false}
-                        />
+                          <UserElement
+                              key={chat.id}
+                              {...chat}
+                              handleCreateChat={() => handleCreateChat(chat.id)}
+                              showMessageIcon={true}
+                              existingChat={!!conversations.find(c => c.user_id === chat.id)}
+                          />
+
+
                           //if false -> create new chat and show ChatElement
                       ))
                   ) : (

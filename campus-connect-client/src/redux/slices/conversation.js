@@ -1,7 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {faker} from "@faker-js/faker";
-import axios from "../../utils/axios"
-import {showSnackbar} from "./app";
 
 let user_id = window.localStorage.getItem("user_id");
 
@@ -66,18 +64,21 @@ const slice = createSlice({
 
         addDirectConversation(state, action) {
             const this_conversation = action.payload.conversation;
-            const user = this_conversation.participants.find((elm) => elm._id.toString() !== user_id);
-            state.direct_chat.conversations = state.direct_chat.conversations.filter((el) => el?.id !== this_conversation._id);
+            const user = this_conversation.users.find((elm) => elm.id.toString() !== user_id);
+            state.direct_chat.conversations = state.direct_chat.conversations.filter((el) => el?.id !== this_conversation.id);
+            const lastMessage = this_conversation.messages?.length ? this_conversation.messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, this_conversation.messages[0]) : {
+                text: "You can start messaging with...", createdAt: null
+            };
             state.direct_chat.conversations.push({
-                id: this_conversation._id._id,
-                user_id: user?._id,
-                name: `${user?.firstName} ${user?.lastName}`,
-                online: user?.status === "Online",
+                id: this_conversation.id,
+                user_id: this_conversation.user,
+                name: this_conversation.user?.name,
+                online: this_conversation.online ? "Online" : "Offline",
                 img: faker.image.avatar(),
                 msg: faker.music.songName(),
-                time: "9:36",
-                unread: 0,
-                pinned: false,
+                time: lastMessage.createdAt ? new Date(lastMessage.createdAt).toLocaleTimeString() : "9:36",
+                unread: this_conversation.unread,
+                pinned: this_conversation.pinned,
             });
         },
 

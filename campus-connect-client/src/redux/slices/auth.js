@@ -92,7 +92,7 @@ export function searchUser(data) {
         }
         try {
             const response = await axios.get(
-                `/api/user/${data.keyword}`,
+                `api/user/search?query=${data.keyword}`,
                 {
                     headers: {
                         "Content-Type": "application/json",

@@ -1,20 +1,21 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {Stack} from "@mui/material";
 import {Navigate, Outlet} from "react-router-dom";
 import SideBar from "./SideBar";
-import {useSelector, useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {
-    AddDirectMessage,
+    AddDirectConversation,
+    AddDirectGroupConversation,
     UpdateDirectConversation,
-    AddDirectConversation, AddDirectGroupConversation,
 } from "../../redux/slices/conversation";
-import {showSnackbar, SelectRoomId, SelectChatType} from "../../redux/slices/app";
+import {SelectChatType, SelectRoomId} from "../../redux/slices/app";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const DashboardLayout = () => {
     const {isLoggedIn, user_id} = useSelector((state) => state.auth);
 
     const {isConnected, socket} = useWebSocket();
+    const {conversations} = useSelector((state) => state.conversation.direct_chat);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -24,6 +25,20 @@ const DashboardLayout = () => {
             socket.on("/group/group-create-response", (data) => {
                 dispatch(AddDirectGroupConversation(data));
             })
+
+            socket.on(`/chat/chat-create-response/${user_id}`, (chatData) => {
+                const data = JSON.parse(chatData.body);
+                console.log("Start chat data:", data);
+
+                const existingConversation = conversations.find((el) => el?.id === data.id);
+                if (existingConversation) {
+                    dispatch(UpdateDirectConversation({conversation: data}));
+                } else {
+                    dispatch(AddDirectConversation({conversation: data}));
+                }
+                dispatch(SelectChatType({chat_type: "individual"}));
+                dispatch(SelectRoomId({room_id: data.id}));
+            });
 
             /*socket.on(`/topic/messages/${user_id}`, (messageOutput) => {
                 const message = JSON.parse(messageOutput.body);
