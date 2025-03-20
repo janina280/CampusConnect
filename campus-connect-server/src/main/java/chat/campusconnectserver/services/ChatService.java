@@ -26,13 +26,13 @@ public class ChatService {
         this.userService = userService;
     }
 
-    public Chat createChat(Long firstUserId, Long secondUserId) throws UserException {
+    public ChatDto createChat(Long firstUserId, Long secondUserId) throws UserException {
         User firstUser = userService.findUserById(firstUserId);
         User secondUser = userService.findUserById(secondUserId);
 
         Chat isChatExist = chatRepository.findSingleChatByUserIds(secondUser, Optional.ofNullable(firstUser));
         if (isChatExist != null) {
-            return isChatExist;
+            return new ChatDto(isChatExist);
         }
         Chat chat = new Chat();
         chat.setCreatedBy(firstUser);
@@ -41,7 +41,7 @@ public class ChatService {
         chat.setGroup(false);
 
         chatRepository.save(chat);
-        return chat;
+        return new ChatDto(chat);
     }
 
     public Chat findChatById(Long chatId) throws ChatException {
@@ -69,7 +69,7 @@ public class ChatService {
 
         return chatRepository.findGroupChatsByUser(user).stream().map(ChatDto::new).toList();
     }
-    public List<Chat> searchGroupByName(String groupName, Long userId) throws UserException {
+    public List<ChatDto> searchGroupByName(String groupName, Long userId) throws UserException {
         User user = userService.findUserById(userId);
         if (user == null) {
             throw new UserException("User not found with ID: " + userId);
@@ -78,8 +78,7 @@ public class ChatService {
         return chatRepository.findAllGroupChats().stream()
                 .filter(chat -> chat.isGroup()
                         && chat.getName().toLowerCase().contains(groupName.toLowerCase())
-                        && chat.getUsers().contains(user))
-                .toList();
+                        && chat.getUsers().contains(user)).map(ChatDto::new).toList();
     }
 
 

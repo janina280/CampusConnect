@@ -1,12 +1,8 @@
-import React, {useState, useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useTheme} from "@mui/material/styles";
 import {Box, Divider, IconButton, Stack, Typography} from "@mui/material";
 import {MagnifyingGlass, Plus} from "phosphor-react";
-import {
-    Search,
-    SearchIconWrapper,
-    StyledInputBase,
-} from "../../components/Search";
+import {Search, SearchIconWrapper, StyledInputBase,} from "../../components/Search";
 import {SimpleBarStyle} from "../../components/Scrollbar";
 import ChatElement from "../../components/ChatElement";
 import CreateGroup from "../../sections/main/CreateGroup";
@@ -15,6 +11,7 @@ import {FetchDirectGroups, SetCurrentGroup} from "../../redux/slices/conversatio
 import {useWebSocket} from "../../contexts/WebSocketContext";
 import BottomNav from "../../layouts/dashboard/BottomNav";
 import useResponsive from "../../hooks/useResponsive";
+import {searchGroup} from "../../redux/slices/auth";
 
 
 const Group = () => {
@@ -28,6 +25,8 @@ const Group = () => {
 
     const [queryGroup, setQueryGroup] = useState("");
     const {groups} = useSelector((state) => state.conversation.group_chat);
+    const {availableGroups} = useSelector((state) => state.auth);
+
 
     useEffect(() => {
         if (!isConnected) return;
@@ -49,22 +48,7 @@ const Group = () => {
             setFilteredGroups(groups);
             return;
         }
-        try {
-            const response = await fetch(
-                `http://localhost:8080/api/chat/groups/search?name=${encodeURIComponent(searchTerm)}`,
-                {
-                    method: "GET",
-                    headers: {Authorization: `Bearer ${token}`},
-                }
-            );
-
-            if (response.ok) {
-                const data = await response.json();
-                setFilteredGroups(data);
-            }
-        } catch (error) {
-            console.error("Error searching groups:", error);
-        }
+        dispatch(searchGroup({keyword: searchTerm}));
     };
 
     return (
@@ -126,13 +110,19 @@ const Group = () => {
                                 <Typography variant="subtitle2" sx={{color: "#676667"}}>
                                     All Groups
                                 </Typography>
-                                {groups.map((group) => (
-                                    <ChatElement
-                                        key={group.id}
-                                        {...group}
-                                        onClick={() => handleGroupSelect(group.id)}
-                                    />
-                                ))}
+                                {(queryGroup.trim() === "" ? groups : availableGroups).length > 0 ? (
+                                    (queryGroup.trim() === "" ? groups : availableGroups).map((group) => (
+                                        <ChatElement
+                                            key={group.id}
+                                            {...group}
+                                            onClick={() => handleGroupSelect(group.id)}
+                                        />
+                                    ))
+                                ) : (
+                                    <Typography variant="body2" sx={{color: "gray"}}>
+                                        No groups created yet.
+                                    </Typography>
+                                )}
                             </Stack>
                         </SimpleBarStyle>
                     </Stack>

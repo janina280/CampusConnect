@@ -36,13 +36,13 @@ public class ChatController {
         this.tokenProvider = tokenProvider;
     }
 
-    @PostMapping()
-    public ResponseEntity<Chat> createChatHandle(@RequestBody SingleChatRequest singleChatRequest, @RequestHeader("Authorization") String jwt) throws UserException {
+    @Transactional
+    @MessageMapping("/chat-create")
+    @SendTo("/chat/chat-create-response")
+    public ChatDto createChatHandle(@RequestBody SingleChatRequest singleChatRequest, @RequestHeader("Authorization") String jwt) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
-        Chat chat = chatService.createChat(currentUserId, singleChatRequest.getUserId());
-
-        return new ResponseEntity<>(chat, HttpStatus.OK);
+        return chatService.createChat(currentUserId, singleChatRequest.getUserId());
     }
 
     @Transactional
@@ -81,13 +81,13 @@ public class ChatController {
     }
 
     @GetMapping("/groups/search")
-    public ResponseEntity<List<Chat>> searchGroupsByName(
+    public ResponseEntity<List<ChatDto>> searchGroupsByName(
             @RequestHeader("Authorization") String jwt,
             @RequestParam("name") String groupName) throws UserException {
         System.out.println("Searching for group: " + groupName);
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
-        List<Chat> groups = chatService.searchGroupByName(groupName, currentUserId);
+        List<ChatDto> groups = chatService.searchGroupByName(groupName, currentUserId);
 
         return new ResponseEntity<>(groups, HttpStatus.OK);
     }

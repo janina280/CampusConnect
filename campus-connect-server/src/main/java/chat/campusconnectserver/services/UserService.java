@@ -1,5 +1,6 @@
 package chat.campusconnectserver.services;
 
+import chat.campusconnectserver.dtos.UserDto;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.repositories.UserRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -46,13 +48,16 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public List<User> searchUser(String query) {
+    public List<UserDto> searchUser(String query) {
         List<User> users = userRepository.searchUser(query);
-        return users;
+        return users.stream()
+                .map(UserDto::new)
+                .collect(Collectors.toList());
     }
 
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
+    public List<UserDto> findAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(UserDto::new).collect(Collectors.toList());
     }
 
 }

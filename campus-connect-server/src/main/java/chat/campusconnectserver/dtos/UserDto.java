@@ -2,9 +2,9 @@ package chat.campusconnectserver.dtos;
 
 import chat.campusconnectserver.modal.AuthProvider;
 import chat.campusconnectserver.modal.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor

@@ -6,7 +6,8 @@ const initialState = {
     isLoggedIn: false,
     accessToken: "",
     isLoading: false,
-    availableChats: []
+    availableChats: [],
+    availableGroups: []
 };
 
 const slice = createSlice({
@@ -29,6 +30,9 @@ const slice = createSlice({
         search(state, action) {
             state.availableChats = action.payload.availableChats;
         },
+        searchGroup(state, action) {
+            state.availableGroups = action.payload.availableGroups;
+        }
     },
 });
 
@@ -79,7 +83,7 @@ export function LoginUser(fromValues) {
     };
 }
 
-//Search
+//Search User
 export function searchUser(data) {
     return async (dispatch, getState) => {
         const token = getState().auth.accessToken;
@@ -105,6 +109,34 @@ export function searchUser(data) {
             console.error("Search API error:", error);
         }
     };
+}
+
+//Search Group
+export function searchGroup(data) {
+    return async (dispatch, getState) => {
+        const token = getState().auth.accessToken;
+        if (!token) {
+            return;
+        }
+        try {
+            const response = await axios.get(
+                `groups/search?name=${data.keyword}`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            dispatch(
+                slice.actions.searchGroup({
+                    availableGroups: response.data,
+                })
+            );
+        } catch (error) {
+            console.error("Search API error:", error);
+        }
+    }
 }
 
 //Log Out

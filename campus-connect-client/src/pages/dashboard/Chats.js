@@ -1,30 +1,15 @@
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  IconButton,
-  Stack,
-  Typography,
-  Button,
-  Divider,
-  Snackbar,
-  Alert,
-} from "@mui/material";
-import { ArchiveBox, CircleDashed, MagnifyingGlass } from "phosphor-react";
-import { SimpleBarStyle } from "../../components/Scrollbar";
+import React, {useEffect, useState} from "react";
+import {Alert, Box, Button, Divider, IconButton, Snackbar, Stack, Typography,} from "@mui/material";
+import {ArchiveBox, CircleDashed, MagnifyingGlass} from "phosphor-react";
+import {SimpleBarStyle} from "../../components/Scrollbar";
 import BottomNav from "../../layouts/dashboard/BottomNav";
-import {
-  Search,
-  SearchIconWrapper,
-  StyledInputBase,
-} from "../../components/Search";
+import {Search, SearchIconWrapper, StyledInputBase,} from "../../components/Search";
 import ChatElement from "../../components/ChatElement";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  AddDirectConversation, FetchDirectConversations
-} from "../../redux/slices/conversation";
-import { useTheme } from "@mui/material/styles";
+import {useDispatch, useSelector} from "react-redux";
+import {AddDirectConversation, FetchDirectConversations} from "../../redux/slices/conversation";
+import {useTheme} from "@mui/material/styles";
 import useResponsive from "../../hooks/useResponsive";
-import { searchUser } from "../../redux/slices/auth";
+import {searchUser} from "../../redux/slices/auth";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const Chats = () => {
@@ -43,6 +28,17 @@ const Chats = () => {
   const {conversations} = useSelector((state) => state.conversation.direct_chat);
 
   const users = useSelector((state) => state.auth.availableChats);
+
+  useEffect(() => {
+
+    if (!isConnected) return;
+
+    socket.emit("/app/chats", "Bearer " + token)
+
+    socket.on("/chat/chats-response", (data) => {
+      dispatch(FetchDirectConversations(data));
+    });
+  }, [isConnected]);
 
   //todo: check if it still needed
   const handleSearch = (value) => {
@@ -78,18 +74,6 @@ const Chats = () => {
         setSnackbarOpen(true);
       });
   };
-  
-  useEffect(() => {
-
-    if (!isConnected) return;
-
-    socket.emit("/app/chats", "Bearer " + token)
-
-    socket.on("/chat/chats-response",(data) =>{
-      dispatch(FetchDirectConversations(data));
-    });
-  }, [isConnected]);
-  
 
   return (
     <Box
