@@ -25,10 +25,17 @@ const slice = createSlice({
     initialState,
     reducers: {
         fetchUser(state, action) {
-            state.user = action.payload.user;
+            state.user = {
+                name: action.payload.user.name || "N/A",
+                email: action.payload.user.email || "N/A",
+                imageUrl: action.payload.user.imageUrl || "",
+                nickname: action.payload.user.nickname || "",
+                about: action.payload.user.about || "",
+            };
         },
         updateUser(state, action) {
-            state.user = action.payload.user;
+            state.user.nickname = action.payload.nickname;
+            state.user.about = action.payload.about;
         },
         // Toggle Sidebar
         toggleSideBar(state) {
@@ -122,24 +129,32 @@ export function SelectRoomId({room_id}) {
 
 export const FetchUserProfile = () => {
     return async (dispatch, getState) => {
-        axios
-            .get("/profile", {
+        const token = getState().auth.accessToken;
+
+        if (!token) {
+            console.error("Token is missing. Please log in.");
+            return;
+        }
+        try {
+            const response = await axios.get("http://localhost:8080/api/user", {
                 headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${getState().auth.token}`,
+                    Authorization: `Bearer ${token}`,
                 },
-            })
-            .then((response) => {
-                console.log(response);
-                dispatch(slice.actions.fetchUser({user: response.data.data}));
-            })
-            .catch((err) => {
-                console.log(err);
             });
+
+            if (response.status === 200) {
+                dispatch(slice.actions.fetchUser({ user: response.data }));
+            } else {
+                console.error("Failed to fetch user profile, status:", response.status);
+            }
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
+        }
     };
 };
 
-export const FetchAllUsers = (data) => {
+
+export const FetchAllUsers = () => {
     return async (dispatch, getState) => {
         const token = getState().auth.accessToken;
 
@@ -166,3 +181,8 @@ export const FetchAllUsers = (data) => {
     };
 };
 
+export const updateUserProfile = (nickname, about) => {
+    return async (dispatch) => {
+        dispatch(slice.actions.updateUser({ nickname, about }));
+    };
+};

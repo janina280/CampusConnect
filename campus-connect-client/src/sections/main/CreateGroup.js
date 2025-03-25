@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {
     Button,
     Dialog,
@@ -14,7 +14,6 @@ import {RHFTextField} from "../../components/hook-form";
 import RHFAutocomplete from "../../components/hook-form/RHFAutocomplete";
 import {useSelector, useDispatch} from "react-redux";
 import {FetchAllUsers, showSnackbar} from "../../redux/slices/app";
-import {AddDirectGroupConversation} from "../../redux/slices/conversation";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const CreateGroupForm = ({handleClose}) => {

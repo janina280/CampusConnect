@@ -7,6 +7,7 @@ import chat.campusconnectserver.modal.Chat;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.GroupChatRequest;
 import chat.campusconnectserver.repositories.ChatRepository;
+import chat.campusconnectserver.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,13 @@ import java.util.Optional;
 public class ChatService {
 
     private final ChatRepository chatRepository;
-
+    private final UserRepository  userRepository;
     private final UserService userService;
 
     @Autowired
-    public ChatService(ChatRepository chatRepository, UserService userService) {
+    public ChatService(ChatRepository chatRepository, UserRepository userRepository, UserService userService) {
         this.chatRepository = chatRepository;
+        this.userRepository = userRepository;
         this.userService = userService;
     }
 
@@ -60,7 +62,6 @@ public class ChatService {
         return chatRepository.findChatByUserIds(user).stream().map(ChatDto::new).toList();
     }
 
-
     public List<ChatDto> findAllGroupChats(Long userId) throws UserException {
         User user = userService.findUserById(userId);
         if (user == null) {
@@ -80,8 +81,6 @@ public class ChatService {
                         && chat.getName().toLowerCase().contains(groupName.toLowerCase())
                         && chat.getUsers().contains(user)).map(ChatDto::new).toList();
     }
-
-
 
     public ChatDto createGroup(GroupChatRequest req, User reqUser) throws UserException {
         Chat group = new Chat();
@@ -124,13 +123,20 @@ public class ChatService {
         throw new ChatException("Chat not found with id" + chatId);
     }
 
-    public void deleteChat(Long chatId, Long userId) {
-        Optional<Chat> opt = chatRepository.findById(chatId);
-        if (opt.isPresent()) {
-            Chat chat = opt.get();
-            chatRepository.deleteById(chat.getId());
+    public void deleteChatForUser(Long chatId, Long userId) throws UserException, ChatException {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ChatException("Chat not found"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("User not found"));
+
+        if (!chat.getUsers().contains(user)) {
+            throw new UserException("User is not part of this chat");
         }
+        chat.getUsers().remove(user);
+        chatRepository.save(chat);
     }
+
 
     public Chat saveChat(Chat chat) {
         return chatRepository.save(chat);

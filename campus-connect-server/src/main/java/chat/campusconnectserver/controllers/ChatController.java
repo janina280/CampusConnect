@@ -81,15 +81,13 @@ public class ChatController {
     }
 
     @GetMapping("/groups/search")
-    public ResponseEntity<List<ChatDto>> searchGroupsByName(
+    public List<ChatDto> searchGroupsByName(
             @RequestHeader("Authorization") String jwt,
             @RequestParam("name") String groupName) throws UserException {
         System.out.println("Searching for group: " + groupName);
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
-        List<ChatDto> groups = chatService.searchGroupByName(groupName, currentUserId);
-
-        return new ResponseEntity<>(groups, HttpStatus.OK);
+        return chatService.searchGroupByName(groupName, currentUserId);
     }
 
     @PutMapping("/{chatId}/add/{userId}")
@@ -111,16 +109,18 @@ public class ChatController {
     }
 
     @DeleteMapping("/{chatId}")
-    public ResponseEntity<ApiResponse> deleteChatHandle(
+    public ResponseEntity<ApiResponse> deleteChatForUser(
             @PathVariable Long chatId,
             @RequestHeader("Authorization") String jwt
-    ) throws UserException {
-        User reqUser = userService.findUserProfile(jwt);
+    ) throws UserException, ChatException {
+        Long userId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
-        chatService.deleteChat(chatId, reqUser.getId());
+        chatService.deleteChatForUser(chatId, userId);
 
-        ApiResponse res = new ApiResponse("Chat is deleted successfully", true);
+        ApiResponse res = new ApiResponse("Chat deleted successfully for your view", true);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
+
 
 }

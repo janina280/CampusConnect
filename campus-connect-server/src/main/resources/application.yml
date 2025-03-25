@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/campus_connect?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
+    url: jdbc:postgresql://localhost:5432/campus-connect?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
     username: postgres
-    password: janina
+    password: postgres
 
   mvc:
       pattern:

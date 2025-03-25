@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {
-    Avatar,
-    Badge,
     Box,
     IconButton,
     Stack,
@@ -11,7 +9,6 @@ import {useTheme} from "@mui/material/styles";
 import {MagnifyingGlass} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {ToggleSidebar} from "../../redux/slices/app";
-import {SetCurrentConversation} from "../../redux/slices/conversation";
 import {useDispatch, useSelector} from "react-redux";
 import CreateAvatar from "../../utils/createAvatar";
 import StyledBadge from "../StyledBadge";
@@ -24,7 +21,7 @@ const ChatHeader = () => {
     const {current_conversation} = useSelector((state) => state.conversation.direct_chat);
     const {current_group_conversation} = useSelector((state) => state.conversation.group_chat);
 
-    const {chat_type, room_id} = useSelector((store) => store.app);
+    const {chat_type} = useSelector((store) => store.app);
 
     const [conversation, setConversation] = useState(null);
 

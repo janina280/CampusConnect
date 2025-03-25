@@ -15,7 +15,7 @@ import {
     Stack,
 } from "@mui/material";
 import {useNavigate, useLocation} from "react-router-dom";
-import {SelectChatType} from "../../redux/slices/app";
+import {FetchUserProfile, SelectChatType} from "../../redux/slices/app";
 
 const getMenuPath = (index) => {
     switch (index) {
@@ -64,41 +64,12 @@ const SideBar = () => {
         setAnchorEl(null);
     };
 
-    const [userData, setUserData] = useState({
-        name: "",
-        email: "",
-        imageUrl: "",
-        about: "",
-    });
+    const { user } = useSelector((state) => state.app);
 
     useEffect(() => {
-        const fetchProfileData = async () => {
-            try {
-                const response = await fetch("http://localhost:8080/api/user", {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    setUserData({
-                        name: data.name || "N/A",
-                        email: data.email || "N/A",
-                        imageUrl: data.imageUrl || "",
-                        about: data.about || "",
-                    });
-                } else {
-                    console.error("Failed to load profile data");
-                }
-            } catch (error) {
-                console.error("Error fetching profile data", error);
-            }
-        };
-
-        fetchProfileData();
+        dispatch(FetchUserProfile())
     }, [token]);
+
 
     useEffect(() => {
         switch (location.pathname) {
@@ -250,8 +221,8 @@ const SideBar = () => {
                         onClick={handleAvatarClick}
                     >
                         <CreateAvatar
-                            name={userData.name}
-                            imageUrl={userData.imageUrl}
+                            name={user.name}
+                            imageUrl={user.imageUrl}
                             size={56}
                         />
                     </Box>

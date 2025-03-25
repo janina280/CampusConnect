@@ -55,26 +55,56 @@ const BlockDialog = ({ open, handleClose }) => {
   );
 };
 
-const DeleteChatDialog = ({ open, handleClose }) => {
+const DeleteChatDialog = ({ open, handleClose}) => {
+  const [loading, setLoading] = useState(false);
+  const chatId=useSelector((state)=>state.conversation.direct_chat.current_conversation.id);
+  const token = useSelector((state) => state.auth.accessToken);
+  const groupId=useSelector((state)=>state.conversation.group_chat.current_group_conversation.id);
+  const handleDelete = () => {
+    setLoading(true);
+
+    fetch(`http://localhost:8080/${chatId}`, {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            console.log("Successfully deleted");
+          }
+        })
+        .catch((error) => {
+          console.error('Error deleting chat:', error);
+        })
+        .finally(() => {
+          setLoading(false);
+          handleClose();
+        });
+  };
   return (
-    <Dialog
-      open={open}
-      TransitionComponent={Transition}
-      keepMounted
-      onClose={handleClose}
-      aria-describedby="alert-dialog-slide-description"
-    >
-      <DialogTitle>Delete this chat</DialogTitle>
-      <DialogContent>
-        <DialogContentText id="alert-dialog-slide-description">
-          Are you sure you want to delete this chat?
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleClose}>Yes</Button>
-      </DialogActions>
-    </Dialog>
+      <Dialog
+          open={open}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={handleClose}
+          aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle>Delete this chat</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Are you sure you want to delete this chat?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleDelete} disabled={loading}>
+            {loading ? "Deleting..." : "Yes"}
+          </Button>
+        </DialogActions>
+      </Dialog>
   );
 };
 
@@ -83,7 +113,6 @@ const Contact = () => {
 
   const {current_conversation} = useSelector((state) => state.conversation.direct_chat);
   const {current_group_conversation} = useSelector((state) => state.conversation.group_chat);
-
   const {chat_type, room_id} = useSelector((store) => store.app);
 
   const theme = useTheme();
@@ -260,6 +289,7 @@ const Contact = () => {
               fullWidth
               startIcon={<Trash />}
               variant="outlined"
+
             >
               Delete
             </Button>

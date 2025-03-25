@@ -17,7 +17,8 @@ import CreateAvatar from "../../utils/createAvatar";
 import RequestAccountInfo from "../../sections/settings/RequestAccountInfo";
 import ChatWallpaper from "../../sections/settings/ChatWallpaper";
 import Privacy from "../../sections/settings/Privacy";
-import { useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {FetchUserProfile} from "../../redux/slices/app";
 
 function Settings() {
   const theme = useTheme();
@@ -27,6 +28,7 @@ function Settings() {
   const [openRequestInfo, setOpenRequestInfo] = useState(false);
   const [openChatWallpaper, setOpenChatWallpaper] = useState(false);
   const { open } = useSelector((store) => store.app.sideBar);
+  const dispatch = useDispatch();
 
   const handleOpenPrivacy = () => {
     setOpenPrivacy(true);
@@ -58,42 +60,12 @@ function Settings() {
     setOpenRequestInfo(false);
   };
 
-  const [userData, setUserData] = useState({
-    name: "",
-    email: "",
-    imageUrl: "",
-    about: "",
-  });
+  const { user} = useSelector((state) => state.app);
 
   const token = useSelector((state) => state.auth.accessToken);
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/user", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUserData({
-            name: data.name || "N/A",
-            email: data.email || "N/A",
-            imageUrl: data.imageUrl || "",
-            about: data.about || "",
-          });
-        } else {
-          console.error("Failed to load profile data");
-        }
-      } catch (error) {
-        console.error("Error fetching profile data", error);
-      }
-    };
-
-    fetchProfileData();
+    dispatch(FetchUserProfile())
   }, [token]);
 
   const list = [
@@ -163,13 +135,13 @@ function Settings() {
             {/* Profile */}
             <Stack direction={"row"} spacing={3}>
               <CreateAvatar
-                name={userData.name}
-                imageUrl={userData.imageUrl}
+                name={user.name}
+                imageUrl={user.imageUrl}
                 size={56}
               />
               <Stack spacing={0.5}>
-                <Typography variant="article">{userData.name}</Typography>
-                <Typography variant="body2">{userData.about}</Typography>
+                <Typography variant="article">{user.name}</Typography>
+                <Typography variant="body2">{user.about}</Typography>
               </Stack>
             </Stack>
             {/* List of options */}
