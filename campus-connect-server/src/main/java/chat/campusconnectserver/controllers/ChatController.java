@@ -16,13 +16,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 public class ChatController {
     private final ChatService chatService;
     private final UserService userService;
@@ -121,6 +120,17 @@ public class ChatController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    @GetMapping("/common-groups/{userId}")
+    public ResponseEntity<List<ChatDto>> getCommonGroups(
+            @RequestHeader("Authorization") String jwt,
+            @PathVariable Long userId) throws UserException {
+
+        Long currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
+
+        List<ChatDto> commonGroups = chatService.findCommonGroups(currentUserId, userId);
+
+        return new ResponseEntity<>(commonGroups, HttpStatus.OK);
+    }
 
 
 }

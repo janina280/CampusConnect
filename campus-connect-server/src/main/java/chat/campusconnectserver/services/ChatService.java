@@ -176,4 +176,14 @@ public class ChatService {
         throw new ChatException("Chat not found with id" + chatId);
     }
 
+    public List<ChatDto> findCommonGroups(Long userId1, Long userId2) throws UserException {
+        List<ChatDto> user1Groups = findAllGroupChats(userId1);
+        List<ChatDto> user2Groups = findAllGroupChats(userId2);
+
+        return user1Groups.stream()
+                .filter(user2Groups::contains)
+                .toList();
+    }
+
+
 }

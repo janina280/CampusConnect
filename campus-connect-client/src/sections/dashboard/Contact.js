@@ -1,32 +1,26 @@
 import React, {useEffect, useState} from "react";
-import { useTheme } from "@mui/material/styles";
+import {useTheme} from "@mui/material/styles";
 import {
   Box,
   Button,
-  Divider,
-  IconButton,
-  Stack,
-  Typography,
-  Slide,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  IconButton,
+  Slide,
+  Stack,
+  Typography,
 } from "@mui/material";
 import CreateAvatar from "../../utils/createAvatar";
-import {
-  Bell,
-  CaretRight,
-  Prohibit,
-  Star,
-  Trash,
-  X,
-} from "phosphor-react";
+import {Bell, CaretRight, Prohibit, Star, Trash, X,} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import AntSwitch from "../../components/AntSwitch";
-import { useDispatch, useSelector } from "react-redux";
-import { ToggleSidebar, UpdateSidebarType } from "../../redux/slices/app";
+import {useDispatch, useSelector} from "react-redux";
+import {ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
+import axios from "axios";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -59,7 +53,7 @@ const DeleteChatDialog = ({ open, handleClose}) => {
   const [loading, setLoading] = useState(false);
   const chatId=useSelector((state)=>state.conversation.direct_chat.current_conversation.id);
   const token = useSelector((state) => state.auth.accessToken);
-  const groupId=useSelector((state)=>state.conversation.group_chat.current_group_conversation.id);
+  //const groupId=useSelector((state)=>state.conversation.group_chat.current_group_conversation.id);
   const handleDelete = () => {
     setLoading(true);
 
@@ -114,7 +108,7 @@ const Contact = () => {
   const {current_conversation} = useSelector((state) => state.conversation.direct_chat);
   const {current_group_conversation} = useSelector((state) => state.conversation.group_chat);
   const {chat_type, room_id} = useSelector((store) => store.app);
-
+  const authToken = useSelector((state) => state.auth.accessToken);
   const theme = useTheme();
 
   const isDesktop = useResponsive("up", "md");
@@ -122,6 +116,7 @@ const Contact = () => {
   const [openBlock, setOpenBlock] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
+  const [commonGroups, setCommonGroups] = useState([]);
   const [conversation, setConversation] = useState(null);
 
   const handleCloseBlock = () => {
@@ -130,6 +125,26 @@ const Contact = () => {
   const handleCloseDelete = () => {
     setOpenDelete(false);
   }
+
+  useEffect(() => {
+    const fetchCommonGroups = async () => {
+      try {
+        const response = await axios.get(
+            `http://localhost:8080/common-groups/${current_conversation.user_id}`,
+            {headers: {Authorization: `Bearer ${authToken}`}}
+        );
+        setCommonGroups(response.data);
+      } catch (error) {
+        console.error("Error fetching common groups:", error);
+      }
+    };
+
+    if (current_conversation?.user_id) {
+
+      fetchCommonGroups();
+    }
+  }, [current_conversation]);
+
 
   useEffect(() => {
       if(chat_type === "individual") {
@@ -260,17 +275,26 @@ const Contact = () => {
             <AntSwitch />
           </Stack>
           <Divider />
-          <Typography variant="body2">1 group in common</Typography>
-          <Stack direction="row" alignItems={"center"} spacing={2}>
-            {/* <Avatar src={faker.image.imageUrl()} alt={faker.name.fullName()} /> */}
-            <Stack direction="column" spacing={0.5}>
-              <Typography variant="subtitle2">Camel’s Gang</Typography>
-              <Typography variant="caption">
-                Owl, Parrot, Rabbit , You
-              </Typography>
-            </Stack>
+          <Typography variant="body2">Groups in common</Typography>
+          <Stack spacing={2}>
+            {commonGroups.length > 0 ? (
+                commonGroups.map((group) => (
+                    <Stack key={group.id} direction="row" alignItems={"center"} spacing={2}>
+                      <CreateAvatar name={group.name} imageUrl={group.img} size={40}/>
+                      <Stack>
+                        <Typography variant="subtitle2">{group.name}</Typography>
+                        <Typography variant="caption">
+                          {group.users.length} members
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                ))
+            ) : (
+                <Typography variant="caption">No groups in common</Typography>
+            )}
           </Stack>
           <Divider />
+
           <Stack direction="row" alignItems={"center"} spacing={2}>
             <Button
               onClick={() => {

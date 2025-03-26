@@ -1,6 +1,5 @@
 import React from "react";
 import Chats from "./Chats";
-import {useEffect, useState} from "react";
 import {Box, Stack, Typography} from "@mui/material";
 import {useTheme} from "@mui/material/styles";
 import {useSelector} from "react-redux";
@@ -19,7 +18,8 @@ const GeneralApp = () => {
     const {open, type} = useSelector((store) => store.app.sideBar);
     const {chat_type, room_id} = useSelector((store) => store.app);
 
-    return (<Stack direction={"row"} sx={{width: "100%"}}>
+    return (
+        <Stack direction={"row"} sx={{width: "100%"}}>
         {chat_type === "individual" ? (
             <Chats/>) : (
             <Group/>)}

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -41,4 +42,18 @@ public class ChatDto {
         this.users = chat.getUsers().stream().map(UserDto::new).toList();
         this.messages = chat.getMessages().stream().map(MessageDto::new).toList();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        ChatDto chatDto = (ChatDto) obj;
+        return Objects.equals(id, chatDto.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 }
