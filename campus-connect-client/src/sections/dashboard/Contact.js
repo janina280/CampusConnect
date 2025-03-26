@@ -15,9 +15,8 @@ import {
   Typography,
 } from "@mui/material";
 import CreateAvatar from "../../utils/createAvatar";
-import {Bell, CaretRight, Prohibit, Star, Trash, X,} from "phosphor-react";
+import {CaretRight, Prohibit, Star, Trash, X,} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
-import AntSwitch from "../../components/AntSwitch";
 import {useDispatch, useSelector} from "react-redux";
 import {ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
 import axios from "axios";
@@ -260,19 +259,6 @@ const Contact = () => {
             >
               <CaretRight />
             </IconButton>
-          </Stack>
-          <Divider />
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent={"space-between"}
-          >
-            <Stack direction="row" alignItems="center" spacing={2}>
-              <Bell size={21} />
-              <Typography variant="subtitle2">Mute Notifications</Typography>
-            </Stack>
-
-            <AntSwitch />
           </Stack>
           <Divider />
           <Typography variant="body2">Groups in common</Typography>

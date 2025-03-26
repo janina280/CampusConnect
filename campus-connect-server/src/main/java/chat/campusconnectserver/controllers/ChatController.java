@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class ChatController {
@@ -130,6 +131,20 @@ public class ChatController {
         List<ChatDto> commonGroups = chatService.findCommonGroups(currentUserId, userId);
 
         return new ResponseEntity<>(commonGroups, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/{chatId}/users")
+    public ResponseEntity<Set<User>> getUsersInGroup(@PathVariable Long chatId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
+        Long currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
+
+        Chat chat = chatService.findChatById(chatId);
+        if (chat == null || !chat.getUsers().stream().anyMatch(user -> user.getId().equals(currentUserId))) {
+            throw new ChatException("You are not part of this group");
+        }
+        Set<User> users = chatService.getUsersInGroup(chatId);
+
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
 

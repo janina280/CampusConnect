@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ChatService {
@@ -184,6 +185,10 @@ public class ChatService {
                 .filter(user2Groups::contains)
                 .toList();
     }
-
+    public Set<User> getUsersInGroup(Long chatId) throws ChatException {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ChatException("Chat not found"));
+        return chat.getUsers();
+    }
 
 }

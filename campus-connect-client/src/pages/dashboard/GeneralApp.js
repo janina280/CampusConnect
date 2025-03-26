@@ -11,6 +11,7 @@ import ChatComponent from "./Conversation";
 import {useSearchParams} from "react-router-dom";
 import Group from "./Group";
 import ChatGroupComponent from "./ConversationGroup";
+import ContactGroup from "../../sections/dashboard/ContactGroup";
 
 const GeneralApp = () => {
     const theme = useTheme();
@@ -48,7 +49,11 @@ const GeneralApp = () => {
         {open && (() => {
             switch (type) {
                 case "CONTACT":
-                    return <Contact/>;
+                    return chat_type === "individual" ? (
+                        <Contact/>
+                    ) : (
+                        <ContactGroup/>
+                    );
 
                 case "SHARED":
                     return <Media/>;
