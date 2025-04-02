@@ -22,6 +22,7 @@ const Group = () => {
     const {isConnected, socket} = useWebSocket();
     const dispatch = useDispatch();
     const token = useSelector((state) => state.auth.accessToken);
+    const {isLoggedIn, user_id} = useSelector((state) => state.auth);
 
     const [queryGroup, setQueryGroup] = useState("");
     const {groups} = useSelector((state) => state.conversation.group_chat);
@@ -33,7 +34,7 @@ const Group = () => {
 
         socket.emit("/app/groups", "Bearer " + token);
 
-        socket.on("/group/groups-response", (data) => {
+        socket.on(`/user/${user_id}/group/groups-response`, (data) => {
             dispatch(FetchDirectGroups(data));
         });
     }, [isConnected]);

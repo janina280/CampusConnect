@@ -5,7 +5,8 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class AddUserRequest {
-    private Long chatId;
+public class AddUserInGroupRequest {
+    private Long groupId;
     private Long userId;
+    private String jwt;
 }

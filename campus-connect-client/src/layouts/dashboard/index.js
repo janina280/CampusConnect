@@ -29,7 +29,7 @@ const DashboardLayout = () => {
                 dispatch(AddDirectGroupConversation(data));
             })
 
-            socket.on(`/group/user-add-response/${groupId}`, (data) => {
+            socket.on(`/user/${user_id}/group/user-add-response`, (data) => {
                 dispatch(AddUserToGroupConversation({conversation: data}));
             });
 

@@ -7,7 +7,8 @@ const initialState = {
     accessToken: "",
     isLoading: false,
     availableChats: [],
-    availableGroups: []
+    availableGroups: [],
+    user_id:""
 };
 
 const slice = createSlice({
@@ -21,6 +22,7 @@ const slice = createSlice({
         logIn(state, action) {
             state.isLoggedIn = action.payload.isLoggedIn;
             state.accessToken = action.payload.accessToken;
+            state.user_id = action.payload.user_id;
         },
         signOut(state, action) {
             state.isLoggedIn = false;

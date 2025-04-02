@@ -5,7 +5,7 @@ import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Chat;
 import chat.campusconnectserver.modal.User;
-import chat.campusconnectserver.payload.AddUserRequest;
+import chat.campusconnectserver.payload.AddUserInGroupRequest;
 import chat.campusconnectserver.payload.ApiResponse;
 import chat.campusconnectserver.payload.GroupChatRequest;
 import chat.campusconnectserver.payload.SingleChatRequest;
@@ -15,9 +15,9 @@ import chat.campusconnectserver.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,11 +31,14 @@ public class ChatController {
 
     private final TokenProvider tokenProvider;
 
+    private final SimpMessagingTemplate simpMessagingTemplate;
+
     @Autowired
-    public ChatController(ChatService chatService, UserService userService, TokenProvider tokenProvider) {
+    public ChatController(ChatService chatService, UserService userService, TokenProvider tokenProvider, SimpMessagingTemplate simpMessagingTemplate) {
         this.chatService = chatService;
         this.userService = userService;
         this.tokenProvider = tokenProvider;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @Transactional
@@ -75,11 +78,14 @@ public class ChatController {
 
     @Transactional
     @MessageMapping("/groups")
-    @SendTo("/group/groups-response")
+    //@SendTo("/group/groups-response")
     public List<ChatDto> findAllGroupChatsByUserHandle(@RequestHeader("Authorization") String jwt) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
-        return chatService.findAllGroupChats(currentUserId);
+        var groups = chatService.findAllGroupChats(currentUserId);
+        simpMessagingTemplate.convertAndSendToUser(currentUserId.toString(), "/group/groups-response", groups);
+
+        return groups;
     }
 
     @GetMapping("/groups/search")
@@ -100,13 +106,18 @@ public class ChatController {
 
         return new ResponseEntity<>(chat, HttpStatus.OK);
     }
-    @MessageMapping("/user-add")
-    @SendTo("/group/user-add-response/{chatId}")
-    public ChatDto addUserToGroup(AddUserRequest request, @Header("Authorization") String jwt) throws UserException, ChatException {
-        User reqUser = userService.findUserProfile(jwt);
-        return chatService.addUserToGroup(request.getUserId(), request.getChatId(), reqUser);
-    }
 
+    @Transactional
+    @MessageMapping("/user-add")
+    //@SendTo("/group/user-add-response")
+    public ChatDto addUserToGroup(AddUserInGroupRequest request) throws UserException, ChatException {
+        User reqUser = userService.findUserProfile(request.getJwt());
+        var group = chatService.addUserToGroup(request.getUserId(), request.getGroupId(), reqUser);
+        for(var g : group.getUsers()) {
+            simpMessagingTemplate.convertAndSendToUser(g.getId().toString(), "/group/user-add-response", group);
+        }
+        return group;
+    }
 
 
     @PutMapping("/{chatId}/remove/{userId}")

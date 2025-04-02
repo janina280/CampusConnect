@@ -115,7 +115,7 @@ const AddUserDialog = ({open, handleClose, groupId}) => {
                 throw new Error("The Socket is not connected");
             }
 
-            socket.emit("/app/add-user", requestData);
+            socket.emit("/app/user-add", requestData);
 
             dispatch(
                 showSnackbar({
