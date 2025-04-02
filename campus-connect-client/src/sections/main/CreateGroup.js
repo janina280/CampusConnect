@@ -1,18 +1,12 @@
 import React, {useEffect} from "react";
-import {
-    Button,
-    Dialog,
-    DialogContent,
-    DialogTitle,
-    Stack,
-} from "@mui/material";
+import {Button, Dialog, DialogContent, DialogTitle, Stack,} from "@mui/material";
 import * as Yup from "yup";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import FormProvider from "../../components/hook-form/FormProvider";
 import {RHFTextField} from "../../components/hook-form";
 import RHFAutocomplete from "../../components/hook-form/RHFAutocomplete";
-import {useSelector, useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {FetchAllUsers, showSnackbar} from "../../redux/slices/app";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
@@ -54,10 +48,6 @@ const CreateGroupForm = ({handleClose}) => {
         };
 
         try {
-            /*const newGroup = await dispatch(AddDirectGroupConversation({
-                name: data.title,
-                conversation: requestData,
-            }));*/
             if (!isConnected) {
                 throw new Error("The Socket is not connected");
             }

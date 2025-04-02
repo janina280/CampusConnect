@@ -154,6 +154,14 @@ const slice = createSlice({
                 pinned: this_conversation.pinned,
             });
         },
+        addUserToGroupConversation(state, action) {
+            const {groupId, user} = action.payload;
+            const groupIndex = state.group_chat.groups.findIndex(g => g.id === groupId);
+            if (groupIndex !== -1) {
+                state.group_chat.groups[groupIndex].users.push(user);
+            }
+        },
+
     },
 });
 
@@ -226,38 +234,8 @@ export const AddDirectGroupConversation = (conversation) => {
         dispatch(slice.actions.addDirectGroupConversation({group: conversation}));
     }
 }
-/*try {
-    const response = await axios.post("http://localhost:8080/group", {
-        name,
-        userIds,
-    });
-
-    if (response.status === 200) {
-        dispatch(slice.actions.addDirectGroupConversation({
-            conversation: response.data,
-            name
-        }));
-        dispatch(
-            showSnackbar({
-                severity: "success",
-                message: "Group conversation added successfully!",
-            })
-        );
-    } else {
-        dispatch(
-            showSnackbar({
-                severity: "error",
-                message: "Failed to add group conversation.",
-            })
-        );
+export const AddUserToGroupConversation = (conversation) => {
+    return async (dispatch, getState) => {
+        dispatch(slice.actions.addUserToGroupConversation({group: conversation}));
     }
-} catch (error) {
-    console.error("Error adding group conversation:", error);
-    dispatch(
-        showSnackbar({
-            severity: "error",
-            message: "An error occurred while adding the group conversation.",
-        })
-    );
-}*/
-
+}

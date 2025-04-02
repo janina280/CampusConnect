@@ -1,4 +1,4 @@
-import { Client } from "@stomp/stompjs";
+import {Client} from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
 const SOCKET_URL = "http://localhost:8080/ws";
@@ -24,7 +24,7 @@ class WebSocketService {
 
             this.stompClient.onConnect = () => {
                 console.log("Connected to WebSocket");
-                resolve(); // ✅ Rezolvă promisiunea doar după ce STOMP s-a conectat
+                resolve();
             };
 
             this.stompClient.onDisconnect = () => {

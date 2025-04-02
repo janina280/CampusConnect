@@ -162,19 +162,22 @@ public class ChatService {
         throw new ChatException("Chat not found with id" + chatId);
     }
 
-    public Chat addUserToGroup(Long userId, Long chatId, User reqUser) throws UserException, ChatException {
+    public ChatDto addUserToGroup(Long userId, Long chatId, User reqUser) throws UserException, ChatException {
         Optional<Chat> opt = chatRepository.findById(chatId);
         User user = userService.findUserById(userId);
+
         if (opt.isPresent()) {
             Chat chat = opt.get();
             if (chat.getAdmins().contains(reqUser)) {
                 chat.getUsers().add(user);
-                return chatRepository.save(chat);
+                Chat updatedChat = chatRepository.save(chat);
+
+                return new ChatDto(updatedChat.getId(), updatedChat.getName(), updatedChat.getUsers(), updatedChat.getMessages());
             } else {
                 throw new UserException("You are not admin");
             }
         }
-        throw new ChatException("Chat not found with id" + chatId);
+        throw new ChatException("Chat not found with id " + chatId);
     }
 
     public List<ChatDto> findCommonGroups(Long userId1, Long userId2) throws UserException {

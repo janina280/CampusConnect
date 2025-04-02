@@ -2,6 +2,8 @@ package chat.campusconnectserver.dtos;
 
 
 import chat.campusconnectserver.modal.Chat;
+import chat.campusconnectserver.modal.Message;
+import chat.campusconnectserver.modal.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,8 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -41,6 +45,13 @@ public class ChatDto {
         this.admins = chat.getAdmins().stream().map(UserDto::new).toList();
         this.users = chat.getUsers().stream().map(UserDto::new).toList();
         this.messages = chat.getMessages().stream().map(MessageDto::new).toList();
+    }
+
+    public ChatDto(Long id, String name, Set<User> users, List<Message> messages) {
+        this.id = id;
+        this.name = name;
+        this.users = users.stream().map(UserDto::new).collect(Collectors.toList());
+        this.messages = messages.stream().map(MessageDto::new).collect(Collectors.toList());
     }
 
     @Override

@@ -23,9 +23,10 @@ import CreateAvatar from "../../utils/createAvatar";
 import {CaretRight, Plus, Star, Trash, X,} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
-import {ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
+import {FetchAllUsers, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
 import axios from "../../utils/axios";
 import Snackbar from "@mui/material/Snackbar";
+import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -83,24 +84,19 @@ const DeleteChatDialog = ({open, handleClose}) => {
     );
 };
 
-const AddUserDialog = ({open, handleClose, chatId}) => {
+const AddUserDialog = ({open, handleClose, groupId}) => {
     const [loading, setLoading] = useState(false);
-    const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState("");
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const token = useSelector((state) => state.auth.accessToken);
+    const users = useSelector((state) => state.app.all_users);
+    const dispatch = useDispatch();
+    const {isConnected, socket} = useWebSocket();
 
     useEffect(() => {
-        axios
-            .get("http://localhost:8080/api/user/all", {
-                headers: {Authorization: `Bearer ${token}`},
-            })
-            .then((response) => {
-                setUsers(response.data);
-            })
-            .catch((error) => console.error("Error fetching users:", error));
-    }, [token]);
+        dispatch(FetchAllUsers());
+    }, [dispatch]);
 
     const handleAddUser = async () => {
         if (!selectedUser) {
@@ -108,34 +104,37 @@ const AddUserDialog = ({open, handleClose, chatId}) => {
             return;
         }
 
-        setLoading(true);
-        try {
-            const response = await axios.put(
-                `http://localhost:8080/${chatId}/add/${selectedUser}`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+        const requestData = {
+            groupId: groupId,
+            userId: selectedUser,
+            jwt: "Bearer " + token,
+        };
 
-            if (response.status === 200) {
-                setSnackbarMessage("User added successfully!");
-                setOpenSnackbar(true);
-                handleClose();
-            } else if (response.status === 409) {
-                setSnackbarMessage("User is already in the group.");
-                setOpenSnackbar(true);
+        try {
+            if (!isConnected) {
+                throw new Error("The Socket is not connected");
             }
+
+            socket.emit("/app/add-user", requestData);
+
+            dispatch(
+                showSnackbar({
+                    severity: "success",
+                    message: "User added successfully!",
+                })
+            );
+            handleClose();
         } catch (error) {
             console.error("Error adding user:", error);
-            setSnackbarMessage("Failed to add user.");
-            setOpenSnackbar(true);
-        } finally {
-            setLoading(false);
+            dispatch(
+                showSnackbar({
+                    severity: "error",
+                    message: "Failed to add user.",
+                })
+            );
         }
     };
+
 
     return (
         <>
@@ -189,7 +188,7 @@ const ContactGroup = () => {
     const {current_group_conversation} = useSelector((state) => state.conversation.group_chat);
     const {chat_type} = useSelector((store) => store.app);
     const theme = useTheme();
-    const chatId = current_group_conversation.id;
+    const groupId = current_group_conversation.id;
 
     const isDesktop = useResponsive("up", "md");
     const [openDelete, setOpenDelete] = useState(false);
@@ -207,7 +206,7 @@ const ContactGroup = () => {
 
     const fetchGroupMembers = () => {
         axios
-            .get(`http://localhost:8080/${chatId}/users`, {
+            .get(`http://localhost:8080/${groupId}/users`, {
                 headers: {Authorization: `Bearer ${token}`},
             })
             .then((response) => {
@@ -221,7 +220,7 @@ const ContactGroup = () => {
             setConversation(current_group_conversation);
             fetchGroupMembers();
         }
-    }, [chat_type, current_group_conversation, chatId]);
+    }, [chat_type, current_group_conversation, groupId]);
 
     return (
         <Box sx={{width: !isDesktop ? "100vw" : 320, maxHeight: "100vh"}}>
@@ -361,7 +360,7 @@ const ContactGroup = () => {
                 </Stack>
             </Stack>
             {openDelete && <DeleteChatDialog open={openDelete} handleClose={handleCloseDelete}/>}
-            {<AddUserDialog open={openAddUser} handleClose={handleCloseAddUser} chatId={chatId}/>}
+            {<AddUserDialog open={openAddUser} handleClose={handleCloseAddUser} groupId={groupId}/>}
         </Box>
     );
 };

@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {
     AddDirectConversation,
     AddDirectGroupConversation,
+    AddUserToGroupConversation,
     UpdateDirectConversation,
 } from "../../redux/slices/conversation";
 import {SelectChatType, SelectRoomId} from "../../redux/slices/app";
@@ -13,6 +14,8 @@ import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const DashboardLayout = () => {
     const {isLoggedIn, user_id} = useSelector((state) => state.auth);
+    const {current_group_conversation} = useSelector((state) => state.conversation.group_chat);
+    const groupId = current_group_conversation ? current_group_conversation.id : null;
 
     const {isConnected, socket} = useWebSocket();
     const {conversations} = useSelector((state) => state.conversation.direct_chat);
@@ -25,6 +28,10 @@ const DashboardLayout = () => {
             socket.on("/group/group-create-response", (data) => {
                 dispatch(AddDirectGroupConversation(data));
             })
+
+            socket.on(`/group/user-add-response/${groupId}`, (data) => {
+                dispatch(AddUserToGroupConversation({conversation: data}));
+            });
 
             socket.on(`/chat/chat-create-response/${user_id}`, (chatData) => {
                 const data = JSON.parse(chatData.body);

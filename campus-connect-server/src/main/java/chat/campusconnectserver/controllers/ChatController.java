@@ -5,6 +5,7 @@ import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Chat;
 import chat.campusconnectserver.modal.User;
+import chat.campusconnectserver.payload.AddUserRequest;
 import chat.campusconnectserver.payload.ApiResponse;
 import chat.campusconnectserver.payload.GroupChatRequest;
 import chat.campusconnectserver.payload.SingleChatRequest;
@@ -14,6 +15,7 @@ import chat.campusconnectserver.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,13 +93,21 @@ public class ChatController {
     }
 
     @PutMapping("/{chatId}/add/{userId}")
-    public ResponseEntity<Chat> addUserToGroupHandle(@PathVariable Long chatId, @PathVariable Long userId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
+    public ResponseEntity<ChatDto> addUserToGroupHandle(@PathVariable Long chatId, @PathVariable Long userId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
         User reqUser = userService.findUserProfile(jwt);
 
-        Chat chat = chatService.addUserToGroup(userId, chatId, reqUser);
+        ChatDto chat = chatService.addUserToGroup(userId, chatId, reqUser);
 
         return new ResponseEntity<>(chat, HttpStatus.OK);
     }
+    @MessageMapping("/user-add")
+    @SendTo("/group/user-add-response/{chatId}")
+    public ChatDto addUserToGroup(AddUserRequest request, @Header("Authorization") String jwt) throws UserException, ChatException {
+        User reqUser = userService.findUserProfile(jwt);
+        return chatService.addUserToGroup(request.getUserId(), request.getChatId(), reqUser);
+    }
+
+
 
     @PutMapping("/{chatId}/remove/{userId}")
     public ResponseEntity<Chat> removeUserFromGroupHandle(@PathVariable Long chatId, @PathVariable Long userId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
