@@ -158,12 +158,24 @@ const slice = createSlice({
 
         },
         addUserToGroupConversation(state, action) {
-            const {groupId, user} = action.payload;
-            const groupIndex = state.group_chat.groups.findIndex(g => g.id === groupId);
-            if (groupIndex !== -1) {
-                state.group_chat.groups[groupIndex].users.push(user);
-            }
-        },
+            const group = action.payload.group.conversation;
+            const groupId = group.id;
+
+            const users = Array.isArray(group.users) ? group.users : [];
+
+            const user = group.users.find((elm) => elm.id.toString() !== user_id);
+
+            state.group_chat.groups = state.group_chat.groups.map(group => {
+                if (group.id === groupId) {
+                    return {
+                        ...group,
+                        users: [...users, user],
+                    };
+                }
+                return group;
+            });
+        }
+
 
     },
 });

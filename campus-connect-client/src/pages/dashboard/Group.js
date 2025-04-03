@@ -22,7 +22,7 @@ const Group = () => {
     const {isConnected, socket} = useWebSocket();
     const dispatch = useDispatch();
     const token = useSelector((state) => state.auth.accessToken);
-    const {isLoggedIn, user_id} = useSelector((state) => state.auth);
+    const { user_id} = useSelector((state) => state.auth);
 
     const [queryGroup, setQueryGroup] = useState("");
     const {groups} = useSelector((state) => state.conversation.group_chat);

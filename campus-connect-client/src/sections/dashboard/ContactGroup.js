@@ -27,14 +27,16 @@ import {FetchAllUsers, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../
 import axios from "../../utils/axios";
 import Snackbar from "@mui/material/Snackbar";
 import {useWebSocket} from "../../contexts/WebSocketContext";
+import {FetchDirectGroups} from "../../redux/slices/conversation";
+import {useNavigate} from "react-router-dom";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const DeleteChatDialog = ({open, handleClose}) => {
+const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
     const [loading, setLoading] = useState(false);
-    const chatId = useSelector((state) => state.conversation.direct_chat.current_conversation.id);
+    const chatId = useSelector((state) => state.conversation.group_chat.current_group_conversation.id);
     const token = useSelector((state) => state.auth.accessToken);
     const handleDelete = () => {
         setLoading(true);
@@ -49,7 +51,7 @@ const DeleteChatDialog = ({open, handleClose}) => {
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
-                    console.log("Successfully deleted");
+                    onDeleteSuccess();
                 }
             })
             .catch((error) => {
@@ -196,13 +198,13 @@ const ContactGroup = () => {
     const [openAddUser, setOpenAddUser] = useState(false);
     const [groupMembers, setGroupMembers] = useState([]);
     const token = useSelector((state) => state.auth.accessToken);
+    const navigate = useNavigate();
+    const {isConnected, socket} = useWebSocket();
+    const { user_id} = useSelector((state) => state.auth);
 
     const handleCloseAddUser = () => {
         setOpenAddUser(false);
     };
-    const handleCloseDelete = () => {
-        setOpenDelete(false);
-    }
 
     const fetchGroupMembers = () => {
         axios
@@ -221,6 +223,27 @@ const ContactGroup = () => {
             fetchGroupMembers();
         }
     }, [chat_type, current_group_conversation, groupId]);
+
+    const fetchGroups = () => {
+        if (!isConnected) return;
+
+        socket.emit("/app/groups", `Bearer ${token}`);
+
+        socket.on(`/user/${user_id}/group/groups-response`, (data) => {
+            dispatch(FetchDirectGroups(data));
+        });
+    };
+
+
+    useEffect(() => {
+        fetchGroups();
+    }, [isConnected]);
+
+
+    const handleDeleteSuccess = () => {
+        navigate("/app");
+        fetchGroups();
+    };
 
     return (
         <Box sx={{width: !isDesktop ? "100vw" : 320, maxHeight: "100vh"}}>
@@ -359,7 +382,7 @@ const ContactGroup = () => {
 
                 </Stack>
             </Stack>
-            {openDelete && <DeleteChatDialog open={openDelete} handleClose={handleCloseDelete}/>}
+            {openDelete && <DeleteChatDialog open={openDelete} handleClose={() => setOpenDelete(false)} onDeleteSuccess={handleDeleteSuccess} />}
             {<AddUserDialog open={openAddUser} handleClose={handleCloseAddUser} groupId={groupId}/>}
         </Box>
     );
