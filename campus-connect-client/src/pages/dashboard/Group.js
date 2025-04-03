@@ -37,7 +37,9 @@ const Group = () => {
         socket.on(`/user/${user_id}/group/groups-response`, (data) => {
             dispatch(FetchDirectGroups(data));
         });
+
     }, [isConnected]);
+
 
     const handleGroupSelect = (groupId) => {
         dispatch(SetCurrentGroup({room_id: groupId}));

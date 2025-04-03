@@ -14,7 +14,7 @@ const CreateGroupForm = ({handleClose}) => {
     const dispatch = useDispatch();
     const all_users = useSelector((state) => state.app.all_users);
     const token = useSelector((state) => state.auth.accessToken);
-
+    const {isLoggedIn, user_id} = useSelector((state) => state.auth);
     const {isConnected, socket} = useWebSocket();
 
     useEffect(() => {

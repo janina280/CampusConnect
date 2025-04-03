@@ -22,7 +22,7 @@ const Chats = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const {isConnected, socket} = useWebSocket();
-
+  const {user_id} = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.accessToken);
 
@@ -38,7 +38,7 @@ const Chats = () => {
 
     socket.emit("/app/chats", "Bearer " + token)
 
-    socket.on("/chat/chats-response", (data) => {
+    socket.on(`/user/${user_id}/chat/chats-response`, (data) => {
       dispatch(FetchDirectConversations(data));
     });
   }, [isConnected]);

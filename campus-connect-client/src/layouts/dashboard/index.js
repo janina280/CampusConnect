@@ -15,7 +15,6 @@ import {useWebSocket} from "../../contexts/WebSocketContext";
 const DashboardLayout = () => {
     const {isLoggedIn, user_id} = useSelector((state) => state.auth);
     const {current_group_conversation} = useSelector((state) => state.conversation.group_chat);
-    const groupId = current_group_conversation ? current_group_conversation.id : null;
 
     const {isConnected, socket} = useWebSocket();
     const {conversations} = useSelector((state) => state.conversation.direct_chat);
@@ -25,8 +24,8 @@ const DashboardLayout = () => {
         if (isLoggedIn) {
             if (!isConnected) return;
 
-            socket.on("/group/group-create-response", (data) => {
-                dispatch(AddDirectGroupConversation(data));
+            socket.on(`/user/${user_id}/group/group-create-response`, (data) => {
+                dispatch(AddDirectGroupConversation({conversation: data}));
             })
 
             socket.on(`/user/${user_id}/group/user-add-response`, (data) => {

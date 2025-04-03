@@ -101,7 +101,8 @@ const slice = createSlice({
 
         setCurrentGroup(state, action) {
             state.group_chat.current_group_conversation = action.payload;
-        }, fetchCurrentMessagesGroup(state, action) {
+        },
+        fetchCurrentMessagesGroup(state, action) {
             const messages = action.payload.messages;
             const formatted_messages = messages.map((el) => ({
                 id: el.id,
@@ -112,7 +113,8 @@ const slice = createSlice({
                 outgoing: el.from === user_id,
             }));
             state.group_chat.current_messages_group = formatted_messages;
-        }, addDirectMessageGroup(state, action) {
+        },
+        addDirectMessageGroup(state, action) {
             state.group_chat.current_messages_group.push(action.payload.message);
         },
         fetchDirectGroups(state, action) {
@@ -137,7 +139,7 @@ const slice = createSlice({
             state.group_chat.groups = [...list];
         },
         addDirectGroupConversation(state, action) {
-            const this_conversation = action.payload.group;
+            const this_conversation = action.payload.group.conversation;
             state.group_chat.groups = state.group_chat.groups.filter((el) => el?.id !== this_conversation.id);
             const lastMessage = this_conversation.messages?.length ? this_conversation.messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, this_conversation.messages[0]) : {
                 text: "You can start messaging with...", createdAt: null
@@ -153,6 +155,7 @@ const slice = createSlice({
                 unread: this_conversation.unread,
                 pinned: this_conversation.pinned,
             });
+
         },
         addUserToGroupConversation(state, action) {
             const {groupId, user} = action.payload;

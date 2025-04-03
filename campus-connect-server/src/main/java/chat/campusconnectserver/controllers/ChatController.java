@@ -52,11 +52,16 @@ public class ChatController {
 
     @Transactional
     @MessageMapping("/group-create")
-    @SendTo("/group/group-create-response")
+    //@SendTo("/group/group-create-response")
     public ChatDto createGroupHandle(GroupChatRequest req) throws UserException {
         User reqUser = userService.findUserProfile(req.getJwt());
 
-        return chatService.createGroup(req, reqUser);
+        var group = chatService.createGroup(req, reqUser);
+
+        for (var g : group.getUsers()) {
+            simpMessagingTemplate.convertAndSendToUser(g.getId().toString(), "/group/group-create-response", group);
+        }
+        return group;
     }
 
 
@@ -69,11 +74,15 @@ public class ChatController {
 
     @Transactional
     @MessageMapping("/chats")
-    @SendTo("/chat/chats-response")
+    //@SendTo("/chat/chats-response")
     public List<ChatDto> findAllChatByUserHandle(@RequestHeader("Authorization") String jwt) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
-        return chatService.findAllChatByUserId(currentUserId);
+        var chats = chatService.findAllChatByUserId(currentUserId);
+
+        simpMessagingTemplate.convertAndSendToUser(currentUserId.toString(), "/chat/chats-response", chats);
+
+        return chats;
     }
 
     @Transactional
@@ -113,7 +122,7 @@ public class ChatController {
     public ChatDto addUserToGroup(AddUserInGroupRequest request) throws UserException, ChatException {
         User reqUser = userService.findUserProfile(request.getJwt());
         var group = chatService.addUserToGroup(request.getUserId(), request.getGroupId(), reqUser);
-        for(var g : group.getUsers()) {
+        for (var g : group.getUsers()) {
             simpMessagingTemplate.convertAndSendToUser(g.getId().toString(), "/group/user-add-response", group);
         }
         return group;
