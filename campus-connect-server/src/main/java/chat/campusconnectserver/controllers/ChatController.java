@@ -43,11 +43,16 @@ public class ChatController {
 
     @Transactional
     @MessageMapping("/chat-create")
-    @SendTo("/chat/chat-create-response")
+    //@SendTo("/chat/chat-create-response")
     public ChatDto createChatHandle(@RequestBody SingleChatRequest singleChatRequest, @RequestHeader("Authorization") String jwt) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
-        return chatService.createChat(currentUserId, singleChatRequest.getUserId());
+        var chat= chatService.createChat(currentUserId, singleChatRequest.getUserId());
+
+        for(var c: chat.getUsers()) {
+            simpMessagingTemplate.convertAndSendToUser(c.getId().toString(), "/chat/chat-create-response", chat);
+        }
+        return chat;
     }
 
     @Transactional
@@ -105,15 +110,6 @@ public class ChatController {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
         return chatService.searchGroupByName(groupName, currentUserId);
-    }
-
-    @PutMapping("/{chatId}/add/{userId}")
-    public ResponseEntity<ChatDto> addUserToGroupHandle(@PathVariable Long chatId, @PathVariable Long userId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
-        User reqUser = userService.findUserProfile(jwt);
-
-        ChatDto chat = chatService.addUserToGroup(userId, chatId, reqUser);
-
-        return new ResponseEntity<>(chat, HttpStatus.OK);
     }
 
     @Transactional

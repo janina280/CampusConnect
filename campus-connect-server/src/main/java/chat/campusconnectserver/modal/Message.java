@@ -1,21 +1,30 @@
 package chat.campusconnectserver.modal;
 
+import chat.campusconnectserver.common.BaseAuditingEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Setter
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
-public class Message {
+public class Message extends BaseAuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
-    private LocalDateTime timestamp;
+
+    @Enumerated(EnumType.STRING)
+    private MessageState state;
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
 
     @ManyToOne
     private  User user ;
@@ -24,18 +33,10 @@ public class Message {
     private Chat chat;
 
     private String formattedTime;
-
-    public Message(Long id, String content,String formattedTime, LocalDateTime timestamp, User user, Chat chat) {
-        this.id = id;
-        this.content = content;
-        this.timestamp = timestamp;
-        this.user = user;
-        this.chat = chat;
-        this.formattedTime=formattedTime;
-    }
-
-    public Message() {
-
-    }
+    @Column(name = "sender_id", nullable = false)
+    private String senderId;
+    @Column(name = "receiver_id", nullable = false)
+    private String receiverId;
+    private String mediaFilePath;
 
 }

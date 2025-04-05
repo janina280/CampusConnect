@@ -23,7 +23,6 @@ public class MessageDto {
     public MessageDto(Message message) {
         this.id = message.getId();
         this.content = message.getContent();
-        this.timestamp = message.getTimestamp();
         this.user = message.getUser();
         this.chat = message.getChat();
         this.formattedTime = message.getFormattedTime();

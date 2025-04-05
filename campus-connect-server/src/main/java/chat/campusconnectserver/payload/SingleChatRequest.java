@@ -7,12 +7,4 @@ import lombok.Setter;
 @Getter
 public class SingleChatRequest {
     private Long userId;
-    public SingleChatRequest(){
-
-    }
-
-    public SingleChatRequest(Long userId) {
-        super();
-        this.userId = userId;
-    }
 }

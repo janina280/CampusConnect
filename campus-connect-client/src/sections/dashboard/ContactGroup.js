@@ -20,7 +20,7 @@ import {
     Typography,
 } from "@mui/material";
 import CreateAvatar from "../../utils/createAvatar";
-import {CaretRight, Plus, Star, Trash, X,} from "phosphor-react";
+import {CaretRight, Plus, PushPin, Star, Trash, X,} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
 import {FetchAllUsers, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
@@ -28,11 +28,31 @@ import axios from "../../utils/axios";
 import Snackbar from "@mui/material/Snackbar";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 import {FetchDirectGroups} from "../../redux/slices/conversation";
-import {useNavigate} from "react-router-dom";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
+
+const PinnedDialog = ({open, handleClose}) => {
+    return (<Dialog
+        open={open}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleClose}
+        aria-describedby="alert-dialog-slide-description"
+    >
+        <DialogTitle>Pin this group</DialogTitle>
+        <DialogContent>
+            <DialogContentText id="alert-dialog-slide-description">
+                Would you like to pin this group?
+            </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleClose}>Yes</Button>
+        </DialogActions>
+    </Dialog>);
+};
 
 const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
     const [loading, setLoading] = useState(false);
@@ -196,9 +216,10 @@ const ContactGroup = () => {
     const [openDelete, setOpenDelete] = useState(false);
     const [conversation, setConversation] = useState(null);
     const [openAddUser, setOpenAddUser] = useState(false);
+    const [openPinned, setOpenPinned] = useState(false);
     const [groupMembers, setGroupMembers] = useState([]);
     const token = useSelector((state) => state.auth.accessToken);
-    const navigate = useNavigate();
+
     const {isConnected, socket} = useWebSocket();
     const { user_id} = useSelector((state) => state.auth);
 
@@ -234,14 +255,14 @@ const ContactGroup = () => {
         });
     };
 
-
     useEffect(() => {
         fetchGroups();
-    }, [isConnected]);
+    },[ isConnected]);
 
 
     const handleDeleteSuccess = () => {
-        navigate("/app");
+        //TODO: trebuie sa dispara si grupul atunci cand il stergem de pe pag
+        setOpenDelete(false);
         fetchGroups();
     };
 
@@ -368,7 +389,7 @@ const ContactGroup = () => {
                             variant="outlined"
                             sx={{width: "100%"}}
                         >
-                            Add User
+                            Add
                         </Button>
                         <Button
                             onClick={() => setOpenDelete(true)}
@@ -378,12 +399,21 @@ const ContactGroup = () => {
                         >
                             Delete
                         </Button>
+                        <Button
+                            onClick={() => setOpenPinned(true)}
+                            startIcon={<PushPin/>}
+                            variant="outlined"
+                            sx={{width: "100%"}}
+                        >
+                            Pin
+                        </Button>
                     </Stack>
 
                 </Stack>
             </Stack>
             {openDelete && <DeleteChatDialog open={openDelete} handleClose={() => setOpenDelete(false)} onDeleteSuccess={handleDeleteSuccess} />}
             {<AddUserDialog open={openAddUser} handleClose={handleCloseAddUser} groupId={groupId}/>}
+            {openPinned && <PinnedDialog open={openPinned} handleClose={()=> setOpenPinned(false)} />}
         </Box>
     );
 };

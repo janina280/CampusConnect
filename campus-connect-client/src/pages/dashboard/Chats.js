@@ -56,7 +56,14 @@ const Chats = () => {
 
   //todo: later
   const handleCreateChat = (userId) => {
-    const existingChat = conversations.find((chat) => chat.user_id === userId);
+    conversations.forEach((chat, index) => {
+      console.log(`Checking chat at index ${index}:`, chat);
+      console.log(chat.user_id);
+    });
+
+   let existingChat = conversations.find((chat) => chat.user_id === userId);
+
+    console.log('Existing chat:', existingChat);
 
     if (existingChat) {
       setSelectedChat(existingChat);
@@ -165,7 +172,7 @@ const Chats = () => {
                           <UserElement
                               key={chat.id}
                               {...chat}
-                              handleCreateChat={() => handleCreateChat(chat.id)}
+                              onClick={() => handleCreateChat(chat.id)}
                               showMessageIcon={true}
                               existingChat={!!conversations.find(c => c.user_id === chat.id)}
                           />

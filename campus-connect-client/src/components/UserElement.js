@@ -41,7 +41,7 @@ const StyledBadge = styled(Badge)(({theme}) => ({
     },
 }));
 
-const UserElement = ({img, name, online, id}) => {
+const UserElement = ({img, name, online, id, onClick}) => {
     const theme = useTheme();
 
     return (
@@ -49,7 +49,9 @@ const UserElement = ({img, name, online, id}) => {
             width: "100%",
             borderRadius: 1,
             backgroundColor: theme.palette.background.paper,
-        }} p={2}>
+        }} p={2}
+                       onClick={onClick}>
+
             <Stack
                 direction="row"
                 alignItems={"center"}

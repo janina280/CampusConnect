@@ -6,7 +6,7 @@ import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Message;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.ApiResponse;
-import chat.campusconnectserver.payload.SendMessageRequest;
+import chat.campusconnectserver.payload.MessageRequest;
 import chat.campusconnectserver.services.MessageService;
 import chat.campusconnectserver.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +30,10 @@ public class MessageController {
     }
 
     @PostMapping()
-    public ResponseEntity<Message> sendMessageHandler(@RequestBody SendMessageRequest req, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
+    public ResponseEntity<Message> sendMessageHandler(@RequestBody MessageRequest req, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
         User user = userService.findUserProfile(jwt);
 
-        req.setUserId(user.getId());
+        req.setSenderId(user.getId());
 
         Message message = messageService.sendMessage(req);
         return new ResponseEntity<Message>(message, HttpStatus.OK);

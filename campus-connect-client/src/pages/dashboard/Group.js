@@ -110,6 +110,22 @@ const Group = () => {
                     >
                         <SimpleBarStyle timeout={500} autoHide={true}>
                             <Stack spacing={2.4}>
+                                <Typography variant="subtitle2" sx={{ color: "#676767" }}>
+                                    Pinned
+                                </Typography>
+                                {groups
+                                    .filter((group) => group.pinned)
+                                    .map((group) => {
+                                        return (
+                                            <ChatElement
+                                                key={group.id}
+                                                {...group}
+                                                onClick={() => handleGroupSelect(group.id)}
+                                            />
+                                        );
+                                    })}
+                            </Stack>
+                            <Stack spacing={2.4}>
                                 <Typography variant="subtitle2" sx={{color: "#676667"}}>
                                     All Groups
                                 </Typography>

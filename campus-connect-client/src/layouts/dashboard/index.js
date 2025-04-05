@@ -14,8 +14,6 @@ import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const DashboardLayout = () => {
     const {isLoggedIn, user_id} = useSelector((state) => state.auth);
-    const {current_group_conversation} = useSelector((state) => state.conversation.group_chat);
-
     const {isConnected, socket} = useWebSocket();
     const {conversations} = useSelector((state) => state.conversation.direct_chat);
 
@@ -32,11 +30,11 @@ const DashboardLayout = () => {
                 dispatch(AddUserToGroupConversation({conversation: data}));
             });
 
-            socket.on(`/chat/chat-create-response/${user_id}`, (chatData) => {
+            socket.on(`/user/${user_id}/chat/chat-create-response`, (chatData) => {
                 const data = JSON.parse(chatData.body);
                 console.log("Start chat data:", data);
 
-                const existingConversation = conversations.find((el) => el?.id === data.id);
+                const existingConversation = conversations.find((el) => el?.user_id=== data.id);
                 if (existingConversation) {
                     dispatch(UpdateDirectConversation({conversation: data}));
                 } else {

@@ -4,7 +4,7 @@ import chat.campusconnectserver.dtos.Greeting;
 import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Message;
-import chat.campusconnectserver.payload.SendMessageRequest;
+import chat.campusconnectserver.payload.MessageRequest;
 import chat.campusconnectserver.services.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -28,7 +28,7 @@ public class ChatWebSocketController {
     }
 
     @MessageMapping("/sendMessage")
-    public void sendMessage(@Payload SendMessageRequest request) throws IOException, ChatException, UserException {
+    public void sendMessage(@Payload MessageRequest request) throws IOException, ChatException, UserException {
         Message message = messageService.sendMessage(request);
 
         // Trimite mesajul DOAR către destinatar

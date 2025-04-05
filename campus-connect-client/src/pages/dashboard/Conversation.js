@@ -5,7 +5,6 @@ import { SimpleBarStyle } from "../../components/Scrollbar";
 
 import { ChatHeader, ChatFooter } from "../../components/Chat";
 import useResponsive from "../../hooks/useResponsive";
-import { Chat_History } from "../../data";
 import {
   DocMsg,
   LinkMsg,
@@ -16,7 +15,6 @@ import {
 } from "../../sections/dashboard/Conversation";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  FetchCurrentMessages,
   SetCurrentConversation,
 } from "../../redux/slices/conversation";
 import SockJS from "sockjs-client";
@@ -113,7 +111,6 @@ const ChatComponent = () => {
   );
 
   useEffect(() => {
-    // Scroll to the bottom of the message list when new messages are added
     messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
   }, [current_messages]);
 
