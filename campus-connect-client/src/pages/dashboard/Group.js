@@ -22,7 +22,7 @@ const Group = () => {
     const {isConnected, socket} = useWebSocket();
     const dispatch = useDispatch();
     const token = useSelector((state) => state.auth.accessToken);
-    const { user_id} = useSelector((state) => state.auth);
+    const {user_id} = useSelector((state) => state.auth);
 
     const [queryGroup, setQueryGroup] = useState("");
     const {groups} = useSelector((state) => state.conversation.group_chat);
@@ -110,7 +110,7 @@ const Group = () => {
                     >
                         <SimpleBarStyle timeout={500} autoHide={true}>
                             <Stack spacing={2.4}>
-                                <Typography variant="subtitle2" sx={{ color: "#676767" }}>
+                                <Typography variant="subtitle2" sx={{color: "#676767"}}>
                                     Pinned
                                 </Typography>
                                 {groups

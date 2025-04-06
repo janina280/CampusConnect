@@ -23,11 +23,11 @@ import CreateAvatar from "../../utils/createAvatar";
 import {CaretRight, Plus, PushPin, Star, Trash, X,} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
-import {FetchAllUsers, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
+import {FetchAllUsers, SelectRoomId, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
 import axios from "../../utils/axios";
 import Snackbar from "@mui/material/Snackbar";
 import {useWebSocket} from "../../contexts/WebSocketContext";
-import {FetchDirectGroups} from "../../redux/slices/conversation";
+import {SetCurrentGroup} from "../../redux/slices/conversation";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -58,7 +58,8 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
     const [loading, setLoading] = useState(false);
     const chatId = useSelector((state) => state.conversation.group_chat.current_group_conversation.id);
     const token = useSelector((state) => state.auth.accessToken);
-    const handleDelete = () => {
+    const {socket} = useWebSocket();
+    const handleDeleteGroup = () => {
         setLoading(true);
 
         fetch(`http://localhost:8080/${chatId}`, {
@@ -71,6 +72,7 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
+                    socket.emit("/app/groups", "Bearer " + token);
                     onDeleteSuccess();
                 }
             })
@@ -90,15 +92,15 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
             onClose={handleClose}
             aria-describedby="alert-dialog-slide-description"
         >
-            <DialogTitle>Delete this chat</DialogTitle>
+            <DialogTitle>Delete this group</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                    Are you sure you want to delete this chat?
+                    Are you sure you want to delete this group?
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={handleDelete} disabled={loading}>
+                <Button onClick={handleDeleteGroup} disabled={loading}>
                     {loading ? "Deleting..." : "Yes"}
                 </Button>
             </DialogActions>
@@ -220,9 +222,6 @@ const ContactGroup = () => {
     const [groupMembers, setGroupMembers] = useState([]);
     const token = useSelector((state) => state.auth.accessToken);
 
-    const {isConnected, socket} = useWebSocket();
-    const { user_id} = useSelector((state) => state.auth);
-
     const handleCloseAddUser = () => {
         setOpenAddUser(false);
     };
@@ -245,25 +244,11 @@ const ContactGroup = () => {
         }
     }, [chat_type, current_group_conversation, groupId]);
 
-    const fetchGroups = () => {
-        if (!isConnected) return;
-
-        socket.emit("/app/groups", `Bearer ${token}`);
-
-        socket.on(`/user/${user_id}/group/groups-response`, (data) => {
-            dispatch(FetchDirectGroups(data));
-        });
-    };
-
-    useEffect(() => {
-        fetchGroups();
-    },[ isConnected]);
-
-
     const handleDeleteSuccess = () => {
-        //TODO: trebuie sa dispara si grupul atunci cand il stergem de pe pag
         setOpenDelete(false);
-        fetchGroups();
+        dispatch(SetCurrentGroup({room_id: null}));
+        dispatch(SelectRoomId({room_id: null}));
+        dispatch(ToggleSidebar());
     };
 
     return (
@@ -411,9 +396,10 @@ const ContactGroup = () => {
 
                 </Stack>
             </Stack>
-            {openDelete && <DeleteChatDialog open={openDelete} handleClose={() => setOpenDelete(false)} onDeleteSuccess={handleDeleteSuccess} />}
+            {openDelete && <DeleteChatDialog open={openDelete} handleClose={() => setOpenDelete(false)}
+                                             onDeleteSuccess={handleDeleteSuccess}/>}
             {<AddUserDialog open={openAddUser} handleClose={handleCloseAddUser} groupId={groupId}/>}
-            {openPinned && <PinnedDialog open={openPinned} handleClose={()=> setOpenPinned(false)} />}
+            {openPinned && <PinnedDialog open={openPinned} handleClose={() => setOpenPinned(false)}/>}
         </Box>
     );
 };

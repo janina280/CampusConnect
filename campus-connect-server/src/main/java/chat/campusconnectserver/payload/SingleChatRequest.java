@@ -7,4 +7,5 @@ import lombok.Setter;
 @Getter
 public class SingleChatRequest {
     private Long userId;
+    private String jwtString;
 }

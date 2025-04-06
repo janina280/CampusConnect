@@ -21,51 +21,51 @@ const GeneralApp = () => {
 
     return (
         <Stack direction={"row"} sx={{width: "100%"}}>
-        {chat_type === "individual" ? (
-            <Chats/>) : (
-            <Group/>)}
-        <Box
-            sx={{
-                height: "100%",
-                width: open ? `calc(100vw - 740px )` : "calc(100vw - 420px )",
-                backgroundColor: theme.palette.mode === "light" ? "#F8FAFF" : theme.palette.background.paper,
-                borderBottom: searchParams.get("type") === "individual-chat" && searchParams.get("id") ? "0px" : "1px solid #F8FAFF",
-            }}
-        >
-            {room_id ? (chat_type === "individual" ? (<ChatComponent key={room_id}/>) : (
-                <ChatGroupComponent key={room_id}/>)) : (<Stack
-                spacing={2}
-                sx={{height: "100%", width: "100%"}}
-                alignItems={"center"}
-                justifyContent={"center"}
+            {chat_type === "individual" ? (
+                <Chats/>) : (
+                <Group/>)}
+            <Box
+                sx={{
+                    height: "100%",
+                    width: open ? `calc(100vw - 740px )` : "calc(100vw - 420px )",
+                    backgroundColor: theme.palette.mode === "light" ? "#F8FAFF" : theme.palette.background.paper,
+                    borderBottom: searchParams.get("type") === "individual-chat" && searchParams.get("id") ? "0px" : "1px solid #F8FAFF",
+                }}
             >
-                <NoChatSVG/>
-                <Typography variant="subtitle2">
-                    Select a conversation or start new one.
-                </Typography>
-            </Stack>)}
-        </Box>
+                {room_id ? (chat_type === "individual" ? (<ChatComponent key={room_id}/>) : (
+                    <ChatGroupComponent key={room_id}/>)) : (<Stack
+                    spacing={2}
+                    sx={{height: "100%", width: "100%"}}
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                >
+                    <NoChatSVG/>
+                    <Typography variant="subtitle2">
+                        Select a conversation or start new one.
+                    </Typography>
+                </Stack>)}
+            </Box>
 
-        {open && (() => {
-            switch (type) {
-                case "CONTACT":
-                    return chat_type === "individual" ? (
-                        <Contact/>
-                    ) : (
-                        <ContactGroup/>
-                    );
+            {open && (() => {
+                switch (type) {
+                    case "CONTACT":
+                        return chat_type === "individual" ? (
+                            <Contact/>
+                        ) : (
+                            <ContactGroup/>
+                        );
 
-                case "SHARED":
-                    return <Media/>;
+                    case "SHARED":
+                        return <Media/>;
 
-                case "STARRED":
-                    return <StarredMessages/>;
+                    case "STARRED":
+                        return <StarredMessages/>;
 
-                default:
-                    break;
-            }
-        })()}
-    </Stack>);
+                    default:
+                        break;
+                }
+            })()}
+        </Stack>);
 };
 
 export default GeneralApp;

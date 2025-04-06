@@ -18,9 +18,9 @@ import CreateAvatar from "../../utils/createAvatar";
 import {CaretRight, PushPin, Star, Trash, X,} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
-import {ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
+import {SelectRoomId, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
 import axios from "axios";
-import {FetchDirectConversations, FetchDirectGroups} from "../../redux/slices/conversation";
+import {SetCurrentConversation} from "../../redux/slices/conversation";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -54,8 +54,6 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
     const chatId = useSelector((state) => state.conversation.direct_chat.current_conversation.id);
     const token = useSelector((state) => state.auth.accessToken);
     const {socket} = useWebSocket();
-    const dispatch = useDispatch();
-
     const handleDelete = () => {
         setLoading(true);
 
@@ -67,10 +65,7 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
-                    // TODO: verified
-                    socket.emit('/app/chats', 'Bearer ' + token);
-
-                    dispatch(FetchDirectConversations(data));
+                    socket.emit("/app/chats", "Bearer " + token)
                     onDeleteSuccess();
                 }
             })
@@ -113,10 +108,6 @@ const Contact = () => {
     const authToken = useSelector((state) => state.auth.accessToken);
     const theme = useTheme();
     const isDesktop = useResponsive("up", "md");
-    const {isConnected, socket} = useWebSocket();
-    const {user_id} = useSelector((state) => state.auth);
-
-    const token = useSelector((state) => state.auth.accessToken);
 
     const [openPinned, setOpenPinned] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
@@ -149,165 +140,157 @@ const Contact = () => {
         }
     }, [chat_type, current_conversation, current_group_conversation])
 
-    const fetchChat = () => {
-        if (!isConnected) return;
-
-        socket.emit("/app/chats", `Bearer ${token}`);
-
-        socket.on(`/user/${user_id}/chat/chats-response`, (data) => {
-            dispatch(FetchDirectGroups(data));
-        });
-    };
-
-    useEffect(() => {
-        fetchChat();
-    }, [isConnected]);
-
     const handleDeleteSuccess = () => {
-        //TODO: trebuie sa dispara si chatul atunci cand il stergem de pe pag
         setOpenDelete(false);
-        fetchChat();
+        dispatch(SelectRoomId({room_id: null}));
+        dispatch(SetCurrentConversation({room_id: null}));
+        dispatch(ToggleSidebar());
     };
 
-    return (<Box sx={{width: !isDesktop ? "100vw" : 320, maxHeight: "100vh"}}>
-        <Stack sx={{height: "100%"}}>
-            <Box
-                sx={{
-                    boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
-                    width: "100%",
-                    backgroundColor: theme.palette.mode === "light" ? "#F8FAFF" : theme.palette.background,
-                }}
-            >
+    return (
+        <Box sx={{width: !isDesktop ? "100vw" : 320, maxHeight: "100vh"}}>
+            <Stack sx={{height: "100%"}}>
+                <Box
+                    sx={{
+                        boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
+                        width: "100%",
+                        backgroundColor: theme.palette.mode === "light" ? "#F8FAFF" : theme.palette.background,
+                    }}
+                >
+                    <Stack
+                        sx={{height: "100%", p: 2}}
+                        direction="row"
+                        alignItems={"center"}
+                        justifyContent="space-between"
+                        spacing={3}
+                    >
+                        <Typography variant="subtitle2">Contact Info</Typography>
+                        <IconButton
+                            onClick={() => {
+                                dispatch(ToggleSidebar());
+                            }}
+                        >
+                            <X/>
+                        </IconButton>
+                    </Stack>
+                </Box>
                 <Stack
-                    sx={{height: "100%", p: 2}}
-                    direction="row"
-                    alignItems={"center"}
-                    justifyContent="space-between"
+                    sx={{
+                        height: "100%", position: "relative", flexGrow: 1, overflow: "scroll",
+                    }}
+                    p={3}
                     spacing={3}
                 >
-                    <Typography variant="subtitle2">Contact Info</Typography>
-                    <IconButton
-                        onClick={() => {
-                            dispatch(ToggleSidebar());
-                        }}
-                    >
-                        <X/>
-                    </IconButton>
-                </Stack>
-            </Box>
-            <Stack
-                sx={{
-                    height: "100%", position: "relative", flexGrow: 1, overflow: "scroll",
-                }}
-                p={3}
-                spacing={3}
-            >
-                <Stack alignItems="center" direction="row" spacing={2}>
-                    <CreateAvatar
-                        name={conversation?.name}
-                        imageUrl={conversation?.img}
-                        size={56}
-                    />
+                    <Stack alignItems="center" direction="row" spacing={2}>
+                        <CreateAvatar
+                            name={conversation?.name}
+                            imageUrl={conversation?.img}
+                            size={56}
+                        />
+                        <Stack spacing={0.5}>
+                            <Typography variant="article" fontWeight={600}>
+                                {conversation?.name}
+                            </Typography>
+                            <Typography variant="body2" fontWeight={500}>
+                                {conversation?.nickname}
+                            </Typography>
+                        </Stack>
+                    </Stack>
+                    <Divider/>
                     <Stack spacing={0.5}>
                         <Typography variant="article" fontWeight={600}>
-                            {conversation?.name}
+                            About
                         </Typography>
                         <Typography variant="body2" fontWeight={500}>
-                            {conversation?.nickname}
+                            {conversation?.about}
                         </Typography>
                     </Stack>
-                </Stack>
-                <Divider/>
-                <Stack spacing={0.5}>
-                    <Typography variant="article" fontWeight={600}>
-                        About
-                    </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                        {conversation?.about}
-                    </Typography>
-                </Stack>
-                <Divider/>
-                <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent={"space-between"}
-                >
-                    <Typography variant="subtitle2">Media, Links & Docs</Typography>
-                    <Button
-                        onClick={() => {
-                            dispatch(UpdateSidebarType("SHARED"));
-                        }}
-                        endIcon={<CaretRight/>}
+                    <Divider/>
+                    <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent={"space-between"}
                     >
-                        401
-                    </Button>
-                </Stack>
-                <Stack direction={"row"} alignItems="center" spacing={2}>
-                    {[1, 2, 3].map((el) => (<Box>
-                        {/* <img src={faker.image.city()} alt={faker.internet.userName()} /> */}
-                    </Box>))}
-                </Stack>
-                <Divider/>
-                <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent={"space-between"}
-                >
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                        <Star size={21}/>
-                        <Typography variant="subtitle2">Starred Messages</Typography>
+                        <Typography variant="subtitle2">Media, Links & Docs</Typography>
+                        <Button
+                            onClick={() => {
+                                dispatch(UpdateSidebarType("SHARED"));
+                            }}
+                            endIcon={<CaretRight/>}
+                        >
+                            401
+                        </Button>
                     </Stack>
-
-                    <IconButton
-                        onClick={() => {
-                            dispatch(UpdateSidebarType("STARRED"));
-                        }}
+                    <Stack direction={"row"} alignItems="center" spacing={2}>
+                        {[1, 2, 3].map((el) => (<Box>
+                            {/* <img src={faker.image.city()} alt={faker.internet.userName()} /> */}
+                        </Box>))}
+                    </Stack>
+                    <Divider/>
+                    <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent={"space-between"}
                     >
-                        <CaretRight/>
-                    </IconButton>
-                </Stack>
-                <Divider/>
-                <Typography variant="body2">Groups in common</Typography>
-                <Stack spacing={2}>
-                    {commonGroups.length > 0 ? (commonGroups.map((group) => (
-                        <Stack key={group.id} direction="row" alignItems={"center"} spacing={2}>
-                            <CreateAvatar name={group.name} imageUrl={group.img} size={40}/>
-                            <Stack>
-                                <Typography variant="subtitle2">{group.name}</Typography>
-                                <Typography variant="caption">
-                                    {group.users.length} members
-                                </Typography>
-                            </Stack>
-                        </Stack>))) : (<Typography variant="caption">No groups in common</Typography>)}
-                </Stack>
-                <Divider/>
+                        <Stack direction="row" alignItems="center" spacing={2}>
+                            <Star size={21}/>
+                            <Typography variant="subtitle2">Starred Messages</Typography>
+                        </Stack>
 
-                <Stack direction="row" alignItems={"center"} spacing={2}>
-                    <Button
-                        startIcon={<PushPin/>}
-                        variant="outlined"
-                        sx={{width: "100%"}}
-                    >
-                        Pin
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            setOpenDelete(true);
-                        }}
-                        fullWidth
-                        startIcon={<Trash/>}
-                        variant="outlined"
+                        <IconButton
+                            onClick={() => {
+                                dispatch(UpdateSidebarType("STARRED"));
+                            }}
+                        >
+                            <CaretRight/>
+                        </IconButton>
+                    </Stack>
+                    <Divider/>
+                    <Typography variant="body2">Groups in common</Typography>
+                    <Stack spacing={2}>
+                        {commonGroups.length > 0 ? (commonGroups.map((group) => (
+                            <Stack key={group.id} direction="row" alignItems={"center"} spacing={2}>
+                                <CreateAvatar name={group.name} imageUrl={group.img} size={40}/>
+                                <Stack>
+                                    <Typography variant="subtitle2">{group.name}</Typography>
+                                    <Typography variant="caption">
+                                        {group.users.length} members
+                                    </Typography>
+                                </Stack>
+                            </Stack>))) : (<Typography variant="caption">No groups in common</Typography>)}
+                    </Stack>
+                    <Divider/>
 
-                    >
-                        Delete
-                    </Button>
+                    <Stack direction="row" alignItems={"center"} spacing={2}>
+                        <Button
+                            onClick={() => {
+                                setOpenPinned(true);
+                            }}
+                            startIcon={<PushPin/>}
+                            variant="outlined"
+                            sx={{width: "100%"}}
+                        >
+                            Pin
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setOpenDelete(true);
+                            }}
+                            fullWidth
+                            startIcon={<Trash/>}
+                            variant="outlined"
+
+                        >
+                            Delete
+                        </Button>
+                    </Stack>
                 </Stack>
             </Stack>
-        </Stack>
-        {openDelete && <DeleteChatDialog open={openDelete} handleClose={() => setOpenDelete(false)}
-                                         onDeleteSuccess={handleDeleteSuccess}/>}
-        {openPinned && <PinnedDialog open={openPinned} handleClose={() => setOpenPinned(false)}/>}
-    </Box>);
+            {openDelete && <DeleteChatDialog open={openDelete} handleClose={() => setOpenDelete(false)}
+                                             onDeleteSuccess={handleDeleteSuccess}/>}
+            {openPinned && <PinnedDialog open={openPinned} handleClose={() => setOpenPinned(false)}/>}
+        </Box>
+    );
 };
 
 export default Contact;

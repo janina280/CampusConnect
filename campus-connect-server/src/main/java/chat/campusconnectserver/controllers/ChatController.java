@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +43,8 @@ public class ChatController {
     @Transactional
     @MessageMapping("/chat-create")
     //@SendTo("/chat/chat-create-response")
-    public ChatDto createChatHandle(@RequestBody SingleChatRequest singleChatRequest, @RequestHeader("Authorization") String jwt) throws UserException {
-        var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
+    public ChatDto createChatHandle(@RequestBody SingleChatRequest singleChatRequest) throws UserException {
+        var currentUserId = tokenProvider.getUserIdFromToken(singleChatRequest.getJwtString().substring(7));
 
         var chat= chatService.createChat(currentUserId, singleChatRequest.getUserId());
 

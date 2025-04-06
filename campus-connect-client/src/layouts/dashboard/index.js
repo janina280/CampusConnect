@@ -30,11 +30,8 @@ const DashboardLayout = () => {
                 dispatch(AddUserToGroupConversation({conversation: data}));
             });
 
-            socket.on(`/user/${user_id}/chat/chat-create-response`, (chatData) => {
-                const data = JSON.parse(chatData.body);
-                console.log("Start chat data:", data);
-
-                const existingConversation = conversations.find((el) => el?.user_id=== data.id);
+            socket.on(`/user/${user_id}/chat/chat-create-response`, (data) => {
+                const existingConversation = conversations.find((el) => el?.id === data.id);
                 if (existingConversation) {
                     dispatch(UpdateDirectConversation({conversation: data}));
                 } else {
