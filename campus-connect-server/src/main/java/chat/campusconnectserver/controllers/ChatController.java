@@ -70,7 +70,7 @@ public class ChatController {
 
 
     @GetMapping("/{chatId}")
-    public ResponseEntity<Chat> findChatByIdHandle(@PathVariable Long chatId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
+    public ResponseEntity<Chat> findChatByIdHandle(@PathVariable Long chatId) throws ChatException {
         Chat chat = chatService.findChatById(chatId);
 
         return new ResponseEntity<>(chat, HttpStatus.OK);

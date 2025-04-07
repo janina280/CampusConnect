@@ -1,6 +1,7 @@
 package chat.campusconnectserver.controllers;
 
 import chat.campusconnectserver.dtos.Greeting;
+import chat.campusconnectserver.dtos.MessageDto;
 import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Message;
@@ -25,18 +26,6 @@ public class ChatWebSocketController {
     public ChatWebSocketController(SimpMessagingTemplate messagingTemplate, MessageService messageService) {
         this.messagingTemplate = messagingTemplate;
         this.messageService = messageService;
-    }
-
-    @MessageMapping("/sendMessage")
-    public void sendMessage(@Payload MessageRequest request) throws IOException, ChatException, UserException {
-        Message message = messageService.sendMessage(request);
-
-        // Trimite mesajul DOAR către destinatar
-        messagingTemplate.convertAndSendToUser(
-                request.getReceiverId().toString(), // ID-ul destinatarului
-                "/queue/messages",
-                message
-        );
     }
 
     //todo: for testing

@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 public class MessageRequest {
     private Long senderId;  // Expeditor
-    private Long receiverId; // Destinatar
+   // private Long receiverId; // Destinatar
     private String content;
     private Long chatId;
     private MessageType type;

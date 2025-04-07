@@ -11,24 +11,47 @@ const initialState = {
     },
 };
 
+const addMessageToState = (state, message) => {
+    state.direct_chat.current_messages.push({
+        id: message.id,
+        type: message.type,
+        subtype: message.subtype,
+        message: message.message,
+        incoming: message.incoming,
+        outgoing: message.outgoing,
+        senderId: message.senderId,
+        receiverId: message.receiverId,
+        state: message.state,
+        createdAt: message.createdAt,
+        media: message.media,
+        formattedTime: message.formattedTime,
+    });
+};
+
 const slice = createSlice({
     name: "conversation", initialState, reducers: {
+
+
         fetchDirectConversations(state, action) {
-            user_id = window.localStorage.getItem("user_id");
+            const user_id = window.localStorage.getItem("user_id");
+
             const list = action.payload.conversations.map((el) => {
+
                 const user = el.users.find((elm) => elm.id.toString() !== user_id);
+
                 const messages = [...el.messages];
-                const lastMessage = messages?.length ? messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, messages[0]) : {
-                    text: "You can start messaging with...", createdAt: null
-                };
+
+                const lastMessage = messages.length > 0
+                    ? messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, messages[0])
+                    : { content: "You can start messaging with...", createdAt: null };
 
                 return {
                     id: el.id,
                     user_id: user?.id,
                     name: user?.name,
                     nickname: user?.nickname,
-                    msg: lastMessage?.text,
-                    time: lastMessage.createdAt ? new Date(lastMessage.createdAt).toLocaleTimeString() : "9:36",
+                    msg: lastMessage?.content,
+                    time: lastMessage.createdAt ? new Date(lastMessage.createdAt).toLocaleTimeString() : "",
                     unread: 0,
                     pinned: el.pinned,
                     about: user?.about,
@@ -36,8 +59,33 @@ const slice = createSlice({
                     img: faker.image.avatar()
                 };
             });
-            console.log("Updated conversations: ", list);
+
             state.direct_chat.conversations = [...list];
+        },
+
+        fetchDirectGroups(state, action) {
+            user_id = window.localStorage.getItem("user_id");
+
+            const list = action.payload.groups.map((el) => {
+
+                const messages = [...el.messages];
+
+                const lastMessage = messages.length > 0
+                    ? messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, messages[0])
+                    : { content: "You can start messaging with...", createdAt: null };
+
+                return {
+                    id: el.id,
+                    name: el.name,
+                    msg: lastMessage?.content,
+                    time: lastMessage.createdAt ? new Date(lastMessage.createdAt).toLocaleTimeString() : "",
+                    unread: 0,
+                    pinned: el.pinned,
+                    img: faker.image.avatar(),
+                };
+            });
+            console.log("Updated conversations: ", list);
+            state.group_chat.groups = [...list];
         },
 
         updateDirectConversation(state, action) {
@@ -62,6 +110,7 @@ const slice = createSlice({
             });
         },
 
+
         addDirectConversation(state, action) {
             const this_conversation = action.payload.conversation;
             const user = this_conversation.users.find((elm) => elm.id.toString() !== user_id);
@@ -82,62 +131,68 @@ const slice = createSlice({
             });
         },
 
+
         setCurrentConversation(state, action) {
             state.direct_chat.current_conversation = action.payload;
-        }, fetchCurrentMessages(state, action) {
+        },
+
+
+        fetchCurrentMessages(state, action) {
             const messages = action.payload.messages;
             const formatted_messages = messages.map((el) => ({
-                id: el._id,
-                type: "msg",
-                subtype: el.type,
-                message: el.text,
-                incoming: el.to === user_id,
-                outgoing: el.from === user_id,
+                id: el.id,
+                type: el.type,
+                subtype: el.subtype,
+                message: el.message,
+                incoming: el.incoming,
+                outgoing: el.outgoing,
+                senderId: el.senderId,
+                receiverId: el.receiverId,
+                state: el.state,
+                createdAt: el.createdAt,
+                media: el.media,
+                formattedTime: el.formattedTime,
             }));
             state.direct_chat.current_messages = formatted_messages;
-        }, addDirectMessage(state, action) {
-            state.direct_chat.current_messages.push(action.payload.message);
         },
+
+
+        addDirectMessage(state, action) {
+            addMessageToState(state, action.payload.message);
+        },
+
+
+
+        addDirectMessageGroup(state, action) {
+            addMessageToState(state, action.payload.message);
+        },
+
 
         setCurrentGroup(state, action) {
             state.group_chat.current_group_conversation = action.payload;
         },
+
+
         fetchCurrentMessagesGroup(state, action) {
             const messages = action.payload.messages;
             const formatted_messages = messages.map((el) => ({
                 id: el.id,
-                type: "msg",
-                subtype: el.type,
-                message: el.text,
-                incoming: el.to === user_id,
-                outgoing: el.from === user_id,
+                type: el.type,
+                subtype: el.subtype,
+                message: el.message,
+                incoming: el.incoming,
+                outgoing: el.outgoing,
+                senderId: el.senderId,
+                receiverId: el.receiverId,
+                state: el.state,
+                createdAt: el.createdAt,
+                media: el.media,
+                formattedTime: el.formattedTime,
             }));
             state.group_chat.current_messages_group = formatted_messages;
         },
-        addDirectMessageGroup(state, action) {
-            state.group_chat.current_messages_group.push(action.payload.message);
-        },
-        fetchDirectGroups(state, action) {
-            user_id = window.localStorage.getItem("user_id");
-            const list = action.payload.groups.map((el) => {
-                const messages = [...el.messages];
-                const lastMessage = messages?.length ? messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, messages[0]) : {
-                    text: "You can start messaging with...", createdAt: null
-                };
 
-                return {
-                    id: el.id,
-                    name: el.name,
-                    msg: lastMessage?.text,
-                    time: lastMessage ? new Date(lastMessage.createdAt).toLocaleTimeString() : "9:36",
-                    unread: 0,
-                    pinned: el.pinned,
-                    img: faker.image.avatar(),
-                };
-            });
-            console.log("Updated conversations: ", list);
-            state.group_chat.groups = [...list];
-        },
+
         addDirectGroupConversation(state, action) {
             const this_conversation = action.payload.group.conversation;
             state.group_chat.groups = state.group_chat.groups.filter((el) => el?.id !== this_conversation.id);
@@ -157,6 +212,8 @@ const slice = createSlice({
             });
 
         },
+
+
         addUserToGroupConversation(state, action) {
             const group = action.payload.group.conversation;
             const groupId = group.id;

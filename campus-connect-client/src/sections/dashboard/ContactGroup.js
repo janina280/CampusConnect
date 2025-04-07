@@ -59,6 +59,7 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
     const chatId = useSelector((state) => state.conversation.group_chat.current_group_conversation.id);
     const token = useSelector((state) => state.auth.accessToken);
     const {socket} = useWebSocket();
+    const dispatch = useDispatch();
     const handleDeleteGroup = () => {
         setLoading(true);
 
@@ -74,6 +75,12 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
                 if (data.success) {
                     socket.emit("/app/groups", "Bearer " + token);
                     onDeleteSuccess();
+                    dispatch(
+                        showSnackbar({
+                            severity: "success",
+                            message: "Group deleted successfully!",
+                        })
+                    );
                 }
             })
             .catch((error) => {

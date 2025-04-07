@@ -10,7 +10,7 @@ public class MessageMapper {
                 .id(message.getId())
                 .content(message.getContent())
                 .senderId(message.getSenderId())
-                .receiverId(message.getReceiverId())
+               // .receiverId(message.getReceiverId())
                 .type(message.getType())
                 .state(message.getState())
                 .createdAt(message.getCreatedDate())

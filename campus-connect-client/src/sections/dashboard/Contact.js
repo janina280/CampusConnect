@@ -18,7 +18,7 @@ import CreateAvatar from "../../utils/createAvatar";
 import {CaretRight, PushPin, Star, Trash, X,} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
-import {SelectRoomId, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
+import {SelectRoomId, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
 import axios from "axios";
 import {SetCurrentConversation} from "../../redux/slices/conversation";
 import {useWebSocket} from "../../contexts/WebSocketContext";
@@ -54,6 +54,7 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
     const chatId = useSelector((state) => state.conversation.direct_chat.current_conversation.id);
     const token = useSelector((state) => state.auth.accessToken);
     const {socket} = useWebSocket();
+    const dispatch = useDispatch();
     const handleDelete = () => {
         setLoading(true);
 
@@ -67,6 +68,12 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
                 if (data.success) {
                     socket.emit("/app/chats", "Bearer " + token)
                     onDeleteSuccess();
+                    dispatch(
+                        showSnackbar({
+                            severity: "success",
+                            message: "Chat deleted successfully!",
+                        })
+                    );
                 }
             })
             .catch((error) => {

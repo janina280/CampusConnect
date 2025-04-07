@@ -32,15 +32,12 @@ public class UserService {
         throw new UserException("User not found with id" + id);
     }
 
-    public User findUserProfile(String jwt) throws UserException {
+    public User findUserProfile(String jwt) {
         Long userId = tokenProvider.getUserIdFromToken(jwt.substring(7));
         if (userId == null) {
             throw new BadCredentialsException("Invalid token: unable to extract user email");
         }
         var user = userRepository.findById(userId);
-        if (user == null) {
-            throw new UserException("User not found with id: " + userId);
-        }
         return user.get();
     }
 

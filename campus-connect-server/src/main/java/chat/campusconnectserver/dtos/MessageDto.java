@@ -1,10 +1,7 @@
 package chat.campusconnectserver.dtos;
 
-import chat.campusconnectserver.modal.Chat;
+
 import chat.campusconnectserver.modal.Message;
-import chat.campusconnectserver.modal.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,16 +12,21 @@ import java.time.LocalDateTime;
 public class MessageDto {
     private Long id;
     private String content;
-    private LocalDateTime timestamp;
-    private User user ;
-    private Chat chat;
-    private String formattedTime;
+    private String senderId;
+    private String receiverId;
+    private String type;
+    private String state;
+    private LocalDateTime createdAt;
+    private String media;
 
     public MessageDto(Message message) {
         this.id = message.getId();
         this.content = message.getContent();
-        this.user = message.getUser();
-        this.chat = message.getChat();
-        this.formattedTime = message.getFormattedTime();
+        this.senderId = String.valueOf(message.getUser().getId());
+       // this.receiverId = String.valueOf(message.getChat().getReceiver().getId());
+        this.type = String.valueOf(message.getType());
+        this.state = String.valueOf(message.getState());
+        this.createdAt = message.getCreatedDate();// Or use the appropriate date/time format
+        this.media = message.getMediaFilePath();
     }
 }

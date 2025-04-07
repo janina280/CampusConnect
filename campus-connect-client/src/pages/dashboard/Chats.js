@@ -42,7 +42,6 @@ const Chats = () => {
         });
     }, [isConnected]);
 
-    //todo: check if it still needed
     const handleSearch = (value) => {
         const trimmedValue = value.trim();
         setQueryChat(trimmedValue);

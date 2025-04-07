@@ -5,7 +5,7 @@ import SideBar from "./SideBar";
 import {useDispatch, useSelector} from "react-redux";
 import {
     AddDirectConversation,
-    AddDirectGroupConversation,
+    AddDirectGroupConversation, AddDirectMessage,
     AddUserToGroupConversation,
     UpdateDirectConversation,
 } from "../../redux/slices/conversation";
@@ -16,7 +16,7 @@ const DashboardLayout = () => {
     const {isLoggedIn, user_id} = useSelector((state) => state.auth);
     const {isConnected, socket} = useWebSocket();
     const {conversations} = useSelector((state) => state.conversation.direct_chat);
-
+    const {current_conversation}=useSelector((state) => state.conversation.direct_chat.current_conversation || []);
     const dispatch = useDispatch();
     useEffect(() => {
         if (isLoggedIn) {
@@ -30,6 +30,32 @@ const DashboardLayout = () => {
                 dispatch(AddUserToGroupConversation({conversation: data}));
             });
 
+            socket.on("new_message", (data) => {
+
+                const message = data.message;
+                console.log(current_conversation, data);
+
+                if (current_conversation?.id === data.conversation_id) {
+                    dispatch(
+                        AddDirectMessage({
+                            id: message.id,
+                            type: "msg",
+                            subtype: message.type,
+                            message: message.content,
+                            incoming: message.receiverId === user_id,
+                            outgoing: message.senderId === user_id,
+                            senderId: message.senderId,
+                            receiverId: message.receiverId,
+                            state: message.state,
+                            createdAt: message.createdAt,
+                            media: message.media,
+                            formattedTime: message.formattedTime,
+                        })
+                    );
+
+                }
+            });
+
             socket.on(`/user/${user_id}/chat/chat-create-response`, (data) => {
                 const existingConversation = conversations.find((el) => el?.id === data.id);
                 if (existingConversation) {
@@ -41,45 +67,6 @@ const DashboardLayout = () => {
                 dispatch(SelectRoomId({room_id: data.id}));
             });
 
-            /*socket.on(`/topic/messages/${user_id}`, (messageOutput) => {
-                const message = JSON.parse(messageOutput.body);
-                console.log("Received message:", message);
-
-                // Check if the message is for the currently selected conversation
-                if (current_conversation?.id === message.conversation_id) {
-                    dispatch(
-                        AddDirectMessage({
-                            id: message._id,
-                            type: "msg",
-                            subtype: message.type,
-                            message: message.text,
-                            incoming: message.to === user_id,
-                            outgoing: message.from === user_id,
-                        })
-                    );
-                }
-            });
-            socket.on(`/topic/start_chat/${user_id}`, (chatData) => {
-                const data = JSON.parse(chatData.body);
-                console.log("Start chat data:", data);
-
-                // Check if the conversation already exists
-                const existingConversation = conversations.find((el) => el?.id === data.id);
-                if (existingConversation) {
-                    // Update the conversation
-                    dispatch(UpdateDirectConversation({conversation: data}));
-                } else {
-                    // Add the new conversation
-                    dispatch(AddDirectConversation({conversation: data}));
-                }
-                dispatch(SelectChatType({chat_type: "individual"}));
-                dispatch(SelectRoomId({room_id: data.id}));
-            });
-
-            socket.on(`/topic/request_sent/${user_id}`, (requestData) => {
-                const data = JSON.parse(requestData.body);
-                dispatch(showSnackbar({severity: "success", message: data.message}));
-            });*/
         }
     }, [isLoggedIn, isConnected]);
 

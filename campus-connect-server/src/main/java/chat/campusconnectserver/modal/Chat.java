@@ -54,17 +54,17 @@ public class Chat {
     @JoinColumn(name = "sender_id")
     private User sender;
     @ManyToOne
-    @JoinColumn(name = "recipient_id")
-    private User recipient;
+   @JoinColumn(name = "receiver_id")
+    private User receiver;
 
 
-    @Transient
-    public String getTargetChatName(String senderId) {
-        if (sender.getId().equals(senderId)) {
-            return sender.getName();
-        }
-        return recipient.getName();
-    }
+  //  @Transient
+   // public String getTargetChatName(String senderId) {
+      // if (sender.getId().equals(senderId)) {
+           // return sender.getName();
+      //  }
+       // return receiver.getName();
+  // }
 
     @Transient
     public long getUnreadMessages(String senderId) {

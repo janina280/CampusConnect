@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public class MessageService {
     private final MessageMapper mapper;
     private final ChatService chatService;
     private final ChatRepository chatRepository;
-   // private final FileService fileService;
+    // private final FileService fileService;
 
     @Autowired
     public MessageService(MessageRepository messageRepository, UserService userService, MessageMapper mapper, ChatService chatService, ChatRepository chatRepository) {
@@ -38,7 +39,7 @@ public class MessageService {
         this.mapper = mapper;
         this.chatService = chatService;
         this.chatRepository = chatRepository;
-       // this.fileService = fileService;
+        // this.fileService = fileService;
     }
 
     public void saveMessage(MessageRequest messageRequest) {
@@ -49,7 +50,7 @@ public class MessageService {
         message.setContent(messageRequest.getContent());
         message.setChat(chat);
         message.setSenderId(String.valueOf(messageRequest.getSenderId()));
-        message.setReceiverId(String.valueOf(messageRequest.getReceiverId()));
+        //message.setReceiverId(String.valueOf(messageRequest.getReceiverId()));
         message.setType(messageRequest.getType());
         message.setState(MessageState.sent);
 
@@ -71,11 +72,16 @@ public class MessageService {
         message.setChat(chat);
         message.setUser(user);
         message.setContent(req.getContent());
-        //message.setTimestamp(LocalDateTime.now());
 
-       // String formattedTime = formatMessageTime(message.getTimestamp());
-        //message.setFormattedTime(formattedTime);
+        message.setCreatedDate(LocalDateTime.now());
 
+        String formattedTime = formatMessageTime(message.getCreatedDate());
+        message.setFormattedTime(formattedTime);
+
+        // message.setReceiverId(req.getReceiverId().toString());
+        message.setSenderId(req.getSenderId().toString());
+        message.setType(req.getType());
+        message.setState(MessageState.sent);
         message = messageRepository.save(message);
 
         chat.getMessages().add(message);
@@ -85,15 +91,17 @@ public class MessageService {
         return message;
     }
 
+
     @Transactional
     public void setMessagesToSeen(Long chatId, Authentication authentication) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new RuntimeException("Chat not found"));
-        final Long recipientId = getRecipientId(chat, authentication);
+        //  final Long recipientId = getRecipientId(chat, authentication);
 
         messageRepository.setMessagesToSeenByChatId(chatId, MessageState.seen);
 
     }
+
     public String formatMessageTime(LocalDateTime timestamp) {
         LocalDateTime now = LocalDateTime.now();
         long hoursDiff = ChronoUnit.HOURS.between(timestamp, now);
@@ -129,11 +137,11 @@ public class MessageService {
     }
 
     public void deleteMessage(Long messageId, User reqUser) throws MessageException, UserException {
-    Message message=findMessageById(messageId);
-    if(message.getUser().getId().equals(reqUser.getId())){
-        messageRepository.deleteById(messageId);
-    }
-    throw new UserException("You can't delete another user's message"+reqUser.getName());
+        Message message = findMessageById(messageId);
+        if (message.getUser().getId().equals(reqUser.getId())) {
+            messageRepository.deleteById(messageId);
+        }
+        throw new UserException("You can't delete another user's message" + reqUser.getName());
     }
 
     public void uploadMediaMessage(Long chatId, MultipartFile file, Authentication authentication) {
@@ -141,32 +149,34 @@ public class MessageService {
                 .orElseThrow(() -> new RuntimeException("Chat not found"));
 
         final Long senderId = getSenderId(chat, authentication);
-        final Long receiverId = getRecipientId(chat, authentication);
+        //   final Long receiverId = getRecipientId(chat, authentication);
 
-       // final String filePath = fileService.saveFile(file, senderId);
+        // final String filePath = fileService.saveFile(file, senderId);
         Message message = new Message();
-        message.setReceiverId(String.valueOf(receiverId));
+        //   message.setReceiverId(String.valueOf(receiverId));
         message.setSenderId(String.valueOf(senderId));
         message.setState(MessageState.sent);
         message.setType(MessageType.image);
-      //  message.setMediaFilePath(filePath);
+        //  message.setMediaFilePath(filePath);
         message.setChat(chat);
         messageRepository.save(message);
 
     }
 
     private Long getSenderId(Chat chat, Authentication authentication) {
-        if (chat.getSender().getId().equals(authentication.getName())) {
-            return chat.getSender().getId();
-        }
-        return chat.getRecipient().getId();
-    }
 
-    private Long getRecipientId(Chat chat, Authentication authentication) {
-        if (chat.getSender().getId().equals(authentication.getName())) {
-            return chat.getRecipient().getId();
-        }
         return chat.getSender().getId();
     }
-
 }
+       // return chat.getReceiver().getId();
+   // }
+
+    //private Long getRecipientId(Chat chat, Authentication authentication) {
+     //   if (chat.getSender().getId().equals(authentication.getName())) {
+           // return chat.getReceiver().getId();
+      //  }
+       // return chat.getSender().getId();
+   // }
+
+
+

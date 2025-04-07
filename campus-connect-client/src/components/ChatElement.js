@@ -1,10 +1,10 @@
 import React from "react";
-import {Box, Badge, Stack, Typography} from "@mui/material";
-import {styled, useTheme, alpha} from "@mui/material/styles";
+import {Badge, Box, Stack, Typography} from "@mui/material";
+import {alpha, styled, useTheme} from "@mui/material/styles";
 import {ChatCircle} from "phosphor-react";
 import CreateAvatar from "../utils/createAvatar";
 import {useDispatch, useSelector} from "react-redux";
-import { SelectRoomId} from "../redux/slices/app";
+import {SelectRoomId} from "../redux/slices/app";
 
 const truncateText = (string, n) => {
     return string?.length > n ? `${string?.slice(0, n)}...` : string;
@@ -55,52 +55,52 @@ const ChatElement = ({
         isSelected = false;
     }
     return (<StyledChatBox
-            onClick={() => {
-                dispatch(SelectRoomId({room_id: id}));
-            }}
-            sx={{
-                width: "100%",
-                borderRadius: 1,
-                backgroundColor: isSelected ? theme.palette.mode === "light" ? alpha(theme.palette.primary.main, 0.5) : theme.palette.primary.main : theme.palette.mode === "light" ? "#fff" : theme.palette.background.paper,
-            }}
-            p={2}
+        onClick={() => {
+            dispatch(SelectRoomId({room_id: id}));
+        }}
+        sx={{
+            width: "100%",
+            borderRadius: 1,
+            backgroundColor: isSelected ? theme.palette.mode === "light" ? alpha(theme.palette.primary.main, 0.5) : theme.palette.primary.main : theme.palette.mode === "light" ? "#fff" : theme.palette.background.paper,
+        }}
+        p={2}
+    >
+        <Stack
+            direction="row"
+            alignItems={"center"}
+            justifyContent="space-between"
         >
-            <Stack
-                direction="row"
-                alignItems={"center"}
-                justifyContent="space-between"
-            >
-                <Stack direction="row" spacing={2}>
-                    {" "}
-                    {online ? (<StyledBadge
-                            overlap="circular"
-                            anchorOrigin={{vertical: "bottom", horizontal: "right"}}
-                            variant="dot"
-                        >
-                            <CreateAvatar name={name} imageUrl={img} size={56}/>
-                        </StyledBadge>) : (<CreateAvatar name={name} imageUrl={img} size={56}/>)}
-                    <Stack spacing={0.3}>
-                        <Typography variant="subtitle2">{name}</Typography>
-                        <Typography variant="caption">{truncateText(msg, 20)}</Typography>
-                    </Stack>
-                </Stack>
-                <Stack spacing={2} alignItems={"center"}>
-                    {time ? (<Typography sx={{fontWeight: 600}} variant="caption">
-                            {time}
-                        </Typography>) : (<ChatCircle
-                            size={20}
-                            style={{
-                                cursor: "pointer", color: theme.palette.primary.main,
-                            }}
-                        />)}
-                    <Badge
-                        className="unread-count"
-                        color="primary"
-                        badgeContent={unread}
-                    />
+            <Stack direction="row" spacing={2}>
+                {" "}
+                {online ? (<StyledBadge
+                    overlap="circular"
+                    anchorOrigin={{vertical: "bottom", horizontal: "right"}}
+                    variant="dot"
+                >
+                    <CreateAvatar name={name} imageUrl={img} size={56}/>
+                </StyledBadge>) : (<CreateAvatar name={name} imageUrl={img} size={56}/>)}
+                <Stack spacing={0.3}>
+                    <Typography variant="subtitle2">{name}</Typography>
+                    <Typography variant="caption">{truncateText(msg, 20)}</Typography>
                 </Stack>
             </Stack>
-        </StyledChatBox>);
+            <Stack spacing={2} alignItems={"center"}>
+                {time ? (<Typography sx={{fontWeight: 600}} variant="caption">
+                    {time}
+                </Typography>) : (<ChatCircle
+                    size={20}
+                    style={{
+                        cursor: "pointer", color: theme.palette.primary.main,
+                    }}
+                />)}
+                <Badge
+                    className="unread-count"
+                    color="primary"
+                    badgeContent={unread}
+                />
+            </Stack>
+        </Stack>
+    </StyledChatBox>);
 };
 
 export default ChatElement;
