@@ -29,4 +29,5 @@ public class MessageDto {
         this.createdAt = message.getCreatedDate();// Or use the appropriate date/time format
         this.media = message.getMediaFilePath();
     }
+
 }

@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -35,8 +33,8 @@ public class Message extends BaseAuditingEntity {
     private String formattedTime;
     @Column(name = "sender_id", nullable = false)
     private String senderId;
-    @Column(name = "receiver_id", nullable = false)
-    private String receiverId;
+    //@Column(name = "receiver_id", nullable = false)
+   // private Long receiverId;
     private String mediaFilePath;
 
 }

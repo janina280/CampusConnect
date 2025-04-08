@@ -14,5 +14,6 @@ public class MessageRequest {
     private String content;
     private Long chatId;
     private MessageType type;
+    private String jwtString;
 
 }

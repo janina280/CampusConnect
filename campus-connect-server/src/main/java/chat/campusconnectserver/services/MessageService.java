@@ -7,18 +7,16 @@ import chat.campusconnectserver.modal.*;
 import chat.campusconnectserver.payload.MessageRequest;
 import chat.campusconnectserver.repositories.ChatRepository;
 import chat.campusconnectserver.repositories.MessageRepository;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +47,7 @@ public class MessageService {
         Message message = new Message();
         message.setContent(messageRequest.getContent());
         message.setChat(chat);
-        message.setSenderId(String.valueOf(messageRequest.getSenderId()));
+        message.setSenderId(messageRequest.getSenderId().toString());
         //message.setReceiverId(String.valueOf(messageRequest.getReceiverId()));
         message.setType(messageRequest.getType());
         message.setState(MessageState.sent);
@@ -78,7 +76,7 @@ public class MessageService {
         String formattedTime = formatMessageTime(message.getCreatedDate());
         message.setFormattedTime(formattedTime);
 
-        // message.setReceiverId(req.getReceiverId().toString());
+
         message.setSenderId(req.getSenderId().toString());
         message.setType(req.getType());
         message.setState(MessageState.sent);
@@ -90,7 +88,6 @@ public class MessageService {
 
         return message;
     }
-
 
     @Transactional
     public void setMessagesToSeen(Long chatId, Authentication authentication) {
@@ -115,6 +112,7 @@ public class MessageService {
         }
     }
 
+    @Transactional
     public List<Message> getChatsMessages(Long chatId, User reqUser) throws ChatException, UserException {
         Chat chat = chatService.findChatById(chatId);
 
@@ -154,7 +152,7 @@ public class MessageService {
         // final String filePath = fileService.saveFile(file, senderId);
         Message message = new Message();
         //   message.setReceiverId(String.valueOf(receiverId));
-        message.setSenderId(String.valueOf(senderId));
+        message.setSenderId(senderId.toString());
         message.setState(MessageState.sent);
         message.setType(MessageType.image);
         //  message.setMediaFilePath(filePath);

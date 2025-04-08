@@ -9,7 +9,7 @@ public class MessageMapper {
         return MessageResponse.builder()
                 .id(message.getId())
                 .content(message.getContent())
-                .senderId(message.getSenderId())
+                .senderId(String.valueOf(message.getSenderId()))
                // .receiverId(message.getReceiverId())
                 .type(message.getType())
                 .state(message.getState())

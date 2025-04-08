@@ -70,7 +70,7 @@ public class Chat {
     public long getUnreadMessages(String senderId) {
         return this.messages
                 .stream()
-                .filter(m -> m.getReceiverId().equals(senderId))
+                //.filter(m -> m.getReceiverId().equals(senderId))
                 .filter(m -> MessageState.sent == m.getState())
                 .count();
     }

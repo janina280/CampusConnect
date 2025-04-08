@@ -10,8 +10,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
-    @Query("SELECT m FROM Message m JOIN m.chat c WHERE c.id=:chatId")
-    public List<Message> findByChatId(@Param("chatId")Long chatId);
+    @Query("SELECT m FROM Message m JOIN FETCH m.chat c WHERE c.id = :chatId")
+    List<Message> findByChatId(@Param("chatId") Long chatId);
 
     @Query("UPDATE Message m SET m.state = :newState WHERE m.chat.id = :chatId")
     @Modifying

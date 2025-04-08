@@ -16,11 +16,9 @@ const addMessageToState = (state, message) => {
         id: message.id,
         type: message.type,
         subtype: message.subtype,
-        message: message.message,
-        incoming: message.incoming,
+        message: message.content,
         outgoing: message.outgoing,
         senderId: message.senderId,
-        receiverId: message.receiverId,
         state: message.state,
         createdAt: message.createdAt,
         media: message.media,
@@ -110,13 +108,12 @@ const slice = createSlice({
             });
         },
 
-
         addDirectConversation(state, action) {
             const this_conversation = action.payload.conversation;
             const user = this_conversation.users.find((elm) => elm.id.toString() !== user_id);
             state.direct_chat.conversations = state.direct_chat.conversations.filter((el) => el?.id !== this_conversation.id);
             const lastMessage = this_conversation.messages?.length ? this_conversation.messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, this_conversation.messages[0]) : {
-                text: "You can start messaging with...", createdAt: null
+                content: "You can start messaging with...", createdAt: null
             };
             state.direct_chat.conversations.push({
                 id: this_conversation.id,
@@ -124,7 +121,7 @@ const slice = createSlice({
                 name: user?.name,
                 online: user.online ? "Online" : "Offline",
                 img: faker.image.avatar(),
-                msg: lastMessage?.text,
+                msg: lastMessage?.content,
                 time: lastMessage.createdAt ? new Date(lastMessage.createdAt).toLocaleTimeString() : "9:36",
                 unread: this_conversation.unread,
                 pinned: this_conversation.pinned,
@@ -135,7 +132,6 @@ const slice = createSlice({
         setCurrentConversation(state, action) {
             state.direct_chat.current_conversation = action.payload;
         },
-
 
         fetchCurrentMessages(state, action) {
             const messages = action.payload.messages;
@@ -197,7 +193,7 @@ const slice = createSlice({
             const this_conversation = action.payload.group.conversation;
             state.group_chat.groups = state.group_chat.groups.filter((el) => el?.id !== this_conversation.id);
             const lastMessage = this_conversation.messages?.length ? this_conversation.messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, this_conversation.messages[0]) : {
-                text: "You can start messaging with...", createdAt: null
+                content: "You can start messaging with...", createdAt: null
             };
             state.group_chat.groups.push({
                 id: this_conversation.id,
@@ -205,7 +201,7 @@ const slice = createSlice({
                 name: this_conversation.name,
                 online: this_conversation.online ? "Online" : "Offline",
                 img: faker.image.avatar(),
-                msg: lastMessage.text,
+                msg: lastMessage.content,
                 time: lastMessage.createdAt ? new Date(lastMessage.createdAt).toLocaleTimeString() : "9:36",
                 unread: this_conversation.unread,
                 pinned: this_conversation.pinned,

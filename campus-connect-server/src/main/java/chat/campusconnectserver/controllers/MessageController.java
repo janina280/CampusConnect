@@ -12,6 +12,10 @@ import chat.campusconnectserver.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,30 +26,47 @@ public class MessageController {
 
     private final MessageService messageService;
     private final UserService userService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public MessageController(MessageService messageService, UserService userService) {
+    public MessageController(MessageService messageService, UserService userService, SimpMessagingTemplate simpMessagingTemplate) {
         this.messageService = messageService;
         this.userService = userService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
-    @PostMapping()
-    public ResponseEntity<Message> sendMessageHandler(@RequestBody MessageRequest req, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
-        User user = userService.findUserProfile(jwt);
+    @Transactional
+    @MessageMapping("/send-message")
+    public Message sendMessageHandler(@RequestBody MessageRequest req) throws UserException, ChatException {
+        User user = userService.findUserProfile(req.getJwtString());
 
         req.setSenderId(user.getId());
 
-        Message message = messageService.sendMessage(req);
-        return new ResponseEntity<Message>(message, HttpStatus.OK);
+        var message = messageService.sendMessage(req);
+
+        for(var m: message.getChat().getUsers()) {
+            simpMessagingTemplate.convertAndSendToUser(m.getId().toString(), "/message/message-send-response", message);
+        }
+        return message;
     }
 
-    @GetMapping("/{chatId}")
-    public ResponseEntity<List<Message>> getChatsMessagesHandler(@PathVariable Long chatId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
+    @MessageMapping("/get-messages/{chatId}")
+    public void getMessagesHandler(@DestinationVariable Long chatId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
         User user = userService.findUserProfile(jwt);
 
         List<Message> messages = messageService.getChatsMessages(chatId, user);
-        return new ResponseEntity<List<Message>>(messages, HttpStatus.OK);
+
+        for (var m : messages) {
+            for (var chatUser : m.getChat().getUsers()) {
+                simpMessagingTemplate.convertAndSendToUser(
+                        chatUser.getId().toString(),
+                        "/message/chat-" + chatId,
+                        m
+                );
+            }
+        }
     }
+
 
     @DeleteMapping("/{messageId}")
     public ResponseEntity<ApiResponse> deleteMessagesHandler(@PathVariable Long messageId, @RequestHeader("Authorization") String jwt) throws UserException, MessageException {
