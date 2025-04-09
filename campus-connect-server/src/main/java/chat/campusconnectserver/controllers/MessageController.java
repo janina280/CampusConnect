@@ -5,6 +5,7 @@ import chat.campusconnectserver.exception.MessageException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Message;
 import chat.campusconnectserver.modal.MessageMapper;
+import chat.campusconnectserver.modal.MessageResponse;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.ApiResponse;
 import chat.campusconnectserver.payload.MessageRequest;
@@ -28,7 +29,7 @@ public class MessageController {
     private final MessageService messageService;
     private final UserService userService;
 
-    private MessageMapper messageMapper;
+    private final MessageMapper messageMapper;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
@@ -65,15 +66,18 @@ public class MessageController {
         List<Message> messages = messageService.getChatsMessages(chatId, user);
 
         for (var m : messages) {
+            MessageResponse messageResponse = messageMapper.toMessageResponse(m);
+
             for (var chatUser : m.getChat().getUsers()) {
                 simpMessagingTemplate.convertAndSendToUser(
                         chatUser.getId().toString(),
                         "/message/chat-" + chatId,
-                        m
+                        messageResponse
                 );
             }
         }
     }
+
 
 
     @DeleteMapping("/{messageId}")

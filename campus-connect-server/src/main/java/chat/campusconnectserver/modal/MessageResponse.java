@@ -1,5 +1,6 @@
 package chat.campusconnectserver.modal;
 
+import chat.campusconnectserver.dtos.UserDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -19,4 +20,5 @@ public class MessageResponse {
     private LocalDateTime createdAt;
     private String formattedTime;
     private byte[] media;
+    private UserDto sender;
 }

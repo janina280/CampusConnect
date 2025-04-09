@@ -12,13 +12,16 @@ const initialState = {
 };
 
 const addMessageToState = (state, message) => {
+    const outgoing = message.senderId.toString() === user_id;
+
     state.direct_chat.current_messages.push({
         id: message.id,
         type: message.type,
         subtype: message.subtype,
-        message: message.content,
-        outgoing: message.outgoing,
+        message: message.message,
+        outgoing: outgoing,
         senderId: message.senderId,
+        sender: message.sender,
         state: message.state,
         createdAt: message.createdAt,
         media: message.media,
@@ -134,23 +137,29 @@ const slice = createSlice({
         },
 
         fetchCurrentMessages(state, action) {
+            const user_id = window.localStorage.getItem("user_id");
+
             const messages = action.payload.messages;
-            const formatted_messages = messages.map((el) => ({
-                id: el.id,
-                type: el.type,
-                subtype: el.subtype,
-                message: el.message,
-                incoming: el.incoming,
-                outgoing: el.outgoing,
-                senderId: el.senderId,
-                receiverId: el.receiverId,
-                state: el.state,
-                createdAt: el.createdAt,
-                media: el.media,
-                formattedTime: el.formattedTime,
-            }));
+            const formatted_messages = messages.map((el) => {
+                const outgoing = el.senderId.toString() === user_id;
+
+                return {
+                    id: el.id,
+                    type: el.type,
+                    subtype: el.subtype,
+                    message: el.message,
+                    outgoing: outgoing,
+                    senderId: el.senderId,
+                    state: el.state,
+                    createdAt: el.createdAt,
+                    media: el.media,
+                    formattedTime: el.formattedTime,
+                };
+            });
+
             state.direct_chat.current_messages = formatted_messages;
-        },
+        }
+,
 
 
         addDirectMessage(state, action) {

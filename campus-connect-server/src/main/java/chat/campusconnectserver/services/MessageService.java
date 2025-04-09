@@ -99,13 +99,15 @@ public class MessageService {
     public List<Message> getChatsMessages(Long chatId, User reqUser) throws ChatException, UserException {
         Chat chat = chatService.findChatById(chatId);
 
-        if (!chat.getUsers().contains(reqUser)) {
-            throw new UserException("You are not releted to this chat" + chat.getId());
+        boolean isUserInChat = chat.getUsers()
+                .stream()
+                .anyMatch(u -> u.getId().equals(reqUser.getId()));
+
+        if (!isUserInChat) {
+            throw new UserException("You are not related to this chat " + chat.getId());
         }
 
-        List<Message> messages = messageRepository.findByChatId(chatId);
-
-        return messages;
+        return messageRepository.findByChatId(chatId);
     }
 
     public Message findMessageById(Long messageId) throws MessageException {
