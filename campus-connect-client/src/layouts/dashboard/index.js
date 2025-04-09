@@ -7,7 +7,8 @@ import {
     AddDirectConversation,
     AddDirectGroupConversation,
     AddDirectMessage,
-    AddUserToGroupConversation, FetchCurrentMessages,
+    AddUserToGroupConversation,
+    FetchCurrentMessages,
     UpdateDirectConversation,
 } from "../../redux/slices/conversation";
 import {SelectChatType, SelectRoomId} from "../../redux/slices/app";
@@ -32,7 +33,7 @@ const DashboardLayout = () => {
             });
 
             socket.on(`/user/${user_id}/message/chat-${current_conversation?.id}`, (newMessage) => {
-                dispatch(FetchCurrentMessages({ messages: [newMessage] }));
+                dispatch(FetchCurrentMessages({messages: [newMessage]}));
             });
 
             socket.on(`/user/${user_id}/message/message-send-response`, (message) => {
@@ -41,7 +42,7 @@ const DashboardLayout = () => {
                     dispatch(
                         AddDirectMessage({
                             id: message.id,
-                            type: "msg",
+                            type: "text",
                             subtype: message.type,
                             message: message.content,
                             outgoing: message.senderId === user_id,
@@ -51,6 +52,7 @@ const DashboardLayout = () => {
                             createdAt: message.createdAt,
                             media: message.media,
                             formattedTime: message.formattedTime,
+                            chatId: message.chatId,
                         }),
                     );
                 }

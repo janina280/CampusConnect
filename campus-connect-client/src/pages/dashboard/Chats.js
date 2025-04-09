@@ -32,11 +32,13 @@ const Chats = () => {
     const users = useSelector((state) => state.auth.availableChats);
     const [selectedChat, setSelectedChat] = useState(null);
     const {current_conversation} = useSelector((state) => state.conversation.direct_chat.current_conversation || []);
+    const {room_id} = useSelector((state) => state.app);
+
     useEffect(() => {
 
         if (!isConnected) return;
         socket.emit("/app/chats", "Bearer " + token)
-
+        // socket.emit("/app/get-messages/" + current_conversation, "Bearer " + token);
         socket.on(`/user/${user_id}/chat/chats-response`, (data) => {
             dispatch(FetchDirectConversations(data));
         });

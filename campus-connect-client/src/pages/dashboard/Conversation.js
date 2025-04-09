@@ -7,7 +7,7 @@ import {ChatFooter, ChatHeader} from "../../components/Chat";
 import useResponsive from "../../hooks/useResponsive";
 import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline,} from "../../sections/dashboard/Conversation";
 import {useDispatch, useSelector} from "react-redux";
-import { SetCurrentConversation,} from "../../redux/slices/conversation";
+import {SetCurrentConversation,} from "../../redux/slices/conversation";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const Conversation = ({ isMobile, menu }) => {
@@ -20,11 +20,10 @@ const Conversation = ({ isMobile, menu }) => {
     useEffect(() => {
         const current = conversations.find((el) => el?.id === room_id);
         if (current) {
-             socket.emit("/app/get-messages/" + current.id, "Bearer " + token);
-
             dispatch(SetCurrentConversation(current));
+             socket.emit("/app/get-messages/" + current.id, "Bearer " + token);
         }
-    }, [room_id, conversations]);
+    }, [room_id]);
 
     return (
       <Box p={isMobile ? 1 : 3}>
@@ -37,7 +36,7 @@ const Conversation = ({ isMobile, menu }) => {
                     <Timeline el={el} />
                 );
 
-              case "msg":
+                case "text":
                 switch (el.subtype) {
                   case "img":
                     return (
