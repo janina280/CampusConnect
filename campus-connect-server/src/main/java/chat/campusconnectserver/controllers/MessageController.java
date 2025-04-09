@@ -60,21 +60,27 @@ public class MessageController {
 
 
     @MessageMapping("/get-messages/{chatId}")
-    public void getMessagesHandler(@DestinationVariable Long chatId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
+    public void getMessagesHandler(@DestinationVariable Long chatId, String jwt) throws UserException, ChatException {
         User user = userService.findUserProfile(jwt);
 
         List<Message> messages = messageService.getChatsMessages(chatId, user);
 
-        for (var m : messages) {
-            MessageResponse messageResponse = messageMapper.toMessageResponse(m);
+        if(messages.isEmpty()) {
+            simpMessagingTemplate.convertAndSendToUser(
+                    user.getId().toString(),
+                    "/message/chat",
+                    messageMapper.toMessagesResponse(messages)
+            );
+            return;
+        }
 
-            for (var chatUser : m.getChat().getUsers()) {
-                simpMessagingTemplate.convertAndSendToUser(
-                        chatUser.getId().toString(),
-                        "/message/chat-" + chatId,
-                        messageResponse
-                );
-            }
+        for (var chatUser : messages.get(0).getChat().getUsers()) {
+            var messageResponse = messageMapper.toMessagesResponse(messages);
+            simpMessagingTemplate.convertAndSendToUser(
+                    chatUser.getId().toString(),
+                    "/message/chat",
+                    messageResponse
+            );
         }
     }
 

@@ -36,7 +36,7 @@ const Conversation = ({ isMobile, menu }) => {
                     <Timeline el={el} />
                 );
 
-                case "text":
+                case "msg":
                 switch (el.subtype) {
                   case "img":
                     return (

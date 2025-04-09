@@ -39,13 +39,6 @@ public class MessageService {
         // this.fileService = fileService;
     }
 
-    public List<MessageResponse> findChatMessages(Long chatId) {
-        return messageRepository.findByChatId(chatId)
-                .stream()
-                .map(mapper::toMessageResponse)
-                .toList();
-    }
-
     public Message sendMessage(MessageRequest req, User user) throws UserException, ChatException {
         Chat chat = chatService.findChatById(req.getChatId());
 

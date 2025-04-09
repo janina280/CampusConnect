@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import {Stack} from "@mui/material";
 import {Navigate, Outlet} from "react-router-dom";
 import SideBar from "./SideBar";
@@ -17,9 +17,16 @@ import {useWebSocket} from "../../contexts/WebSocketContext";
 const DashboardLayout = () => {
     const {isLoggedIn, user_id} = useSelector((state) => state.auth);
     const {isConnected, socket} = useWebSocket();
-    const {conversations, current_conversation} = useSelector((state) => state.conversation.direct_chat);
+    const conversations = useSelector((state) => state.conversation.direct_chat.conversations);
+    const current_conversation = useSelector((state) => state.conversation.direct_chat.current_conversation);
+
+    const current_conversationRef = useRef(current_conversation);
     const dispatch = useDispatch();
-    const {room_id} = useSelector((state) => state.app);
+
+    useEffect(() => {
+        current_conversationRef.current = current_conversation;
+    }, [current_conversation]);
+
     useEffect(() => {
         if (isLoggedIn) {
             if (!isConnected) return;
@@ -32,17 +39,17 @@ const DashboardLayout = () => {
                 dispatch(AddUserToGroupConversation({conversation: data}));
             });
 
-            socket.on(`/user/${user_id}/message/chat-${current_conversation?.id}`, (newMessage) => {
-                dispatch(FetchCurrentMessages({messages: [newMessage]}));
+            socket.on(`/user/${user_id}/message/chat`, (newMessage) => {
+                dispatch(FetchCurrentMessages({messages: newMessage}));
             });
 
             socket.on(`/user/${user_id}/message/message-send-response`, (message) => {
                 console.log(message);
-                if (current_conversation?.id === message.chatId) {
+                if (current_conversationRef.current?.id === message.chatId) {
                     dispatch(
                         AddDirectMessage({
                             id: message.id,
-                            type: "text",
+                            type: "msg",
                             subtype: message.type,
                             message: message.content,
                             outgoing: message.senderId === user_id,
