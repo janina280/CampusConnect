@@ -1,28 +1,13 @@
-import { Stack, Box } from "@mui/material";
-import React, { useEffect, useRef } from "react";
-import { useTheme } from "@mui/material/styles";
-import { SimpleBarStyle } from "../../components/Scrollbar";
+import {Box, Stack} from "@mui/material";
+import React, {useEffect, useRef} from "react";
+import {useTheme} from "@mui/material/styles";
+import {SimpleBarStyle} from "../../components/Scrollbar";
 
-import { ChatHeader, ChatFooter } from "../../components/Chat";
+import {ChatFooter, ChatHeader} from "../../components/Chat";
 import useResponsive from "../../hooks/useResponsive";
-import {
-    DocMsg,
-    LinkMsg,
-    MediaMsg,
-    ReplyMsg,
-    TextMsg,
-    Timeline,
-} from "../../sections/dashboard/Conversation";
-import { useDispatch, useSelector } from "react-redux";
-import {
-    FetchCurrentMessages,
-    SetCurrentConversation, SetCurrentGroup,
-} from "../../redux/slices/conversation";
-import SockJS from "sockjs-client";
-import { Client } from '@stomp/stompjs';
-
-//const socket = new SockJS("http://localhost:8080/ws");  // URL-ul serverului tău
-//const stompClient = Client(socket);
+import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline,} from "../../sections/dashboard/Conversation";
+import {useDispatch, useSelector} from "react-redux";
+import {SetCurrentGroup,} from "../../redux/slices/conversation";
 
 const ConversationGroup = ({ isMobile, menu, isGroup=false }) => {
     const dispatch = useDispatch();
@@ -34,20 +19,7 @@ const ConversationGroup = ({ isMobile, menu, isGroup=false }) => {
 
         if (current) {
             dispatch(SetCurrentGroup(current));
-
-            // stompClient.connect({}, () => {
-            // stompClient.subscribe(`/topic/messages/${room_id}`, (message) => {
-            //  const newMessage = JSON.parse(message.body);
-            // dispatch(FetchCurrentMessages({ messages: newMessage }));
-            // });
-            //  });
         }
-
-        // return () => {
-        //  if (stompClient) {
-        //    stompClient.disconnect();
-        //  }
-        //  };
     }, [room_id, groups]);
     return (
         <Box p={isMobile ? 1 : 3}>

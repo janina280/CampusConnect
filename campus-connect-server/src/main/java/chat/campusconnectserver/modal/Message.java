@@ -33,8 +33,6 @@ public class Message extends BaseAuditingEntity {
     private String formattedTime;
     @Column(name = "sender_id", nullable = false)
     private String senderId;
-    //@Column(name = "receiver_id", nullable = false)
-   // private Long receiverId;
     private String mediaFilePath;
 
 }

@@ -1,30 +1,13 @@
-import {
-  Box,
-  Fab,
-  IconButton,
-  InputAdornment,
-  Stack,
-  TextField,
-  Tooltip,
-} from "@mui/material";
-import {
-  Camera,
-  File,
-  Image,
-  LinkSimple,
-  PaperPlaneTilt,
-  Smiley,
-  Sticker,
-  User,
-} from "phosphor-react";
-import { useTheme, styled } from "@mui/material/styles";
-import React, { useRef, useState } from "react";
+import {Box, Fab, IconButton, InputAdornment, Stack, TextField, Tooltip,} from "@mui/material";
+import {Camera, File, Image, LinkSimple, PaperPlaneTilt, Smiley, Sticker, User,} from "phosphor-react";
+import {styled, useTheme} from "@mui/material/styles";
+import React, {useRef, useState} from "react";
 import useResponsive from "../../hooks/useResponsive";
 
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
@@ -160,10 +143,6 @@ function containsUrl(text) {
 const Footer = () => {
   const theme = useTheme();
 
-  const { current_conversation } = useSelector(
-      (state) => state.conversation.direct_chat
-  );
-
   const user_id = window.localStorage.getItem("user_id");
   const { socket} = useWebSocket();
   const isMobile = useResponsive("between", "md", "xs", "sm");
@@ -181,7 +160,6 @@ const Footer = () => {
             jwtString: "Bearer " + token,
             content: linkify(value),
             chatId: room_id,
-            senderId: user_id,
             type: containsUrl(value) ? "link" : "text",
         };
 

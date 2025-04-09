@@ -7,7 +7,6 @@ import chat.campusconnectserver.modal.*;
 import chat.campusconnectserver.payload.MessageRequest;
 import chat.campusconnectserver.repositories.ChatRepository;
 import chat.campusconnectserver.repositories.MessageRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -40,21 +39,6 @@ public class MessageService {
         // this.fileService = fileService;
     }
 
-    public void saveMessage(MessageRequest messageRequest) {
-        Chat chat = chatRepository.findById(messageRequest.getChatId())
-                .orElseThrow(() -> new EntityNotFoundException("Chat not found"));
-
-        Message message = new Message();
-        message.setContent(messageRequest.getContent());
-        message.setChat(chat);
-        message.setSenderId(messageRequest.getSenderId().toString());
-        //message.setReceiverId(String.valueOf(messageRequest.getReceiverId()));
-        message.setType(messageRequest.getType());
-        message.setState(MessageState.sent);
-
-        messageRepository.save(message);
-    }
-
     public List<MessageResponse> findChatMessages(Long chatId) {
         return messageRepository.findByChatId(chatId)
                 .stream()
@@ -62,8 +46,7 @@ public class MessageService {
                 .toList();
     }
 
-    public Message sendMessage(MessageRequest req) throws UserException, ChatException {
-        User user = userService.findUserById(req.getSenderId());
+    public Message sendMessage(MessageRequest req, User user) throws UserException, ChatException {
         Chat chat = chatService.findChatById(req.getChatId());
 
         Message message = new Message();
@@ -77,7 +60,7 @@ public class MessageService {
         message.setFormattedTime(formattedTime);
 
 
-        message.setSenderId(req.getSenderId().toString());
+        message.setSenderId(user.getId().toString());
         message.setType(req.getType());
         message.setState(MessageState.sent);
         message = messageRepository.save(message);

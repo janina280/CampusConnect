@@ -15,7 +15,8 @@ public class MessageResponse {
     private MessageType type;
     private MessageState state;
     private String senderId;
-   // private String receiverId;
+    private Long chatId;
     private LocalDateTime createdAt;
+    private String formattedTime;
     private byte[] media;
 }

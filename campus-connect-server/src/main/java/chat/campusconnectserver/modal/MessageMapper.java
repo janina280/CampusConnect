@@ -10,10 +10,11 @@ public class MessageMapper {
                 .id(message.getId())
                 .content(message.getContent())
                 .senderId(String.valueOf(message.getSenderId()))
-               // .receiverId(message.getReceiverId())
+                .chatId(message.getChat().getId())
                 .type(message.getType())
                 .state(message.getState())
                 .createdAt(message.getCreatedDate())
+                .formattedTime(message.getFormattedTime())
                 .media(FileUtils.readFileFromLocation(message.getMediaFilePath()))
                 .build();
     }

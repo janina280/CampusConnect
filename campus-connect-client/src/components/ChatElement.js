@@ -41,7 +41,6 @@ const StyledBadge = styled(Badge)(({theme}) => ({
     },
 }));
 
-
 const ChatElement = ({
                          img, name, msg, time, unread, online, id
                      }) => {

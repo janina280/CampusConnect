@@ -1,57 +1,36 @@
-import { Stack, Box } from "@mui/material";
-import React, { useEffect, useRef } from "react";
-import { useTheme } from "@mui/material/styles";
-import { SimpleBarStyle } from "../../components/Scrollbar";
+import {Box, Stack} from "@mui/material";
+import React, {useEffect, useRef} from "react";
+import {useTheme} from "@mui/material/styles";
+import {SimpleBarStyle} from "../../components/Scrollbar";
 
-import { ChatHeader, ChatFooter } from "../../components/Chat";
+import {ChatFooter, ChatHeader} from "../../components/Chat";
 import useResponsive from "../../hooks/useResponsive";
-import {
-  DocMsg,
-  LinkMsg,
-  MediaMsg,
-  ReplyMsg,
-  TextMsg,
-  Timeline,
-} from "../../sections/dashboard/Conversation";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  SetCurrentConversation,
-} from "../../redux/slices/conversation";
-import SockJS from "sockjs-client";
-import { Client } from '@stomp/stompjs';
-
-//const socket = new SockJS("http://localhost:8080/ws");  // URL-ul serverului tău
-//const stompClient = Client(socket);
+import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline,} from "../../sections/dashboard/Conversation";
+import {useDispatch, useSelector} from "react-redux";
+import {SetCurrentConversation,} from "../../redux/slices/conversation";
+import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const Conversation = ({ isMobile, menu }) => {
   const dispatch = useDispatch();
   const { conversations, current_messages } = useSelector((state) => state.conversation.direct_chat);
   const { room_id } = useSelector((state) => state.app);
+    const {socket} = useWebSocket();
+    const token = useSelector((state) => state.auth.accessToken);
 
-  useEffect(() => {
-    const current = conversations.find((el) => el?.id === room_id);
+    useEffect(() => {
+        const current = conversations.find((el) => el?.id === room_id);
+        if (current) {
+            // socket.emit("/app/get-messages/" + current.id, "Bearer " + token, (data) => {
+            // dispatch(FetchCurrentMessages({ messages: data }));
+            // });
+            dispatch(SetCurrentConversation(current));
+        }
+    }, [room_id, conversations]);
 
-    if (current) {
-      dispatch(SetCurrentConversation(current));
-
-      // stompClient.connect({}, () => {
-      // stompClient.subscribe(`/topic/messages/${room_id}`, (message) => {
-      //  const newMessage = JSON.parse(message.body);
-      // dispatch(FetchCurrentMessages({ messages: newMessage }));
-      // });
-      //  });
-    }
-
-    // return () => {
-    //  if (stompClient) {
-    //    stompClient.disconnect();
-    //  }
-    //  };
-  }, [room_id, conversations]);
-  return (
+    return (
       <Box p={isMobile ? 1 : 3}>
         <Stack spacing={3}>
-          {current_messages.map((el, idx) => {
+            {current_messages?.map((el, idx) => {
             switch (el.type) {
               case "divider":
                 return (

@@ -31,7 +31,7 @@ const Chats = () => {
 
     const users = useSelector((state) => state.auth.availableChats);
     const [selectedChat, setSelectedChat] = useState(null);
-
+    const {current_conversation} = useSelector((state) => state.conversation.direct_chat.current_conversation || []);
     useEffect(() => {
 
         if (!isConnected) return;
@@ -40,7 +40,8 @@ const Chats = () => {
         socket.on(`/user/${user_id}/chat/chats-response`, (data) => {
             dispatch(FetchDirectConversations(data));
         });
-    }, [isConnected]);
+
+    }, [isConnected, dispatch]);
 
     const handleSearch = (value) => {
         const trimmedValue = value.trim();

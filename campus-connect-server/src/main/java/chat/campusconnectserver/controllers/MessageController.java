@@ -4,6 +4,7 @@ import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.MessageException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Message;
+import chat.campusconnectserver.modal.MessageMapper;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.ApiResponse;
 import chat.campusconnectserver.payload.MessageRequest;
@@ -26,29 +27,36 @@ public class MessageController {
 
     private final MessageService messageService;
     private final UserService userService;
+
+    private MessageMapper messageMapper;
+
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public MessageController(MessageService messageService, UserService userService, SimpMessagingTemplate simpMessagingTemplate) {
+    public MessageController(MessageService messageService, UserService userService, MessageMapper messageMapper, SimpMessagingTemplate simpMessagingTemplate) {
         this.messageService = messageService;
         this.userService = userService;
+        this.messageMapper = messageMapper;
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @Transactional
     @MessageMapping("/send-message")
-    public Message sendMessageHandler(@RequestBody MessageRequest req) throws UserException, ChatException {
+    public void sendMessageHandler(@RequestBody MessageRequest req) throws UserException, ChatException {
         User user = userService.findUserProfile(req.getJwtString());
 
-        req.setSenderId(user.getId());
+        var message = messageService.sendMessage(req, user);
+        var response = messageMapper.toMessageResponse(message);
 
-        var message = messageService.sendMessage(req);
-
-        for(var m: message.getChat().getUsers()) {
-            simpMessagingTemplate.convertAndSendToUser(m.getId().toString(), "/message/message-send-response", message);
+        for (var m : message.getChat().getUsers()) {
+            simpMessagingTemplate.convertAndSendToUser(
+                    m.getId().toString(),
+                    "/message/message-send-response",
+                    response
+            );
         }
-        return message;
     }
+
 
     @MessageMapping("/get-messages/{chatId}")
     public void getMessagesHandler(@DestinationVariable Long chatId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {

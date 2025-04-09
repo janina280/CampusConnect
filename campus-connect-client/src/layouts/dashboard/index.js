@@ -5,8 +5,9 @@ import SideBar from "./SideBar";
 import {useDispatch, useSelector} from "react-redux";
 import {
     AddDirectConversation,
-    AddDirectGroupConversation, AddDirectMessage,
-    AddUserToGroupConversation, FetchCurrentMessages, FetchDirectConversations,
+    AddDirectGroupConversation,
+    AddDirectMessage,
+    AddUserToGroupConversation,
     UpdateDirectConversation,
 } from "../../redux/slices/conversation";
 import {SelectChatType, SelectRoomId} from "../../redux/slices/app";
@@ -15,9 +16,9 @@ import {useWebSocket} from "../../contexts/WebSocketContext";
 const DashboardLayout = () => {
     const {isLoggedIn, user_id} = useSelector((state) => state.auth);
     const {isConnected, socket} = useWebSocket();
-    const {conversations} = useSelector((state) => state.conversation.direct_chat);
-    const {current_conversation}=useSelector((state) => state.conversation.direct_chat.current_conversation || []);
+    const {conversations, current_conversation} = useSelector((state) => state.conversation.direct_chat);
     const dispatch = useDispatch();
+    const {room_id} = useSelector((state) => state.app);
     useEffect(() => {
         if (isLoggedIn) {
             if (!isConnected) return;
@@ -34,12 +35,9 @@ const DashboardLayout = () => {
               //  dispatch(FetchCurrentMessages({ messages: [newMessage] }));
           //  });
 
-            socket.on(`/user/${user_id}/message/message-send-response`, (data) => {
-
-                const message = data.message;
-                console.log(current_conversation, data);
-
-                if (current_conversation?.id === data.conversation_id) {
+            socket.on(`/user/${user_id}/message/message-send-response`, (message) => {
+                console.log(message);
+                if (current_conversation?.id === message.chatId) {
                     dispatch(
                         AddDirectMessage({
                             id: message.id,
