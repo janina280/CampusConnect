@@ -55,35 +55,58 @@ const MessageOption = () => {
 };
 
 const TextMsg = ({ el, menu }) => {
-  const theme = useTheme();
-  return (
-    <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
-      <Box
-        px={1.5}
-        py={1.5}
-        sx={{
-          backgroundColor: el.incoming
-            ? alpha(theme.palette.background.default, 1)
-            : theme.palette.primary.main,
-          borderRadius: 1.5,
-          width: "max-content",
-        }}
-      >
-        <Typography
-          variant="body2"
-          color={el.incoming ? theme.palette.text : "#fff"}
-        >
-          {el.message}
-        </Typography>
-      </Box>
-      {menu && <MessageOption />}
-    </Stack>
-  );
+    const theme = useTheme();
+    const isIncoming = !el.outgoing;
+
+    return (
+        <Stack direction="column" alignItems={isIncoming ? "flex-start" : "flex-end"}>
+            {isIncoming && el.sender?.name && (
+                <Typography
+                    variant="caption"
+                    sx={{ color: theme.palette.text.secondary, pl: 1, pb: 0.5 }}
+                >
+                    {el.sender.name}
+                </Typography>
+            )}
+            <Stack direction="row" justifyContent={isIncoming ? "start" : "end"}>
+                <Box
+                    px={1.5}
+                    py={1.5}
+                    sx={{
+                        backgroundColor: isIncoming
+                            ? alpha(theme.palette.background.default, 1)
+                            : theme.palette.primary.main,
+                        borderRadius: 1.5,
+                        width: "max-content",
+                    }}
+                >
+                    <Typography
+                        variant="body2"
+                        color={isIncoming ? theme.palette.text : "#fff"}
+                    >
+                        {el.message}
+                    </Typography>
+                </Box>
+                {menu && <MessageOption />}
+            </Stack>
+        </Stack>
+    );
 };
+
+
 const MediaMsg = ({ el, menu }) => {
   const theme = useTheme();
+  const isIncoming = !el.outgoing;
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
+        {isIncoming && el.sender?.name && (
+            <Typography
+                variant="caption"
+                sx={{ color: theme.palette.text.secondary, pl: 1, pb: 0.5 }}
+            >
+                {el.sender.name}
+            </Typography>
+        )}
       <Box
         px={1.5}
         py={1.5}
@@ -115,8 +138,17 @@ const MediaMsg = ({ el, menu }) => {
 };
 const DocMsg = ({ el, menu }) => {
   const theme = useTheme();
+    const isIncoming = !el.outgoing;
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
+        {isIncoming && el.sender?.name && (
+            <Typography
+                variant="caption"
+                sx={{ color: theme.palette.text.secondary, pl: 1, pb: 0.5 }}
+            >
+                {el.sender.name}
+            </Typography>
+        )}
       <Box
         px={1.5}
         py={1.5}
@@ -159,8 +191,17 @@ const DocMsg = ({ el, menu }) => {
 };
 const LinkMsg = ({ el, menu }) => {
   const theme = useTheme();
+    const isIncoming = !el.outgoing;
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
+        {isIncoming && el.sender?.name && (
+            <Typography
+                variant="caption"
+                sx={{ color: theme.palette.text.secondary, pl: 1, pb: 0.5 }}
+            >
+                {el.sender.name}
+            </Typography>
+        )}
       <Box
         px={1.5}
         py={1.5}
@@ -205,8 +246,17 @@ const LinkMsg = ({ el, menu }) => {
 };
 const ReplyMsg = ({ el, menu }) => {
   const theme = useTheme();
+    const isIncoming = !el.outgoing;
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
+        {isIncoming && el.sender?.name && (
+            <Typography
+                variant="caption"
+                sx={{ color: theme.palette.text.secondary, pl: 1, pb: 0.5 }}
+            >
+                {el.sender.name}
+            </Typography>
+        )}
       <Box
         px={1.5}
         py={1.5}
@@ -250,6 +300,7 @@ const Timeline = ({ el }) => {
   const theme = useTheme();
   return (
     <Stack direction="row" alignItems={"center"} justifyContent="space-between">
+
       <Divider width="46%" />
       <Typography variant="caption" sx={{ color: theme.palette.text }}>
         {el.text}

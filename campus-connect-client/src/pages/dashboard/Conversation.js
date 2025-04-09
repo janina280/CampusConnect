@@ -7,7 +7,7 @@ import {ChatFooter, ChatHeader} from "../../components/Chat";
 import useResponsive from "../../hooks/useResponsive";
 import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline,} from "../../sections/dashboard/Conversation";
 import {useDispatch, useSelector} from "react-redux";
-import {SetCurrentConversation,} from "../../redux/slices/conversation";
+import { SetCurrentConversation,} from "../../redux/slices/conversation";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const Conversation = ({ isMobile, menu }) => {
@@ -20,9 +20,8 @@ const Conversation = ({ isMobile, menu }) => {
     useEffect(() => {
         const current = conversations.find((el) => el?.id === room_id);
         if (current) {
-            // socket.emit("/app/get-messages/" + current.id, "Bearer " + token, (data) => {
-            // dispatch(FetchCurrentMessages({ messages: data }));
-            // });
+             socket.emit("/app/get-messages/" + current.id, "Bearer " + token);
+
             dispatch(SetCurrentConversation(current));
         }
     }, [room_id, conversations]);
