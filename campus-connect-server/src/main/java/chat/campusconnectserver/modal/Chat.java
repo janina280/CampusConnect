@@ -57,15 +57,6 @@ public class Chat {
    @JoinColumn(name = "receiver_id")
     private User receiver;
 
-
-  //  @Transient
-   // public String getTargetChatName(String senderId) {
-      // if (sender.getId().equals(senderId)) {
-           // return sender.getName();
-      //  }
-       // return receiver.getName();
-  // }
-
     @Transient
     public long getUnreadMessages(String senderId) {
         return this.messages
@@ -83,7 +74,7 @@ public class Chat {
             }
             return messages.get(0).getContent();
         }
-        return null; // No messages available
+        return null;
     }
     @Transient
     public LocalDateTime getLastMessageTime() {

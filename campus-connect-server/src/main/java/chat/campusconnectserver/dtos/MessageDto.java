@@ -18,16 +18,17 @@ public class MessageDto {
     private String state;
     private LocalDateTime createdAt;
     private String media;
+    private String formattedTime;
 
     public MessageDto(Message message) {
         this.id = message.getId();
         this.content = message.getContent();
         this.senderId = String.valueOf(message.getUser().getId());
-       // this.receiverId = String.valueOf(message.getChat().getReceiver().getId());
         this.type = String.valueOf(message.getType());
         this.state = String.valueOf(message.getState());
-        this.createdAt = message.getCreatedDate();// Or use the appropriate date/time format
+        this.createdAt = message.getCreatedDate();
         this.media = message.getMediaFilePath();
+        this.formattedTime = message.getFormattedTime();
     }
 
 }

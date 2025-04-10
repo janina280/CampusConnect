@@ -36,7 +36,8 @@ public class ChatDto {
         this.id = chat.getId();
         this.name = chat.getName();
         this.img = chat.getImg();
-        this.time = chat.getTime();
+        this.time = chat.getMessages() != null && !chat.getMessages().isEmpty() ?
+                chat.getMessages().get(0).getFormattedTime() : null;
         this.unread = chat.getUnread();
         this.pinned = chat.isPinned();
         this.online = chat.isOnline();

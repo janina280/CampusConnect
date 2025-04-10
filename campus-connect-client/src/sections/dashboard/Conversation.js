@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import truncateString from "../../utils/truncate";
 //import { LinkPreview } from "@dhaiwat10/react-link-preview";
 import Embed from "react-embed";
+import axios from "axios";
 
 const MessageOption = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -25,6 +26,9 @@ const MessageOption = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+
+
   return (
     <>
       <DotsThreeVertical
@@ -59,16 +63,16 @@ const TextMsg = ({ el, menu }) => {
     const isIncoming = !el.outgoing;
 
     return (
-        <Stack direction="column" alignItems={isIncoming ? "flex-start" : "flex-end"}>
+        <Stack direction="column" alignItems={isIncoming ? "start" : "end"}>
             {isIncoming && el.sender?.name && (
                 <Typography
                     variant="caption"
-                    sx={{ color: theme.palette.text.secondary, pl: 1, pb: 0.5 }}
+                    sx={{ color: theme.palette.text.secondary, pl: 0.5, pb: 0.2 }}
                 >
                     {el.sender.name}
                 </Typography>
             )}
-            <Stack direction="row" justifyContent={isIncoming ? "start" : "end"}>
+            <Stack direction="row" justifyContent={isIncoming ? "start" : "end"} alignItems="flex-end" spacing={0.5}>
                 <Box
                     px={1.5}
                     py={1.5}
@@ -81,13 +85,24 @@ const TextMsg = ({ el, menu }) => {
                     }}
                 >
                     <Typography
-                        variant="body2"
+                        variant="body1"
                         color={isIncoming ? theme.palette.text : "#fff"}
                     >
                         {el.message}
                     </Typography>
                 </Box>
-                {menu && <MessageOption />}
+
+                <Stack direction="column" alignItems="center" spacing={1.3}>
+                    {menu && <MessageOption />}
+                    {isIncoming && el.formattedTime && (
+                        <Typography
+                            variant="caption"
+                            sx={{ color: theme.palette.text.secondary }}
+                        >
+                            {el.formattedTime}
+                        </Typography>
+                    )}
+                </Stack>
             </Stack>
         </Stack>
     );
@@ -141,7 +156,7 @@ const DocMsg = ({ el, menu }) => {
     const isIncoming = !el.outgoing;
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
-        {isIncoming && el.sender?.name && (
+        {(isIncoming || el.sender?.name) && (
             <Typography
                 variant="caption"
                 sx={{ color: theme.palette.text.secondary, pl: 1, pb: 0.5 }}
@@ -149,7 +164,8 @@ const DocMsg = ({ el, menu }) => {
                 {el.sender.name}
             </Typography>
         )}
-      <Box
+
+        <Box
         px={1.5}
         py={1.5}
         sx={{

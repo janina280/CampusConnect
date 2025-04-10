@@ -5,7 +5,6 @@ import chat.campusconnectserver.exception.MessageException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Message;
 import chat.campusconnectserver.modal.MessageMapper;
-import chat.campusconnectserver.modal.MessageResponse;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.ApiResponse;
 import chat.campusconnectserver.payload.MessageRequest;

@@ -47,13 +47,6 @@ public class ChatService {
         return new ChatDto(chat);
     }
 
-  //  public Chat findChatById(Long chatId) throws ChatException {
-       // Optional<Chat> chat = chatRepository.findById(chatId);
-      //  if (chat.isPresent()) {
-        //    return chat.get();
-      //  }
-     //   throw new ChatException("Chat not found with id" + chatId);
-  //  }
 
     public Chat findChatById(Long chatId) throws ChatException {
         Optional<Chat> chat = chatRepository.findWithUsersById(chatId);
@@ -62,7 +55,6 @@ public class ChatService {
         }
         throw new ChatException("Chat not found with id " + chatId);
     }
-
 
 
     public List<ChatDto> findAllChatByUserId(Long userId) throws UserException {

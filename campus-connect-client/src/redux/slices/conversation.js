@@ -1,5 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {faker} from "@faker-js/faker";
+import axios from "axios";
 
 let user_id = window.localStorage.getItem("user_id");
 
@@ -106,6 +107,7 @@ const slice = createSlice({
                         user_id: el.user_id,
                         name: el?.name,
                         nickname: el?.nickname,
+                        sender: el.sender,
                         msg: lastMessage?.content,
                         time: lastMessage?.formattedTime ?? "",
                         unread: 0,
@@ -157,6 +159,7 @@ const slice = createSlice({
                     message: el.content,
                     outgoing: outgoing,
                     senderId: el.senderId,
+                    sender: el.sender,
                     state: el.state,
                     createdAt: el.createdAt,
                     media: el.media,
@@ -175,12 +178,14 @@ const slice = createSlice({
             const message = action.payload.message;
             const list = state.direct_chat.conversations.map((el) => {
                     return {
+                        ...el,
                         id: el.id,
                         user_id: el.user_id,
                         name: el?.name,
                         nickname: el?.nickname,
+                        sender: message.sender,
                         msg: el.id === message.chatId ? message?.message : el.msg,
-                        time: el.id === message.chatId ? message.formattedTime : el.formattedTime,
+                        time: el.id === message.chatId ? message.formattedTime : el.time,
                         unread: 0,
                         pinned: el.pinned,
                         about: el?.about,
@@ -265,10 +270,36 @@ const slice = createSlice({
                 }
                 return group;
             });
+        },
+
+        removeMessage(state, action)  {
+            const { messageId, conversationId } = action.payload;
+
+            state.direct_chat.conversations = state.direct_chat.conversations.map((conversation) => {
+                if (conversation.id === conversationId) {
+                    conversation.messages = conversation.messages.filter(
+                        (message) => message.id !== messageId
+                    );
+                }
+                return conversation;
+            });
+
+            state.group_chat.groups = state.group_chat.groups.map((group) => {
+                if (group.id === conversationId) {
+                    group.messages = group.messages.filter(
+                        (message) => message.id !== messageId
+                    );
+                }
+                return group;
+            });
+
+            state.direct_chat.current_messages = state.direct_chat.current_messages.filter(
+                (message) => message.id !== messageId
+            );
         }
 
-
     },
+
 });
 
 // Reducer
@@ -346,3 +377,30 @@ export const AddUserToGroupConversation = (conversation) => {
         dispatch(slice.actions.addUserToGroupConversation({group: conversation}));
     }
 }
+export const deleteMessage = (messageId, conversationId) => {
+    return async (dispatch, getState) => {
+        const token = getState().auth.accessToken;
+
+        if (!token) {
+            console.error("Token is missing. Please log in.");
+            return;
+        }
+
+        try {
+            const response = await axios.delete(`api/messages/${messageId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status === 200) {
+                console.log('Message deleted successfully');
+                dispatch(slice.actions.removeMessage({ messageId, conversationId }));
+            } else {
+                console.error("Failed to delete message, status:", response.status);
+            }
+        } catch (error) {
+            console.error("Error deleting message:", error);
+        }
+    };
+};
