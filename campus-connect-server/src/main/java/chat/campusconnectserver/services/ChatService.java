@@ -207,6 +207,11 @@ public class ChatService {
         chatRepository.save(chat);
     }
 
+    public void unpinChat(Long chatId, Long userId) throws ChatException {
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new ChatException("Chat not found"));
+        chat.setPinned(false);
+        chatRepository.save(chat);
+    }
 
 
 }

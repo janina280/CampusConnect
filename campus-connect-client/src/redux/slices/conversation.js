@@ -296,7 +296,21 @@ const slice = createSlice({
             state.direct_chat.current_messages = state.direct_chat.current_messages.filter(
                 (message) => message.id !== messageId
             );
-        }
+        },
+
+        updatePinnedStatus(state, action) {
+            const { id, pinned, isGroup } = action.payload;
+
+            if (isGroup) {
+                state.group_chat.groups = state.group_chat.groups.map((group) =>
+                    group.id === id ? { ...group, pinned } : group
+                );
+            } else {
+                state.direct_chat.conversations = state.direct_chat.conversations.map((conv) =>
+                    conv.id === id ? { ...conv, pinned } : conv
+                );
+            }
+        },
 
     },
 
@@ -404,3 +418,9 @@ export const deleteMessage = (messageId, conversationId) => {
         }
     };
 };
+export const UpdatePinnedStatus = ({ id, pinned, isGroup }) => {
+    return async (dispatch, getState) => {
+        dispatch(slice.actions.updatePinnedStatus({ id, pinned, isGroup }));
+    };
+};
+
