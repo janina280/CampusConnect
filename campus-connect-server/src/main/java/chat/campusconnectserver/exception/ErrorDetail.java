@@ -1,13 +1,16 @@
 package chat.campusconnectserver.exception;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
+@Getter
 public class ErrorDetail {
     private String error;
     private String message;
     private LocalDateTime timeStamp;
-    private ErrorDetail(){
 
+    public ErrorDetail() {
     }
 
     public ErrorDetail(String error, String message, LocalDateTime timeStamp) {
@@ -15,4 +18,5 @@ public class ErrorDetail {
         this.message = message;
         this.timeStamp = timeStamp;
     }
+
 }

@@ -8,6 +8,7 @@ import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.GroupChatRequest;
 import chat.campusconnectserver.repositories.ChatRepository;
 import chat.campusconnectserver.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -195,5 +196,17 @@ public class ChatService {
                 .orElseThrow(() -> new ChatException("Chat not found"));
         return chat.getUsers();
     }
+
+    @Transactional
+    public void pinChat(Long chatId, Long userId) throws ChatException {
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new ChatException("Chat not found"));
+        if (chat.getUsers().stream().noneMatch(user -> user.getId().equals(userId))) {
+            throw new ChatException("User not part of this chat");
+        }
+        chat.setPinned(true);
+        chatRepository.save(chat);
+    }
+
+
 
 }

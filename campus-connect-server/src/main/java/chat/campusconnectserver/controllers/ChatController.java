@@ -1,6 +1,7 @@
 package chat.campusconnectserver.controllers;
 
 import chat.campusconnectserver.dtos.ChatDto;
+import chat.campusconnectserver.dtos.UserDto;
 import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Chat;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 public class ChatController {
@@ -160,17 +162,30 @@ public class ChatController {
 
 
     @GetMapping("/{chatId}/users")
-    public ResponseEntity<Set<User>> getUsersInGroup(@PathVariable Long chatId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
+    public ResponseEntity<Set<UserDto>> getUsersInGroup(@PathVariable Long chatId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
         Long currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
         Chat chat = chatService.findChatById(chatId);
-        if (chat == null || !chat.getUsers().stream().anyMatch(user -> user.getId().equals(currentUserId))) {
+        if (chat == null || chat.getUsers().stream().noneMatch(user -> user.getId().equals(currentUserId))) {
             throw new ChatException("You are not part of this group");
         }
         Set<User> users = chatService.getUsersInGroup(chatId);
+        Set<UserDto> userDTOs = users.stream()
+                .map(UserDto::new)
+                .collect(Collectors.toSet());
 
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        return new ResponseEntity<>(userDTOs, HttpStatus.OK);
     }
+    @PatchMapping("/{chatId}/pin")
+    public ResponseEntity<ApiResponse> pinChat(
+            @PathVariable Long chatId,
+            @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
 
+        Long userId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
+        chatService.pinChat(chatId, userId);
+
+        ApiResponse response = new ApiResponse("Chat pinned successfully", true);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
