@@ -125,7 +125,9 @@ const Contact = () => {
     useEffect(() => {
         const fetchCommonGroups = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/common-groups/${current_conversation.user_id}`, {headers: {Authorization: `Bearer ${authToken}`}});
+                const response = await axios.get
+                (`http://localhost:8080/common-groups/${current_conversation.user_id}`,
+                    {headers: {Authorization: `Bearer ${authToken}`}});
                 setCommonGroups(response.data);
             } catch (error) {
                 console.error("Error fetching common groups:", error);
