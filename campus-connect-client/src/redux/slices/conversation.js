@@ -30,12 +30,15 @@ const addMessageToState = (state, message) => {
     });
 };
 
+const getUserId = () => window.localStorage.getItem("user_id");
+
+
 const slice = createSlice({
     name: "conversation", initialState, reducers: {
 
 
         fetchDirectConversations(state, action) {
-            const user_id = window.localStorage.getItem("user_id");
+            const user_id = getUserId();
 
             const list = action.payload.conversations.map((el) => {
 
@@ -86,7 +89,6 @@ const slice = createSlice({
                     img: faker.image.avatar(),
                 };
             });
-            console.log("Updated conversations: ", list);
             state.group_chat.groups = [...list];
         },
 
@@ -146,9 +148,9 @@ const slice = createSlice({
         },
 
         fetchCurrentMessages(state, action) {
-            const user_id = window.localStorage.getItem("user_id");
-
+            const user_id = getUserId();
             const messages = action.payload.messages;
+
             const formatted_messages = messages.map((el) => {
                 const outgoing = el.senderId.toString() === user_id;
 
@@ -163,12 +165,17 @@ const slice = createSlice({
                     state: el.state,
                     createdAt: el.createdAt,
                     media: el.media,
+                    starred: el.starred || false,
                     formattedTime: el.formattedTime,
                 };
             });
 
-            state.direct_chat.current_messages = formatted_messages;
-        },
+
+            state.direct_chat.current_messages = formatted_messages.sort((a, b) => {
+                return new Date(a.createdAt) - new Date(b.createdAt);
+            });
+        }
+,
 
         addDirectMessage(state, action) {
             addMessageToState(state, action.payload.message);
@@ -189,6 +196,7 @@ const slice = createSlice({
                         unread: 0,
                         pinned: el.pinned,
                         about: el?.about,
+                        starred: el.starred || false,
                         online: el?.status === "Online",
                         img: faker.image.avatar()
                     }
@@ -225,6 +233,7 @@ const slice = createSlice({
                 createdAt: el.createdAt,
                 media: el.media,
                 formattedTime: el.formattedTime,
+                starred: el.starred || false,
             }));
             state.group_chat.current_messages_group = formatted_messages;
         }
@@ -272,8 +281,8 @@ const slice = createSlice({
             });
         },
 
-        removeMessage(state, action)  {
-            const { messageId, conversationId } = action.payload;
+        removeMessage(state, action) {
+            const {messageId, conversationId} = action.payload;
 
             state.direct_chat.conversations = state.direct_chat.conversations.map((conversation) => {
                 if (conversation.id === conversationId) {
@@ -299,22 +308,38 @@ const slice = createSlice({
         },
 
         updatePinnedStatus(state, action) {
-            const { id, pinned, isGroup } = action.payload;
+            const {id, pinned, isGroup} = action.payload;
 
             if (isGroup) {
                 state.group_chat.groups = state.group_chat.groups.map((group) =>
-                    group.id === id ? { ...group, pinned } : group
+                    group.id === id ? {...group, pinned} : group
                 );
             } else {
                 state.direct_chat.conversations = state.direct_chat.conversations.map((conv) =>
-                    conv.id === id ? { ...conv, pinned } : conv
+                    conv.id === id ? {...conv, pinned} : conv
                 );
             }
         },
 
-    },
+        starMessage(state, action) {
+            const starredMsg = action.payload;
 
-});
+            const update = (messages) =>
+                messages.map(msg =>
+                    msg.id === starredMsg.id ? {...msg, starred: true} : msg
+                );
+
+            state.direct_chat.current_messages = update(state.direct_chat.current_messages);
+            state.group_chat.current_messages_group = update(state.group_chat.current_messages_group);
+
+            const sortMessagesByTime = (messages) =>
+                messages.sort((a, b) => new Date(a.formattedTime) - new Date(b.formattedTime));
+
+            state.direct_chat.current_messages = sortMessagesByTime(state.direct_chat.current_messages);
+            state.group_chat.current_messages_group = sortMessagesByTime(state.group_chat.current_messages_group);
+        },
+    }
+    });
 
 // Reducer
 export default slice.reducer;
@@ -376,23 +401,35 @@ export const AddDirectMessage = (message) => {
         dispatch(slice.actions.updateLastMessage({message}));
     }
 }
+
 export const AddDirectMessageGroup = (message) => {
     return async (dispatch, getState) => {
         dispatch(slice.actions.addDirectMessageGroup({message}));
     }
 }
+
 export const AddDirectGroupConversation = (conversation) => {
     return async (dispatch, getState) => {
         dispatch(slice.actions.addDirectGroupConversation({group: conversation}));
     }
 }
+
 export const AddUserToGroupConversation = (conversation) => {
     return async (dispatch, getState) => {
         dispatch(slice.actions.addUserToGroupConversation({group: conversation}));
     }
 }
-export const deleteMessage = (messageId, conversationId) => {
+
+export const UpdatePinnedStatus = ({ id, pinned, isGroup }) => {
     return async (dispatch, getState) => {
+        dispatch(slice.actions.updatePinnedStatus({ id, pinned, isGroup }));
+    };
+};
+
+
+
+export const starMessage = (messageId) => async (dispatch, getState) => {
+    try {
         const token = getState().auth.accessToken;
 
         if (!token) {
@@ -400,27 +437,21 @@ export const deleteMessage = (messageId, conversationId) => {
             return;
         }
 
-        try {
-            const response = await axios.delete(`api/messages/${messageId}`, {
+        const response = await axios.put(
+            `http://localhost:8080/api/message/${messageId}/starred`,
+            {},
+           {
                 headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
-            if (response.status === 200) {
-                console.log('Message deleted successfully');
-                dispatch(slice.actions.removeMessage({ messageId, conversationId }));
-            } else {
-                console.error("Failed to delete message, status:", response.status);
-            }
-        } catch (error) {
-            console.error("Error deleting message:", error);
+        if (response.status === 200) {
+            dispatch(slice.actions.starMessage(response.data));
+        } else {
+            console.error("Failed to mark message as starred, status:", response.status);
         }
-    };
+    } catch (error) {
+        console.error('Error starring message:', error);
+    }
 };
-export const UpdatePinnedStatus = ({ id, pinned, isGroup }) => {
-    return async (dispatch, getState) => {
-        dispatch(slice.actions.updatePinnedStatus({ id, pinned, isGroup }));
-    };
-};
-

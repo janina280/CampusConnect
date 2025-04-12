@@ -10,22 +10,44 @@ import {
 } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
 import { DotsThreeVertical, DownloadSimple, Image } from "phosphor-react";
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+
 import { Message_options } from "../../data";
 import { Link } from "react-router-dom";
 import truncateString from "../../utils/truncate";
 //import { LinkPreview } from "@dhaiwat10/react-link-preview";
 import Embed from "react-embed";
-import axios from "axios";
+import {useDispatch} from "react-redux";
+import {starMessage} from "../../redux/slices/conversation";
 
-const MessageOption = () => {
+
+const MessageOption = ({ el }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+    const dispatch = useDispatch();
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+    const handleStarMessage = () => {
+        dispatch(starMessage(el.id));
+        handleClose();
+    };
+
+    const Message_options = [
+        {
+            title: "Star message", action: handleStarMessage
+        },
+        {
+            title: "Delete Message",
+        },
+    ];
 
 
 
@@ -49,9 +71,17 @@ const MessageOption = () => {
         }}
       >
         <Stack spacing={1} px={1}>
-          {Message_options.map((el) => (
-            <MenuItem onClick={handleClose}>{el.title}</MenuItem>
-          ))}
+            {Message_options.map((el) => (
+                <MenuItem
+                    key={el.title}
+                    onClick={() => {
+                        if (el.action) el.action();
+                        handleClose();
+                    }}
+                >
+                    {el.title}
+                </MenuItem>
+            ))}
         </Stack>
       </Menu>
     </>
@@ -65,13 +95,21 @@ const TextMsg = ({ el, menu }) => {
     return (
         <Stack direction="column" alignItems={isIncoming ? "start" : "end"}>
             {isIncoming && el.sender?.name && (
-                <Typography
-                    variant="caption"
-                    sx={{ color: theme.palette.text.secondary, pl: 0.5, pb: 0.2 }}
-                >
-                    {el.sender.name}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                    <Typography
+                        variant="caption"
+                        sx={{ color: theme.palette.text.secondary, pl: 0.5, pb: 0.2 }}
+                    >
+                        {el.sender.name}
+                    </Typography>
+                    {el.starred ? (
+                        <StarIcon sx={{ fontSize: 16, color: "#FFD700" }} />
+                    ) : (
+                        <StarBorderIcon sx={{ fontSize: 16, color: theme.palette.text.secondary }} />
+                    )}
+                </Stack>
             )}
+
             <Stack direction="row" justifyContent={isIncoming ? "start" : "end"} alignItems="flex-end" spacing={0.5}>
                 <Box
                     px={1.5}
@@ -93,7 +131,7 @@ const TextMsg = ({ el, menu }) => {
                 </Box>
 
                 <Stack direction="column" alignItems="center" spacing={1.3}>
-                    {menu && <MessageOption />}
+                    {menu && <MessageOption  el={el}/>}
                     {isIncoming && el.formattedTime && (
                         <Typography
                             variant="caption"
@@ -209,7 +247,7 @@ const LinkMsg = ({ el, menu }) => {
   const theme = useTheme();
     const isIncoming = !el.outgoing;
   return (
-    <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
+    <Stack direction="row" justifyContent={isIncoming ? "start" : "end"}>
         {isIncoming && el.sender?.name && (
             <Typography
                 variant="caption"
@@ -222,7 +260,7 @@ const LinkMsg = ({ el, menu }) => {
         px={1.5}
         py={1.5}
         sx={{
-          backgroundColor: el.incoming
+          backgroundColor: isIncoming
             ? alpha(theme.palette.background.default, 1)
             : theme.palette.primary.main,
           borderRadius: 1.5,
@@ -250,7 +288,7 @@ const LinkMsg = ({ el, menu }) => {
           </Stack>
           <Typography
             variant="body2"
-            color={el.incoming ? theme.palette.text : "#fff"}
+            color={isIncoming ? theme.palette.text : "#fff"}
           >
             <div dangerouslySetInnerHTML={{ __html: el.message }}></div>
           </Typography>
@@ -264,7 +302,7 @@ const ReplyMsg = ({ el, menu }) => {
   const theme = useTheme();
     const isIncoming = !el.outgoing;
   return (
-    <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
+    <Stack direction="row" justifyContent={isIncoming ? "start" : "end"}>
         {isIncoming && el.sender?.name && (
             <Typography
                 variant="caption"
@@ -277,7 +315,7 @@ const ReplyMsg = ({ el, menu }) => {
         px={1.5}
         py={1.5}
         sx={{
-          backgroundColor: el.incoming
+          backgroundColor: isIncoming
             ? alpha(theme.palette.background.paper, 1)
             : theme.palette.primary.main,
           borderRadius: 1.5,
@@ -302,7 +340,7 @@ const ReplyMsg = ({ el, menu }) => {
           </Stack>
           <Typography
             variant="body2"
-            color={el.incoming ? theme.palette.text : "#fff"}
+            color={isIncoming ? theme.palette.text : "#fff"}
           >
             {el.reply}
           </Typography>
@@ -315,14 +353,15 @@ const ReplyMsg = ({ el, menu }) => {
 const Timeline = ({ el }) => {
   const theme = useTheme();
   return (
-    <Stack direction="row" alignItems={"center"} justifyContent="space-between">
 
+    <Stack direction="row" alignItems={"center"} justifyContent="space-between">
       <Divider width="46%" />
       <Typography variant="caption" sx={{ color: theme.palette.text }}>
         {el.text}
       </Typography>
       <Divider width="46%" />
     </Stack>
+
   );
 };
 

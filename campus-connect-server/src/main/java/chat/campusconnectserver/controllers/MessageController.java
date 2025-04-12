@@ -83,8 +83,6 @@ public class MessageController {
         }
     }
 
-
-
     @DeleteMapping("/{messageId}")
     public ResponseEntity<ApiResponse> deleteMessagesHandler(@PathVariable Long messageId, @RequestHeader("Authorization") String jwt) throws UserException, MessageException {
         User user = userService.findUserProfile(jwt);
@@ -92,5 +90,10 @@ public class MessageController {
         messageService.deleteMessage(messageId, user);
         ApiResponse res = new ApiResponse("Message deleted succesfully", false);
         return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @PutMapping("/{messageId}/starred")
+    public Message markMessageAsStarred(@PathVariable Long messageId) {
+        return messageService.markMessageAsStarred(messageId);
     }
 }

@@ -21,6 +21,7 @@ public class MessageMapper {
                         .sender(new UserDto(message.getUser()))
                         .chatId(message.getChat().getId())
                         .type(message.getType())
+                        .starred(message.isStarred())
                         .state(message.getState())
                         .createdAt(message.getCreatedDate())
                         .formattedTime(message.getFormattedTime())

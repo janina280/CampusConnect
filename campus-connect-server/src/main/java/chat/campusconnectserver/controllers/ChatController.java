@@ -192,7 +192,6 @@ public class ChatController {
     public ResponseEntity<ApiResponse> unpinChat(
             @PathVariable Long chatId,
             @RequestHeader("Authorization") String jwt) throws UserException, ChatException {
-
         Long userId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
         chatService.unpinChat(chatId, userId);

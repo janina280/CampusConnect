@@ -16,6 +16,7 @@ import { UpdateSidebarType } from "../../redux/slices/app";
 import { faker } from "@faker-js/faker";
 import { DocMsg, LinkMsg } from "./Conversation";
 import { Shared_docs, Shared_links } from "../../data";
+import {Conversation} from "../../pages/dashboard/Conversation";
 
 const Media = () => {
   const dispatch = useDispatch();
@@ -75,7 +76,7 @@ const Media = () => {
           spacing={3}
           padding={value === 1 ? 1 : 3}
         >
-          {/* <Conversation starred={true} /> */}
+           <Conversation starred={true} />
           {(() => {
             switch (value) {
               case 0:
@@ -84,8 +85,8 @@ const Media = () => {
                     {[0, 1, 2, 3, 4, 5, 6].map((el) => (
                       <Grid item xs={4}>
                         <img
-                          src={faker.image.city()}
-                          alt={faker.internet.userName()}
+                          src={faker.image}
+                          alt={faker.internet}
                         />
                       </Grid>
                     ))}

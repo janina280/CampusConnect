@@ -3,7 +3,6 @@ import {
   ChatCircleDots,
   Gear,
   GearSix,
-  Phone,
   SignOut,
   User,
   Users,
@@ -272,27 +271,6 @@ const Chat_History = [
   },
 ];
 
-const Message_options = [
-  {
-    title: "Reply",
-  },
-  {
-    title: "React to message",
-  },
-  {
-    title: "Forward message",
-  },
-  {
-    title: "Star message",
-  },
-  {
-    title: "Report",
-  },
-  {
-    title: "Delete Message",
-  },
-];
-
 const Shared_links = [
   {
     type: "msg",
@@ -335,7 +313,6 @@ export {
   Nav_Buttons,
   ChatList,
   Chat_History,
-  Message_options,
   Shared_docs,
   Shared_links,
   CallLogs,

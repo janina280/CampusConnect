@@ -143,16 +143,19 @@ public class MessageService {
 
         return chat.getSender().getId();
     }
-}
-       // return chat.getReceiver().getId();
-   // }
 
-    //private Long getRecipientId(Chat chat, Authentication authentication) {
-     //   if (chat.getSender().getId().equals(authentication.getName())) {
-           // return chat.getReceiver().getId();
-      //  }
-       // return chat.getSender().getId();
-   // }
+
+    public Message markMessageAsStarred(Long messageId) {
+        Message message =messageRepository.findById(messageId).orElseThrow(() ->
+                new RuntimeException("Message not found"));
+        if (!message.isStarred()) {
+            message.setStarred(true);
+            return messageRepository.save(message);
+        }
+        return message;
+    }
+
+}
 
 
 

@@ -38,7 +38,7 @@ const Chats = () => {
 
         if (!isConnected) return;
         socket.emit("/app/chats", "Bearer " + token)
-        // socket.emit("/app/get-messages/" + current_conversation, "Bearer " + token);
+
         socket.on(`/user/${user_id}/chat/chats-response`, (data) => {
             dispatch(FetchDirectConversations(data));
         });

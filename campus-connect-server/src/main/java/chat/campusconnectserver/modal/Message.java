@@ -18,7 +18,7 @@ public class Message extends BaseAuditingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
-
+    private boolean starred=false;
     @Enumerated(EnumType.STRING)
     private MessageState state;
     @Enumerated(EnumType.STRING)
