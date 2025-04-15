@@ -38,7 +38,7 @@ const Group = () => {
             dispatch(FetchDirectGroups(data));
         });
 
-    }, [isConnected]);
+    }, [isConnected, dispatch]);
 
 
     const handleGroupSelect = (groupId) => {
@@ -109,28 +109,42 @@ const Group = () => {
                         }}
                     >
                         <SimpleBarStyle timeout={500} autoHide={true}>
-                            <Stack spacing={2.4}>
-                                <Typography variant="subtitle2" sx={{color: "#676767"}}>
-                                    Pinned
-                                </Typography>
-                                {groups
-                                    .filter((group) => group.pinned)
-                                    .map((group) => {
-                                        return (
-                                            <ChatElement
-                                                key={group.id}
-                                                {...group}
-                                                onClick={() => handleGroupSelect(group.id)}
-                                            />
-                                        );
-                                    })}
-                            </Stack>
+
+                            {queryGroup.trim() === "" && (
+                                <Stack spacing={2.4}>
+                                    <Typography variant="subtitle2" sx={{color: "#676767"}}>
+                                        Pinned
+                                    </Typography>
+                                    {groups.filter((group) => group.pinned).length > 0 ? (
+                                        groups
+                                            .filter((group) => group.pinned)
+                                            .map((group) => (
+                                                <ChatElement
+                                                    key={group.id}
+                                                    {...group}
+                                                    onClick={() => handleGroupSelect(group.id)}
+                                                />
+                                            ))
+                                    ) : (
+                                        <Typography variant="body2" sx={{color: "gray"}}>
+                                            No pinned groups.
+                                        </Typography>
+                                    )}
+                                </Stack>
+                            )}
+
                             <Stack spacing={2.4}>
                                 <Typography variant="subtitle2" sx={{color: "#676667"}}>
                                     All Groups
                                 </Typography>
-                                {(queryGroup.trim() === "" ? groups : availableGroups).length > 0 ? (
-                                    (queryGroup.trim() === "" ? groups : availableGroups).map((group) => (
+                                {(queryGroup.trim() === ""
+                                        ? groups.filter((group) => !group.pinned)
+                                        : availableGroups
+                                ).length > 0 ? (
+                                    (queryGroup.trim() === ""
+                                            ? groups.filter((group) => !group.pinned)
+                                            : availableGroups
+                                    ).map((group) => (
                                         <ChatElement
                                             key={group.id}
                                             {...group}
@@ -139,7 +153,7 @@ const Group = () => {
                                     ))
                                 ) : (
                                     <Typography variant="body2" sx={{color: "gray"}}>
-                                        No groups created yet.
+                                        {queryGroup.trim() === "" ? "No groups created yet." : "No groups found."}
                                     </Typography>
                                 )}
                             </Stack>

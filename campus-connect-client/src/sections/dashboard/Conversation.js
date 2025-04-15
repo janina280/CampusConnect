@@ -1,21 +1,9 @@
 import React from "react";
-import {
-  Stack,
-  Box,
-  Typography,
-  Menu,
-  MenuItem,
-  IconButton,
-  Divider,
-} from "@mui/material";
-import { useTheme, alpha } from "@mui/material/styles";
-import { DotsThreeVertical, DownloadSimple, Image } from "phosphor-react";
-import StarIcon from '@mui/icons-material/Star';
+import {Box, Divider, IconButton, Menu, MenuItem, Stack, Typography,} from "@mui/material";
+import {alpha, useTheme} from "@mui/material/styles";
+import {DotsThreeVertical, DownloadSimple, Image} from "phosphor-react";
+import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-
-import { Message_options } from "../../data";
-import { Link } from "react-router-dom";
-import truncateString from "../../utils/truncate";
 //import { LinkPreview } from "@dhaiwat10/react-link-preview";
 import Embed from "react-embed";
 import {useDispatch} from "react-redux";

@@ -147,7 +147,6 @@ const Chats = () => {
                         <Typography variant="body2">Loading chats...</Typography>
                     ) : (
                         <SimpleBarStyle timeout={500} autoHide={true}>
-                            {/* Rezultatele căutării */}
                             {queryChat?.trim() && users.length > 0 ? (
                                 <Stack spacing={2.4}>
                                     <Typography variant="subtitle2" sx={{color: "#676767"}}>

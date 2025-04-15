@@ -27,32 +27,100 @@ import {FetchAllUsers, SelectRoomId, showSnackbar, ToggleSidebar, UpdateSidebarT
 import axios from "../../utils/axios";
 import Snackbar from "@mui/material/Snackbar";
 import {useWebSocket} from "../../contexts/WebSocketContext";
-import {SetCurrentGroup} from "../../redux/slices/conversation";
+import {SetCurrentConversation, SetCurrentGroup, UpdatePinnedStatus} from "../../redux/slices/conversation";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const PinnedDialog = ({open, handleClose}) => {
-    return (<Dialog
-        open={open}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
-    >
-        <DialogTitle>Pin this group</DialogTitle>
-        <DialogContent>
-            <DialogContentText id="alert-dialog-slide-description">
-                Would you like to pin this group?
-            </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleClose}>Yes</Button>
-        </DialogActions>
-    </Dialog>);
+const PinnedDialog = ({open, handleClose, chatId, onPin}) => {
+
+    const authToken = useSelector((state) => state.auth.accessToken);
+    const dispatch = useDispatch();
+    const handlePinChat = async () => {
+        try {
+            await axios.patch(
+                `http://localhost:8080/${chatId}/pin`,
+                {},
+                {headers: {Authorization: `Bearer ${authToken}`}}
+            );
+
+            if (onPin) onPin();
+            handleClose();
+            dispatch(SelectRoomId({room_id: null}));
+            dispatch(SetCurrentConversation({room_id: null}));
+            dispatch(ToggleSidebar());
+
+        } catch (error) {
+            console.error("Error pinning chat:", error);
+        }
+    };
+
+    return (
+        <Dialog
+            open={open}
+            TransitionComponent={Transition}
+            keepMounted
+            onClose={handleClose}
+            aria-describedby="alert-dialog-slide-description"
+        >
+            <DialogTitle>Pin this chat</DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                    Would you like to pin this chat?
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={handlePinChat}>Yes</Button>
+            </DialogActions>
+        </Dialog>
+    );
 };
+
+const UnpinnedDialog = ({open, handleClose, chatId, onUnpin}) => {
+    const authToken = useSelector((state) => state.auth.accessToken);
+    const dispatch = useDispatch();
+    const handleUnpinChat = async () => {
+        try {
+            await axios.patch(
+                `http://localhost:8080/${chatId}/unpin`,
+                {},
+                {headers: {Authorization: `Bearer ${authToken}`}}
+            );
+
+            if (onUnpin) onUnpin();
+            handleClose();
+            dispatch(SelectRoomId({room_id: null}));
+            dispatch(SetCurrentConversation({room_id: null}));
+            dispatch(ToggleSidebar());
+        } catch (error) {
+            console.error("Error unpinning chat:", error);
+        }
+    };
+
+    return (
+        <Dialog
+            open={open}
+            TransitionComponent={Transition}
+            keepMounted
+            onClose={handleClose}
+            aria-describedby="alert-dialog-slide-description"
+        >
+            <DialogTitle>Unpin this chat</DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                    Would you like to unpin this chat?
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={handleUnpinChat}>Yes</Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
+
 
 const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
     const [loading, setLoading] = useState(false);
@@ -220,12 +288,14 @@ const ContactGroup = () => {
     const {chat_type} = useSelector((store) => store.app);
     const theme = useTheme();
     const groupId = current_group_conversation.id;
+    const isGroup = !!current_group_conversation;
 
     const isDesktop = useResponsive("up", "md");
     const [openDelete, setOpenDelete] = useState(false);
     const [conversation, setConversation] = useState(null);
     const [openAddUser, setOpenAddUser] = useState(false);
     const [openPinned, setOpenPinned] = useState(false);
+    const [openUnpinned, setOpenUnpinned] = useState(false);
     const [groupMembers, setGroupMembers] = useState([]);
     const token = useSelector((state) => state.auth.accessToken);
 
@@ -392,12 +462,18 @@ const ContactGroup = () => {
                             Delete
                         </Button>
                         <Button
-                            onClick={() => setOpenPinned(true)}
-                            startIcon={<PushPin/>}
+                            onClick={() => {
+                                if (conversation?.pinned) {
+                                    setOpenUnpinned(true);
+                                } else {
+                                    setOpenPinned(true);
+                                }
+                            }}
+                            startIcon={conversation?.pinned ? <PushPin/> : <PushPin/>}
                             variant="outlined"
                             sx={{width: "100%"}}
                         >
-                            Pin
+                            {conversation?.pinned ? 'Unpin' : 'Pin'}
                         </Button>
                     </Stack>
 
@@ -406,7 +482,26 @@ const ContactGroup = () => {
             {openDelete && <DeleteChatDialog open={openDelete} handleClose={() => setOpenDelete(false)}
                                              onDeleteSuccess={handleDeleteSuccess}/>}
             {<AddUserDialog open={openAddUser} handleClose={handleCloseAddUser} groupId={groupId}/>}
-            {openPinned && <PinnedDialog open={openPinned} handleClose={() => setOpenPinned(false)}/>}
+            {openPinned && (
+                <PinnedDialog
+                    open={openPinned}
+                    handleClose={() => setOpenPinned(false)}
+                    chatId={conversation?.id}
+                    onPin={() => {
+                        dispatch(UpdatePinnedStatus({id: conversation.id, pinned: true, isGroup}));
+                    }}
+                />
+            )}
+            {openUnpinned && (
+                <UnpinnedDialog
+                    open={openUnpinned}
+                    handleClose={() => setOpenUnpinned(false)}
+                    chatId={conversation?.id}
+                    onUnpin={() => {
+                        dispatch(UpdatePinnedStatus({id: conversation.id, pinned: false, isGroup}));
+                    }}
+                />
+            )}
         </Box>
     );
 };

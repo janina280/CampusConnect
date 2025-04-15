@@ -9,7 +9,7 @@ import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline,} from "../../sec
 import {useDispatch, useSelector} from "react-redux";
 import {SetCurrentGroup,} from "../../redux/slices/conversation";
 
-const ConversationGroup = ({ isMobile, menu, isGroup=false }) => {
+const ConversationGroup = ({isMobile, menu}) => {
     const dispatch = useDispatch();
     const { groups, current_messages_group } = useSelector((state) => state.conversation.group_chat);
     const { room_id } = useSelector((state) => state.app);
@@ -84,7 +84,6 @@ const ChatGroupComponent = () => {
     );
 
     useEffect(() => {
-        // Scroll to the bottom of the message list when new messages are added
         messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     }, [current_messages_group]);
 
