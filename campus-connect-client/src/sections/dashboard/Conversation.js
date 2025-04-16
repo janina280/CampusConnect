@@ -8,6 +8,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import Embed from "react-embed";
 import {useDispatch} from "react-redux";
 import {starMessage} from "../../redux/slices/conversation";
+import {fSmartTime} from "../../utils/formatTime";
 
 
 const MessageOption = ({ el }) => {
@@ -79,6 +80,11 @@ const MessageOption = ({ el }) => {
 const TextMsg = ({ el, menu }) => {
     const theme = useTheme();
     const isIncoming = !el.outgoing;
+    const [showTimestamp, setShowTimestamp] = React.useState(false);
+
+    const handleToggleTimestamp = () => {
+        setShowTimestamp(prev => !prev);
+    };
 
     return (
         <Stack direction="column" alignItems={isIncoming ? "start" : "end"}>
@@ -108,7 +114,10 @@ const TextMsg = ({ el, menu }) => {
                             : theme.palette.primary.main,
                         borderRadius: 1.5,
                         width: "max-content",
+                        position: "relative",
+                        cursor: "pointer",
                     }}
+                    onClick={handleToggleTimestamp}
                 >
                     <Typography
                         variant="body1"
@@ -116,23 +125,28 @@ const TextMsg = ({ el, menu }) => {
                     >
                         {el.message}
                     </Typography>
+                    {showTimestamp && el.createdAt && (
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                color: isIncoming ? theme.palette.text.secondary : "rgba(255,255,255,0.7)",
+                                mt: 0.5,
+                                fontSize: "0.65rem",
+                            }}
+                        >
+                            {fSmartTime(el.createdAt)}
+                        </Typography>
+                    )}
                 </Box>
 
                 <Stack direction="column" alignItems="center" spacing={1.3}>
-                    {menu && <MessageOption  el={el}/>}
-                    {isIncoming && el.formattedTime && (
-                        <Typography
-                            variant="caption"
-                            sx={{ color: theme.palette.text.secondary }}
-                        >
-                            {el.formattedTime}
-                        </Typography>
-                    )}
+                    {menu && <MessageOption el={el}/>}
                 </Stack>
             </Stack>
         </Stack>
     );
 };
+
 
 
 const MediaMsg = ({ el, menu }) => {
@@ -340,12 +354,13 @@ const ReplyMsg = ({ el, menu }) => {
 };
 const Timeline = ({ el }) => {
   const theme = useTheme();
+    const messageTime = fSmartTime(el.createdAt);
   return (
 
     <Stack direction="row" alignItems={"center"} justifyContent="space-between">
       <Divider width="46%" />
       <Typography variant="caption" sx={{ color: theme.palette.text }}>
-        {el.text}
+          {messageTime}
       </Typography>
       <Divider width="46%" />
     </Stack>

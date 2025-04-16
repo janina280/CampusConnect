@@ -52,7 +52,6 @@ public class MessageService {
         String formattedTime = formatMessageTime(message.getCreatedDate());
         message.setFormattedTime(formattedTime);
 
-
         message.setSenderId(user.getId().toString());
         message.setType(req.getType());
         message.setState(MessageState.sent);

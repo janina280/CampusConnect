@@ -3,11 +3,13 @@ package chat.campusconnectserver.controllers;
 import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.MessageException;
 import chat.campusconnectserver.exception.UserException;
+import chat.campusconnectserver.modal.Chat;
 import chat.campusconnectserver.modal.Message;
 import chat.campusconnectserver.modal.MessageMapper;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.ApiResponse;
 import chat.campusconnectserver.payload.MessageRequest;
+import chat.campusconnectserver.services.ChatService;
 import chat.campusconnectserver.services.MessageService;
 import chat.campusconnectserver.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +29,15 @@ public class MessageController {
 
     private final MessageService messageService;
     private final UserService userService;
-
+    private final ChatService chatService;
     private final MessageMapper messageMapper;
-
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public MessageController(MessageService messageService, UserService userService, MessageMapper messageMapper, SimpMessagingTemplate simpMessagingTemplate) {
+    public MessageController(MessageService messageService, UserService userService, ChatService chatService, MessageMapper messageMapper, SimpMessagingTemplate simpMessagingTemplate) {
         this.messageService = messageService;
         this.userService = userService;
+        this.chatService = chatService;
         this.messageMapper = messageMapper;
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
@@ -57,30 +59,42 @@ public class MessageController {
         }
     }
 
-
     @MessageMapping("/get-messages/{chatId}")
     public void getMessagesHandler(@DestinationVariable Long chatId, String jwt) throws UserException, ChatException {
         User user = userService.findUserProfile(jwt);
 
         List<Message> messages = messageService.getChatsMessages(chatId, user);
 
-        if(messages.isEmpty()) {
+        if (messages.isEmpty()) {
+            Chat chat = chatService.findChatById(chatId);
+
+            String destination = chat.isGroup()
+                    ? "/message/group"
+                    : "/message/chat";
+
             simpMessagingTemplate.convertAndSendToUser(
                     user.getId().toString(),
-                    "/message/chat",
+                    destination,
                     messageMapper.toMessagesResponse(messages)
             );
             return;
         }
 
+
         for (var chatUser : messages.get(0).getChat().getUsers()) {
             var messageResponse = messageMapper.toMessagesResponse(messages);
+
+            String destination = messages.get(0).getChat().isGroup()
+                    ? "/message/group"
+                    : "/message/chat";
+
             simpMessagingTemplate.convertAndSendToUser(
                     chatUser.getId().toString(),
-                    "/message/chat",
+                    destination,
                     messageResponse
             );
         }
+
     }
 
     @DeleteMapping("/{messageId}")

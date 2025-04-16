@@ -26,6 +26,7 @@ public class MessageMapper {
                         .createdAt(message.getCreatedDate())
                         .formattedTime(message.getFormattedTime())
                         .media(FileUtils.readFileFromLocation(message.getMediaFilePath()))
+                        .isGroup(message.getChat().isGroup())
                         .build();
     }
 }

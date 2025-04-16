@@ -5,6 +5,7 @@ import {ChatCircle} from "phosphor-react";
 import CreateAvatar from "../utils/createAvatar";
 import {useDispatch, useSelector} from "react-redux";
 import {SelectRoomId} from "../redux/slices/app";
+import {fSmartTime} from "../utils/formatTime";
 
 const truncateText = (string, n) => {
     return string?.length > n ? `${string?.slice(0, n)}...` : string;
@@ -84,14 +85,20 @@ const ChatElement = ({
                 </Stack>
             </Stack>
             <Stack spacing={2} alignItems={"center"}>
-                {time ? (<Typography sx={{fontWeight: 600}} variant="caption">
-                    {time}
-                </Typography>) : (<ChatCircle
-                    size={20}
-                    style={{
-                        cursor: "pointer", color: theme.palette.primary.main,
-                    }}
-                />)}
+                {time ? (
+                    <Typography sx={{fontWeight: 600}} variant="caption">
+                        {fSmartTime(time)}
+                    </Typography>
+                ) : (
+                    <ChatCircle
+                        size={20}
+                        style={{
+                            cursor: "pointer",
+                            color: theme.palette.primary.main,
+                        }}
+                    />
+                )}
+
                 <Badge
                     className="unread-count"
                     color="primary"

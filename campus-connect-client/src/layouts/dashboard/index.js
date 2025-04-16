@@ -7,8 +7,10 @@ import {
     AddDirectConversation,
     AddDirectGroupConversation,
     AddDirectMessage,
+    AddDirectMessageGroup,
     AddUserToGroupConversation,
     FetchCurrentMessages,
+    FetchCurrentMessagesGroup,
     UpdateDirectConversation,
 } from "../../redux/slices/conversation";
 import {SelectChatType, SelectRoomId} from "../../redux/slices/app";
@@ -44,10 +46,24 @@ const DashboardLayout = () => {
             });
 
             socket.on(`/user/${user_id}/message/message-send-response`, (message) => {
-                console.log(message);
-                if (current_conversationRef.current?.id === message.chatId) {
-                    dispatch(
-                        AddDirectMessage({
+                if (message.group === true) {
+                    dispatch(AddDirectMessageGroup({
+                        id: message.id,
+                        type: "msg",
+                        subtype: message.type,
+                        message: message.content,
+                        outgoing: message.senderId === user_id,
+                        senderId: message.senderId,
+                        sender: message.sender,
+                        state: message.state,
+                        createdAt: message.createdAt,
+                        media: message.media,
+                        formattedTime: message.formattedTime,
+                        chatId: message.chatId,
+                    }));
+                } else {
+                    if (current_conversationRef.current?.id === message.chatId) {
+                        dispatch(AddDirectMessage({
                             id: message.id,
                             type: "msg",
                             subtype: message.type,
@@ -60,11 +76,14 @@ const DashboardLayout = () => {
                             media: message.media,
                             formattedTime: message.formattedTime,
                             chatId: message.chatId,
-                        }),
-                    );
+                        }));
+                    }
                 }
             });
 
+            socket.on(`/user/${user_id}/message/group`, (newMessage) => {
+                dispatch(FetchCurrentMessagesGroup({messages: newMessage}));
+            });
             socket.on(`/user/${user_id}/chat/chat-create-response`, (data) => {
                 const existingConversation = conversations.find((el) => el?.id === data.id);
                 if (existingConversation) {

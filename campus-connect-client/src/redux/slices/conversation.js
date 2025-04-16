@@ -30,24 +30,42 @@ const addMessageToState = (state, message) => {
     });
 };
 
+const addMessageToStateGroup = (state, message) => {
+    const outgoing = message.senderId.toString() === user_id;
+
+    state.group_chat.current_messages_group.push({
+        id: message.id,
+        type: message.type,
+        subtype: message.subtype,
+        message: message.message,
+        outgoing: outgoing,
+        senderId: message.senderId,
+        sender: message.sender,
+        state: message.state,
+        createdAt: message.createdAt,
+        media: message.media,
+        formattedTime: message.formattedTime,
+    });
+};
+
 const getUserId = () => window.localStorage.getItem("user_id");
 
 
 const slice = createSlice({
     name: "conversation", initialState, reducers: {
 
-
         fetchDirectConversations(state, action) {
             const user_id = getUserId();
 
             const list = action.payload.conversations.map((el) => {
-
                 const user = el.users.find((elm) => elm.id.toString() !== user_id);
-
                 const messages = [...el.messages];
 
                 const lastMessage = messages.length > 0
-                    ? messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, messages[0])
+                    ? messages.reduce((latest, msg) =>
+                            new Date(msg.createdAt) > new Date(latest.createdAt) ? msg : latest,
+                        messages[0]
+                    )
                     : {content: "You can start messaging with...", createdAt: null};
 
                 return {
@@ -56,7 +74,7 @@ const slice = createSlice({
                     name: user?.name,
                     nickname: user?.nickname,
                     msg: lastMessage?.content,
-                    time: lastMessage?.formattedTime ?? "",
+                    time: lastMessage?.createdAt,
                     unread: 0,
                     pinned: el.pinned,
                     about: user?.about,
@@ -65,8 +83,20 @@ const slice = createSlice({
                 };
             });
 
-            state.direct_chat.conversations = [...list];
+            const sortedList = list.sort((a, b) => {
+                // 1. sortăm după pinned
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+
+                // 2. sortăm după timp (descrescător)
+                if (!a.time) return 1;
+                if (!b.time) return -1;
+                return new Date(b.time) - new Date(a.time);
+            });
+
+            state.direct_chat.conversations = sortedList;
         },
+
 
         fetchDirectGroups(state, action) {
             user_id = window.localStorage.getItem("user_id");
@@ -83,13 +113,23 @@ const slice = createSlice({
                     id: el.id,
                     name: el.name,
                     msg: lastMessage?.content,
-                    time: lastMessage?.formattedTime ?? "",
+                    time: lastMessage?.createdAt ?? "",
                     unread: 0,
                     pinned: el.pinned,
                     img: faker.image.avatar(),
                 };
             });
-            state.group_chat.groups = [...list];
+            const sortedListGroup = list.sort((a, b) => {
+                // 1. sortăm după pinned
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+
+                // 2. sortăm după timp (descrescător)
+                if (!a.time) return 1;
+                if (!b.time) return -1;
+                return new Date(b.time) - new Date(a.time);
+            });
+            state.group_chat.groups = sortedListGroup;
         },
 
         updateDirectConversation(state, action) {
@@ -111,7 +151,7 @@ const slice = createSlice({
                         nickname: el?.nickname,
                         sender: el.sender,
                         msg: lastMessage?.content,
-                        time: lastMessage?.formattedTime ?? "",
+                        time: lastMessage?.createdAt ?? "",
                         unread: 0,
                         pinned: el.pinned,
                         about: el?.about,
@@ -136,7 +176,7 @@ const slice = createSlice({
                 online: user.online ? "Online" : "Offline",
                 img: faker.image.avatar(),
                 msg: lastMessage?.content,
-                time: lastMessage?.formattedTime ?? "",
+                time: lastMessage?.createdAt ?? "",
                 unread: this_conversation.unread,
                 pinned: this_conversation.pinned,
             });
@@ -174,8 +214,37 @@ const slice = createSlice({
             state.direct_chat.current_messages = formatted_messages.sort((a, b) => {
                 return new Date(a.createdAt) - new Date(b.createdAt);
             });
+        },
+
+        fetchCurrentMessagesGroup(state, action) {
+            const user_id = getUserId();
+            const messages = action.payload.messages;
+
+            const formatted_messages = messages.map((el) => {
+                const outgoing = el.senderId.toString() === user_id;
+
+                return {
+                    id: el.id,
+                    type: "msg",
+                    subtype: el.type,
+                    message: el.content,
+                    outgoing: outgoing,
+                    senderId: el.senderId,
+                    sender: el.sender,
+                    state: el.state,
+                    createdAt: el.createdAt,
+                    media: el.media,
+                    starred: el.starred || false,
+                    formattedTime: el.formattedTime,
+                };
+            });
+
+
+            state.group_chat.current_messages_group = formatted_messages.sort((a, b) => {
+                return new Date(a.createdAt) - new Date(b.createdAt);
+            });
         }
-,
+        ,
 
         addDirectMessage(state, action) {
             addMessageToState(state, action.payload.message);
@@ -192,7 +261,7 @@ const slice = createSlice({
                         nickname: el?.nickname,
                         sender: message.sender,
                         msg: el.id === message.chatId ? message?.message : el.msg,
-                        time: el.id === message.chatId ? message.formattedTime : el.time,
+                        time: el.id === message.chatId ? message.createdAt : el.time,
                         unread: 0,
                         pinned: el.pinned,
                         about: el?.about,
@@ -206,39 +275,39 @@ const slice = createSlice({
             state.direct_chat.conversations = [...list];
         },
 
+        updateLastMessageGroup(state, action) {
+            const message = action.payload.message;
+            const list = state.group_chat.groups.map((el) => {
+                    return {
+                        ...el,
+                        id: el.id,
+                        user_id: el.user_id,
+                        name: el?.name,
+                        nickname: el?.nickname,
+                        sender: message.sender,
+                        msg: el.id === message.chatId ? message?.message : el.msg,
+                        time: el.id === message.chatId ? message.createdAt : el.time,
+                        unread: 0,
+                        pinned: el.pinned,
+                        about: el?.about,
+                        starred: el.starred || false,
+                        online: el?.status === "Online",
+                        img: faker.image.avatar()
+                    }
+                }
+            );
+
+            state.group_chat.groups = [...list];
+        },
+
         addDirectMessageGroup(state, action) {
-            addMessageToState(state, action.payload.message);
-        }
-        ,
+            addMessageToStateGroup(state, action.payload.message);
+        },
 
 
         setCurrentGroup(state, action) {
             state.group_chat.current_group_conversation = action.payload;
-        }
-        ,
-
-
-        fetchCurrentMessagesGroup(state, action) {
-            const messages = action.payload.messages;
-            const formatted_messages = messages.map((el) => ({
-                id: el.id,
-                type: el.type,
-                subtype: el.subtype,
-                message: el.message,
-                incoming: el.incoming,
-                outgoing: el.outgoing,
-                senderId: el.senderId,
-                receiverId: el.receiverId,
-                state: el.state,
-                createdAt: el.createdAt,
-                media: el.media,
-                formattedTime: el.formattedTime,
-                starred: el.starred || false,
-            }));
-            state.group_chat.current_messages_group = formatted_messages;
-        }
-        ,
-
+        },
 
         addDirectGroupConversation(state, action) {
             const this_conversation = action.payload.group.conversation;
@@ -258,9 +327,7 @@ const slice = createSlice({
                 pinned: this_conversation.pinned,
             });
 
-        }
-        ,
-
+        },
 
         addUserToGroupConversation(state, action) {
             const group = action.payload.group.conversation;
@@ -405,6 +472,7 @@ export const AddDirectMessage = (message) => {
 export const AddDirectMessageGroup = (message) => {
     return async (dispatch, getState) => {
         dispatch(slice.actions.addDirectMessageGroup({message}));
+        dispatch(slice.actions.updateLastMessageGroup({message}));
     }
 }
 

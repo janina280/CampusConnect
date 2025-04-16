@@ -8,19 +8,23 @@ import useResponsive from "../../hooks/useResponsive";
 import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline,} from "../../sections/dashboard/Conversation";
 import {useDispatch, useSelector} from "react-redux";
 import {SetCurrentGroup,} from "../../redux/slices/conversation";
+import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const ConversationGroup = ({isMobile, menu}) => {
     const dispatch = useDispatch();
     const { groups, current_messages_group } = useSelector((state) => state.conversation.group_chat);
     const { room_id } = useSelector((state) => state.app);
+    const {socket} = useWebSocket();
+    const token = useSelector((state) => state.auth.accessToken);
 
     useEffect(() => {
         const current = groups.find((el) => el?.id === room_id);
 
         if (current) {
             dispatch(SetCurrentGroup(current));
+            socket.emit("/app/get-messages/" + current.id, "Bearer " + token);
         }
-    }, [room_id, groups]);
+    }, [room_id]);
     return (
         <Box p={isMobile ? 1 : 3}>
             <Stack spacing={3}>

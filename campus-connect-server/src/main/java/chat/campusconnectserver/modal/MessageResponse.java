@@ -16,6 +16,7 @@ public class MessageResponse {
     private MessageType type;
     private MessageState state;
     private String senderId;
+    private boolean isGroup;
     private Long chatId;
     private Boolean starred;
     private LocalDateTime createdAt;
