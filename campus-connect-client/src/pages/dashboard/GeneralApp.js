@@ -12,6 +12,8 @@ import {useSearchParams} from "react-router-dom";
 import Group from "./Group";
 import ChatGroupComponent from "./ConversationGroup";
 import ContactGroup from "../../sections/dashboard/ContactGroup";
+import StarredMessagesGroup from "../../sections/dashboard/StarredMessagesGroup";
+import MediaGroup from "../../sections/dashboard/SharedMessageGroup";
 
 const GeneralApp = () => {
     const theme = useTheme();
@@ -56,10 +58,17 @@ const GeneralApp = () => {
                         );
 
                     case "SHARED":
-                        return <Media/>;
+                        return chat_type === "individual" ? (
+                            <Media/>) : (
+                            <MediaGroup/>
+                        )
 
                     case "STARRED":
-                        return <StarredMessages/>;
+                        return chat_type === "individual" ? (
+                                <StarredMessages/>) :
+                            (
+                                <StarredMessagesGroup/>
+                            );
 
                     default:
                         break;
