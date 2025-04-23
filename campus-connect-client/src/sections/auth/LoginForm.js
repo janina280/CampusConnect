@@ -1,21 +1,13 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import FormProvider from "../../components/hook-form/FormProvider";
 import * as Yup from "yup";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  Alert,
-  Button,
-  IconButton,
-  InputAdornment,
-  Stack,
-} from "@mui/material";
+import {useForm} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {Alert, Button, IconButton, InputAdornment, Stack,} from "@mui/material";
 import RHFTextField from "../../components/hook-form/RHFTextField";
-import { Eye, EyeSlash } from "phosphor-react";
-import { Link } from "react-router-dom";
-import { Link as RouterLink } from "react-router-dom";
+import {Eye, EyeSlash} from "phosphor-react";
 import {useDispatch, useSelector} from "react-redux";
-import { LoginUser } from "../../redux/slices/auth";
+import {LoginUser} from "../../redux/slices/auth";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +23,7 @@ const LoginForm = () => {
   const dispatch = useDispatch();
 
   const defaultValues = {
-    email: "demo@yahoo.com",
+      email: "demo@campusconnect.com",
     password: "demo1234",
   };
 
@@ -87,15 +79,7 @@ const LoginForm = () => {
         />
       </Stack>
       <Stack alignItems={"flex-end"} sx={{ my: 2 }}>
-        <Link
-          component={RouterLink}
-          to="/auth/reset-password"
-          variant="body2"
-          color="inherit"
-          underline="always"
-        >
-          Forgot Password?
-        </Link>
+
       </Stack>
       <Button
         fullWidth

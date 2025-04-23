@@ -125,10 +125,7 @@ const Group = () => {
                                                     onClick={() => handleGroupSelect(group.id)}
                                                 />
                                             ))
-                                    ) : (
-                                        <Typography variant="body2" sx={{color: "gray"}}>
-                                            No pinned groups.
-                                        </Typography>
+                                    ) : (""
                                     )}
                                 </Stack>
                             )}
@@ -151,11 +148,7 @@ const Group = () => {
                                             onClick={() => handleGroupSelect(group.id)}
                                         />
                                     ))
-                                ) : (
-                                    <Typography variant="body2" sx={{color: "gray"}}>
-                                        {queryGroup.trim() === "" ? "No groups created yet." : "No groups found."}
-                                    </Typography>
-                                )}
+                                ) : ("")}
                             </Stack>
                         </SimpleBarStyle>
                     </Stack>

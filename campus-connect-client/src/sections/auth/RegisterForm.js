@@ -1,21 +1,14 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import FormProvider from "../../components/hook-form/FormProvider";
 import * as Yup from "yup";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  Alert,
-  Button,
-  IconButton,
-  InputAdornment,
-  Stack,
-  CircularProgress,
-} from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import {useForm} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {Alert, Button, IconButton, InputAdornment, Stack,} from "@mui/material";
+import {useDispatch, useSelector} from "react-redux";
 import RHFTextField from "../../components/hook-form/RHFTextField";
-import { Eye, EyeSlash } from "phosphor-react";
-import { RegisterUser } from "../../redux/slices/auth";
-import { useNavigate } from "react-router-dom";
+import {Eye, EyeSlash} from "phosphor-react";
+import {RegisterUser} from "../../redux/slices/auth";
+import {useNavigate} from "react-router-dom";
 
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +27,7 @@ const RegisterForm = () => {
 
   const defaultValues = {
     name: "Demo",
-    email: "demo@yahoo.com",
+      email: "demo@campusconnect.com",
     password: "demo1234",
   };
 

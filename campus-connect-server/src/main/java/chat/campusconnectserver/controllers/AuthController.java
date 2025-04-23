@@ -1,6 +1,5 @@
 package chat.campusconnectserver.controllers;
 
-import chat.campusconnectserver.exception.BadRequestException;
 import chat.campusconnectserver.modal.AuthProvider;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.ApiResponse;
@@ -39,6 +38,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+        if (!loginRequest.getEmail().endsWith("@campusconnect.com")) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse("The email must be of the type @campusconnect.com.", false));
+        }
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -57,8 +61,16 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody SignUpRequest signUpRequest) {
+        if (!signUpRequest.getEmail().endsWith("@campusconnect.com")) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse("The email must be of the type @campusconnect.com.", false));
+        }
+
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new BadRequestException("Email address already in use.");
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse("Email address already in use.", false));
         }
 
         // Creating user's account

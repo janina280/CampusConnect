@@ -1,21 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Stack, Box, IconButton, Typography, Divider } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import {
-  Bell,
-  CaretLeft,
-  Image,
-  Info,
-  Key,
-  Keyboard,
-  Lock,
-  Note,
-} from "phosphor-react";
+import React, {useEffect, useState} from "react";
+import {Box, Divider, IconButton, Stack, Typography} from "@mui/material";
+import {useTheme} from "@mui/material/styles";
+import {CaretLeft, Info, Keyboard, Lock,} from "phosphor-react";
 import Shortcuts from "../../sections/settings/Shortcuts";
 import NoChatSVG from "../../assets/Illustration/NoChat";
 import CreateAvatar from "../../utils/createAvatar";
-import RequestAccountInfo from "../../sections/settings/RequestAccountInfo";
-import ChatWallpaper from "../../sections/settings/ChatWallpaper";
 import Privacy from "../../sections/settings/Privacy";
 import {useDispatch, useSelector} from "react-redux";
 import {FetchUserProfile} from "../../redux/slices/app";
@@ -25,8 +14,6 @@ function Settings() {
 
   const [openShortcuts, setOpenShortcuts] = useState(false);
   const [openPrivacy, setOpenPrivacy] = useState(false);
-  const [openRequestInfo, setOpenRequestInfo] = useState(false);
-  const [openChatWallpaper, setOpenChatWallpaper] = useState(false);
   const { open } = useSelector((store) => store.app.sideBar);
   const dispatch = useDispatch();
 
@@ -37,27 +24,12 @@ function Settings() {
   const handleClosePrivacy = () => {
     setOpenPrivacy(false);
   };
-  const handleOpenChatWallpaper = () => {
-    setOpenChatWallpaper(true);
-  };
-
-  const handleCloseChatWallpaper = () => {
-    setOpenChatWallpaper(false);
-  };
 
   const handleOpenShortcuts = () => {
     setOpenShortcuts(true);
   };
   const handleCloseShortcuts = () => {
     setOpenShortcuts(false);
-  };
-
-  const handleOpenRequestInfo = () => {
-    setOpenRequestInfo(true);
-  };
-
-  const handleCloseRequestInfo = () => {
-    setOpenRequestInfo(false);
   };
 
   const { user} = useSelector((state) => state.app);
@@ -70,38 +42,19 @@ function Settings() {
 
   const list = [
     {
-      key: 0,
-      icon: <Bell size={20} />,
-      title: "Notification",
-      onclick: () => {},
-    },
-    {
       key: 1,
       icon: <Lock size={20} />,
       title: "Privacy",
       onclick: handleOpenPrivacy,
     },
-    { key: 2, icon: <Key size={20} />, title: "Security", onclick: () => {} },
     {
-      key: 3,
-      icon: <Image size={20} />,
-      title: "Chat Wallpaper",
-      onclick: handleOpenChatWallpaper,
-    },
-    {
-      key: 4,
-      icon: <Note size={20} />,
-      title: "Request Account Info",
-      onclick: handleOpenRequestInfo,
-    },
-    {
-      key: 5,
+      key: 2,
       icon: <Keyboard size={20} />,
       title: "Keyboard Shortcuts",
       onclick: handleOpenShortcuts,
     },
     {
-      key: 6,
+      key: 3,
       icon: <Info size={20} />,
       title: "Help",
       onclick: () => {},
@@ -158,7 +111,7 @@ function Settings() {
 
                       <Typography variant="body2">{title}</Typography>
                     </Stack>
-                    {key !== 6 && <Divider />}
+                    {key !== 3 && <Divider/>}
                   </Stack>
                 </React.Fragment>
               ))}
@@ -187,18 +140,6 @@ function Settings() {
       </Stack>
       {openShortcuts && (
         <Shortcuts open={openShortcuts} handleClose={handleCloseShortcuts} />
-      )}
-      {openRequestInfo && (
-        <RequestAccountInfo
-          open={openRequestInfo}
-          handleClose={handleCloseRequestInfo}
-        />
-      )}
-      {openChatWallpaper && (
-        <ChatWallpaper
-          open={openChatWallpaper}
-          handleClose={handleCloseChatWallpaper}
-        />
       )}
       {openPrivacy && (
         <Privacy open={openPrivacy} handleClose={handleClosePrivacy} />

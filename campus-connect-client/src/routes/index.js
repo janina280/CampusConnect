@@ -1,15 +1,15 @@
-import { Suspense, lazy } from "react";
-import { Navigate, useRoutes } from "react-router-dom";
+import {lazy, Suspense} from "react";
+import {Navigate, useRoutes} from "react-router-dom";
 
 // layouts
 import DashboardLayout from "../layouts/dashboard";
 
 // config
-import { DEFAULT_PATH } from "../config";
+import {DEFAULT_PATH} from "../config";
 import LoadingScreen from "../components/LoadingScreen";
-import MainLayout from "../layouts/main";
 import Test from "../layouts/dashboard/index-test";
 import AuthLayout from "../layouts/auth";
+import OAuth2RedirectHandler from "../sections/auth/OAuth2RedirectHandler";
 
 const Loadable = (Component) => (props) => {
   return (
@@ -32,6 +32,10 @@ export default function Router() {
         {
           element: <RegisterPage />,
           path: "register",
+        },
+        {
+          path: "oauth2/redirect",
+          element: <OAuth2RedirectHandler/>,
         },
       ],
     },
@@ -74,3 +78,6 @@ const LoginPage = Loadable(lazy(() => import("../pages/auth/Login")));
 const ProfilePage = Loadable(lazy(()=> import("../pages/dashboard/Profile")));
 const RegisterPage = Loadable(lazy(() => import("../pages/auth/Register")));
 const Page404 = Loadable(lazy(() => import("../pages/Page404")));
+const OAuth2Redirect = Loadable(
+    lazy(() => import("../sections/auth/OAuth2RedirectHandler"))
+);

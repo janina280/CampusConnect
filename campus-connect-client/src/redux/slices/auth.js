@@ -77,7 +77,7 @@ export function LoginUser(fromValues) {
                 );
             })
             .catch(function (error) {
-                dispatch(showSnackbar({severity: "error", message: error.message}));
+                dispatch(showSnackbar({severity: "error", message: error.response.data.message}));
                 dispatch(
                     slice.actions.updateIsLoading({isLoading: false, error: false})
                 );
@@ -177,7 +177,7 @@ export function RegisterUser(formValues, navigate) {
             })
             .catch((error) => {
                 console.log(error);
-                dispatch(showSnackbar({severity: "error", message: error.message}));
+                dispatch(showSnackbar({severity: "error", message: error.response.data.message}));
                 dispatch(
                     slice.actions.updateIsLoading({error: true, isLoading: false})
                 );

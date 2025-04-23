@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {Button, Dialog, DialogContent, DialogTitle, Stack,} from "@mui/material";
+import {Box, Button, Dialog, DialogContent, DialogTitle, Stack,} from "@mui/material";
 import * as Yup from "yup";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
@@ -72,7 +72,7 @@ const CreateGroupForm = ({handleClose}) => {
 
     return (
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={3}>
+            <Stack spacing={4}>
                 <RHFTextField name="title" label="Title"/>
                 <RHFAutocomplete
                     name="members"
@@ -98,7 +98,9 @@ const CreateGroup = ({open, handleClose}) => {
         <Dialog fullWidth maxWidth="xs" open={open} onClose={handleClose}>
             <DialogTitle>Create New Group</DialogTitle>
             <DialogContent>
+                <Box sx={{mt: 3}}>
                 <CreateGroupForm handleClose={handleClose}/>
+                </Box>
             </DialogContent>
         </Dialog>
     );
