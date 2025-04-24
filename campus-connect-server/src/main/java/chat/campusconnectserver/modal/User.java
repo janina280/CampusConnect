@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -18,7 +21,6 @@ public class User {
 
     @Column(nullable = false)
     private String name;
-
 
     @Column(nullable = false)
     private String email;
@@ -37,6 +39,15 @@ public class User {
     private String providerId;
     private String nickname;
     private String about;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -20,13 +20,14 @@ import {
     Typography,
 } from "@mui/material";
 import CreateAvatar from "../../utils/createAvatar";
-import {CaretRight, Plus, PushPin, Star, Trash, X,} from "phosphor-react";
+import {CaretRight, Plus, PushPin, Star, Trash, X,SignOut} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
 import {FetchAllUsers, SelectRoomId, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
 import axios from "../../utils/axios";
 import Snackbar from "@mui/material/Snackbar";
 import {useWebSocket} from "../../contexts/WebSocketContext";
+import DeleteIcon from '@mui/icons-material/Delete';
 import {SetCurrentConversation, SetCurrentGroup, UpdatePinnedStatus} from "../../redux/slices/conversation";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -121,6 +122,25 @@ const UnpinnedDialog = ({open, handleClose, chatId, onUnpin}) => {
     );
 };
 
+const RemoveMemberDialog = ({ open, onClose, onConfirm, user, chatId }) =>(
+    <Dialog open={open}
+            TransitionComponent={Transition}
+            keepMounted
+            onClose={onClose}
+            aria-describedby="alert-dialog-slide-description">
+        <DialogTitle>Confirmă eliminarea</DialogTitle>
+        <DialogContent>
+            <DialogContentText id="alert-dialog-slide-description">
+                Sigur vrei să-l elimini pe <b>{user?.name}</b> din grup?
+            </DialogContentText>
+        </DialogContent>
+            <DialogActions>
+                <Button variant="outline" onClick={onClose}>Anulează</Button>
+                <Button variant="destructive" onClick={() => onConfirm(user.id)}>Confirmă</Button>
+                </DialogActions>
+
+    </Dialog>
+);
 
 const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
     const [loading, setLoading] = useState(false);
@@ -167,16 +187,16 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
             onClose={handleClose}
             aria-describedby="alert-dialog-slide-description"
         >
-            <DialogTitle>Delete this group</DialogTitle>
+            <DialogTitle>Leaving this group</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                    Are you sure you want to delete this group?
+                    Are you sure you want to leave this group?
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
                 <Button onClick={handleDeleteGroup} disabled={loading}>
-                    {loading ? "Deleting..." : "Yes"}
+                    {loading ? "Leaving..." : "Yes"}
                 </Button>
             </DialogActions>
         </Dialog>
@@ -223,6 +243,8 @@ const AddUserDialog = ({open, handleClose, groupId}) => {
                 })
             );
             handleClose();
+           
+            dispatch(ToggleSidebar());
         } catch (error) {
             console.error("Error adding user:", error);
             dispatch(
@@ -328,6 +350,26 @@ const ContactGroup = () => {
         dispatch(ToggleSidebar());
     };
 
+    const [selectedMember, setSelectedMember] = useState(null);
+    const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
+
+    const handleOpenRemoveDialog = (user) => {
+        setSelectedMember(user);
+        setRemoveDialogOpen(true);
+    };
+
+    const handleRemoveMember = async (userId) => {
+        try {
+            await axios.delete(`/api/groups/${groupId}/members/${userId}`);
+            setGroupMembers(prev => prev.filter(m => m.id !== userId));
+        } catch (err) {
+            console.error("Eroare la eliminarea membrului", err);
+        } finally {
+            setRemoveDialogOpen(false);
+            setSelectedMember(null);
+        }
+    };
+
     return (
         <Box sx={{width: !isDesktop ? "100vw" : 320, maxHeight: "100vh"}}>
             <Stack sx={{height: "100%"}}>
@@ -428,13 +470,21 @@ const ContactGroup = () => {
                         <Stack spacing={1}>
                             {groupMembers.length > 0 ? (
                                 groupMembers.map((user) => (
-                                    <Stack direction="row" alignItems="center" spacing={2} key={user.id}>
-                                        <CreateAvatar
-                                            name={user.name}
-                                            imageUrl={user.img}
-                                            size={40}
-                                        />
-                                        <Typography variant="body2">{user.name}</Typography>
+                                    <Stack
+                                        direction="row"
+                                        alignItems="center"
+                                        justifyContent="space-between"
+                                        spacing={2}
+                                        key={user.id}
+                                    >
+                                        <Stack direction="row" alignItems="center" spacing={2}>
+                                            <CreateAvatar name={user.name} imageUrl={user.img} size={40} />
+                                            <Typography variant="body2">{user.name}</Typography>
+                                        </Stack>
+
+                                        <Button onClick={() => handleOpenRemoveDialog(user)}>
+                                            <X className="w-4 h-4 text-red-500 hover:text-red-700" />
+                                        </Button>
                                     </Stack>
                                 ))
                             ) : (
@@ -455,11 +505,11 @@ const ContactGroup = () => {
                         </Button>
                         <Button
                             onClick={() => setOpenDelete(true)}
-                            startIcon={<Trash/>}
+                            startIcon={<SignOut/>}
                             variant="outlined"
                             sx={{width: "100%"}}
                         >
-                            Delete
+                            Leave
                         </Button>
                         <Button
                             onClick={() => {
@@ -502,6 +552,14 @@ const ContactGroup = () => {
                     }}
                 />
             )}
+            <RemoveMemberDialog
+                open={removeDialogOpen}
+                onClose={() => setRemoveDialogOpen(false)}
+                onConfirm={handleRemoveMember}
+                member={selectedMember}
+            />
+
+
         </Box>
     );
 };

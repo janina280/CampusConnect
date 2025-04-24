@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('USER')")
+   // @PreAuthorize("hasRole('USER')")
     public User getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
         return userRepository.findById(userPrincipal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
@@ -44,7 +43,7 @@ public class UserController {
 
 
     @PutMapping("/update")
-    @PreAuthorize("hasRole('USER')")
+   // @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserDto> updateProfile(
             @Valid @RequestBody UserDto updatedUserDto,
             @CurrentUser UserPrincipal currentUser) {

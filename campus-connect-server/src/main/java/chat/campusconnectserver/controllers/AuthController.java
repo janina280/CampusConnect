@@ -1,11 +1,13 @@
 package chat.campusconnectserver.controllers;
 
 import chat.campusconnectserver.modal.AuthProvider;
+import chat.campusconnectserver.modal.Role;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.ApiResponse;
 import chat.campusconnectserver.payload.AuthResponse;
 import chat.campusconnectserver.payload.LoginRequest;
 import chat.campusconnectserver.payload.SignUpRequest;
+import chat.campusconnectserver.repositories.RoleRepository;
 import chat.campusconnectserver.repositories.UserRepository;
 import chat.campusconnectserver.security.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/auth")
@@ -35,6 +38,8 @@ public class AuthController {
 
     @Autowired
     private TokenProvider tokenProvider;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -81,6 +86,10 @@ public class AuthController {
         user.setProvider(AuthProvider.local);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Role roleUser = roleRepository.findByName(Role.RoleName.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Rolul ROLE_USER nu a fost găsit!"));
+        user.setRoles(Collections.singleton(roleUser));
+
 
         User result = userRepository.save(user);
 

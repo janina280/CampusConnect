@@ -4,6 +4,7 @@ import chat.campusconnectserver.dtos.ChatDto;
 import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Chat;
+import chat.campusconnectserver.modal.Role;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.GroupChatRequest;
 import chat.campusconnectserver.repositories.ChatRepository;
@@ -87,6 +88,13 @@ public class ChatService {
     }
 
     public ChatDto createGroup(GroupChatRequest req, User reqUser) throws UserException {
+        boolean isTutorOrAdmin = reqUser.getRoles().stream()
+                .anyMatch(role -> role.getName() == Role.RoleName.ROLE_TUTOR || role.getName() == Role.RoleName.ROLE_ADMIN);
+
+        if (!isTutorOrAdmin) {
+            throw new UserException("You do not have permission to create a group. Only tutors or admins can create groups.");
+        }
+
         Chat group = new Chat();
         group.setGroup(true);
         group.setImg(req.getChat_image());
@@ -99,6 +107,7 @@ public class ChatService {
         }
 
         group.getUsers().add(reqUser);
+
         for (Long userId : req.getUserIds()) {
             User user = userService.findUserById(userId);
             group.getUsers().add(user);
@@ -113,6 +122,8 @@ public class ChatService {
 
         return new ChatDto(group);
     }
+
+
 
     public Chat renameGroup(Long chatId, String groupName, User reqUserId) throws UserException, ChatException {
         Optional<Chat> opt = chatRepository.findById(chatId);
@@ -149,21 +160,33 @@ public class ChatService {
     public Chat removeFromGroup(Long chatId, Long userId, User reqUser) throws UserException, ChatException {
         Optional<Chat> opt = chatRepository.findById(chatId);
         User user = userService.findUserById(userId);
-        if (opt.isPresent()) {
-            Chat chat = opt.get();
-            if (chat.getAdmins().contains(reqUser)) {
-                chat.getUsers().remove(user);
-                return chatRepository.save(chat);
-            } else if (chat.getUsers().contains(reqUser)) {
-                if (user.getId().equals(reqUser.getId())) {
-                    chat.getUsers().remove(user);
-                    return chatRepository.save(chat);
-                }
-            }
-            throw new UserException("You can't remove another user");
+
+        if (opt.isEmpty()) {
+            throw new ChatException("Chat not found with id " + chatId);
         }
-        throw new ChatException("Chat not found with id" + chatId);
+
+        Chat chat = opt.get();
+
+        boolean isTutor = reqUser.getRoles().stream()
+                .anyMatch(role -> role.getName() == Role.RoleName.ROLE_TUTOR);
+
+        boolean isAdmin = chat.getAdmins().contains(reqUser);
+
+        if (isAdmin || isTutor) {
+            chat.getUsers().remove(user);
+            chat.getAdmins().remove(user);
+            return chatRepository.save(chat);
+        }
+
+        if (chat.getUsers().contains(reqUser) && reqUser.getId().equals(user.getId())) {
+            chat.getUsers().remove(user);
+            chat.getAdmins().remove(user);
+            return chatRepository.save(chat);
+        }
+
+        throw new UserException("You can't remove another user");
     }
+
 
     public ChatDto addUserToGroup(Long userId, Long chatId, User reqUser) throws UserException, ChatException {
         Optional<Chat> opt = chatRepository.findById(chatId);
@@ -171,15 +194,22 @@ public class ChatService {
 
         if (opt.isPresent()) {
             Chat chat = opt.get();
-            if (chat.getAdmins().contains(reqUser)) {
+
+            boolean isAdmin = chat.getAdmins().contains(reqUser);
+            boolean isCreatorTutor = chat.getCreatedBy().getId().equals(reqUser.getId()) &&
+                    reqUser.getRoles().stream()
+                            .anyMatch(role -> role.getName() == Role.RoleName.ROLE_TUTOR);
+
+            if (isAdmin || isCreatorTutor) {
                 chat.getUsers().add(user);
                 Chat updatedChat = chatRepository.save(chat);
 
                 return new ChatDto(updatedChat.getId(), updatedChat.getName(), updatedChat.getUsers(), updatedChat.getMessages());
             } else {
-                throw new UserException("You are not admin");
+                throw new UserException("You are not authorized to add users to this group");
             }
         }
+
         throw new ChatException("Chat not found with id " + chatId);
     }
 
@@ -198,20 +228,46 @@ public class ChatService {
     }
 
     @Transactional
-    public void pinChat(Long chatId, Long userId) throws ChatException {
-        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new ChatException("Chat not found"));
-        if (chat.getUsers().stream().noneMatch(user -> user.getId().equals(userId))) {
+    public void pinChat(Long chatId, Long userId) throws ChatException, UserException {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ChatException("Chat not found"));
+        User user = userService.findUserById(userId);
+
+        if (!chat.getUsers().contains(user)) {
             throw new ChatException("User not part of this chat");
         }
+
+        boolean isTutorOrAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getName() == Role.RoleName.ROLE_TUTOR || role.getName() == Role.RoleName.ROLE_ADMIN);
+
+        if (!isTutorOrAdmin) {
+            throw new UserException("Only tutors or admins can pin chats");
+        }
+
         chat.setPinned(true);
         chatRepository.save(chat);
     }
 
-    public void unpinChat(Long chatId, Long userId) throws ChatException {
-        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new ChatException("Chat not found"));
+    public void unpinChat(Long chatId, Long userId) throws ChatException, UserException {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ChatException("Chat not found"));
+        User user = userService.findUserById(userId);
+
+        if (!chat.getUsers().contains(user)) {
+            throw new ChatException("User not part of this chat");
+        }
+
+        boolean isTutorOrAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getName() == Role.RoleName.ROLE_TUTOR || role.getName() == Role.RoleName.ROLE_ADMIN);
+
+        if (!isTutorOrAdmin) {
+            throw new UserException("Only tutors or admins can unpin chats");
+        }
+
         chat.setPinned(false);
         chatRepository.save(chat);
     }
+
 
 
 }
