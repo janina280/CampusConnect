@@ -8,6 +8,7 @@ import CreateAvatar from "../../utils/createAvatar";
 import Privacy from "../../sections/settings/Privacy";
 import {useDispatch, useSelector} from "react-redux";
 import {FetchUserProfile} from "../../redux/slices/app";
+import Statistics from "../../sections/settings/Statistics";
 
 function Settings() {
   const theme = useTheme();
@@ -16,6 +17,11 @@ function Settings() {
   const [openPrivacy, setOpenPrivacy] = useState(false);
   const { open } = useSelector((store) => store.app.sideBar);
   const dispatch = useDispatch();
+  const [openStatistics, setOpenStatistics] = useState(false);
+
+  const handleCloseStatistics = () => {
+    setOpenStatistics(false);
+  };
 
   const handleOpenPrivacy = () => {
     setOpenPrivacy(true);
@@ -56,9 +62,10 @@ function Settings() {
     {
       key: 3,
       icon: <Info size={20} />,
-      title: "Help",
-      onclick: () => {},
-    },
+      title: "Statistics",
+      onclick: () => setOpenStatistics(true),
+    }
+
   ];
 
   return (
@@ -144,6 +151,10 @@ function Settings() {
       {openPrivacy && (
         <Privacy open={openPrivacy} handleClose={handleClosePrivacy} />
       )}
+      {openStatistics && (
+          <Statistics open={openStatistics} handleClose={handleCloseStatistics}/>
+      )}
+
     </>
   );
 }

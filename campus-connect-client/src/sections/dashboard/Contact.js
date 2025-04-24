@@ -15,7 +15,7 @@ import {
     Typography,
 } from "@mui/material";
 import CreateAvatar from "../../utils/createAvatar";
-import {CaretRight, PushPin, Star, Trash, X,} from "phosphor-react";
+import {CaretRight, PushPin, Star, X,} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
 import {SelectRoomId, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
@@ -354,17 +354,6 @@ const Contact = () => {
                             {conversation?.pinned ? 'Unpin' : 'Pin'}
                         </Button>
 
-                        <Button
-                            onClick={() => {
-                                setOpenDelete(true);
-                            }}
-                            fullWidth
-                            startIcon={<Trash/>}
-                            variant="outlined"
-
-                        >
-                            Delete
-                        </Button>
                     </Stack>
                 </Stack>
             </Stack>

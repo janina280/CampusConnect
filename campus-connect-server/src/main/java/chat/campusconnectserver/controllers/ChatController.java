@@ -176,6 +176,8 @@ public class ChatController {
 
         return new ResponseEntity<>(userDTOs, HttpStatus.OK);
     }
+
+
     @PatchMapping("/{chatId}/pin")
     public ResponseEntity<ApiResponse> pinChat(
             @PathVariable Long chatId,
@@ -198,6 +200,15 @@ public class ChatController {
 
         ApiResponse response = new ApiResponse("Chat unpinned successfully", true);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/groups")
+    public ResponseEntity<List<ChatDto>> getAllGroupsForAdmin(@RequestHeader("Authorization") String jwt) throws UserException {
+        Long currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
+
+        List<ChatDto> groups = chatService.findAllGroupsForAdmin(currentUserId);
+
+        return new ResponseEntity<>(groups, HttpStatus.OK);
     }
 
 

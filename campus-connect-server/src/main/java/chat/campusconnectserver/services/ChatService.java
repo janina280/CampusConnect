@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ChatService {
@@ -195,10 +196,12 @@ public class ChatService {
         if (opt.isPresent()) {
             Chat chat = opt.get();
 
-            boolean isAdmin = chat.getAdmins().contains(reqUser);
+            boolean isAdmin = reqUser.getRoles().stream()
+                    .anyMatch(role -> role.getName().equals(Role.RoleName.ROLE_ADMIN));
+
             boolean isCreatorTutor = chat.getCreatedBy().getId().equals(reqUser.getId()) &&
                     reqUser.getRoles().stream()
-                            .anyMatch(role -> role.getName() == Role.RoleName.ROLE_TUTOR);
+                            .anyMatch(role -> role.getName().equals(Role.RoleName.ROLE_TUTOR));
 
             if (isAdmin || isCreatorTutor) {
                 chat.getUsers().add(user);
@@ -266,6 +269,23 @@ public class ChatService {
 
         chat.setPinned(false);
         chatRepository.save(chat);
+    }
+
+    public List<ChatDto> findAllGroupsForAdmin(Long userId) throws UserException {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            throw new UserException("User not found with ID: " + userId);
+        }
+        boolean isAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getName() == Role.RoleName.ROLE_ADMIN);
+
+        if (!isAdmin) {
+            throw new UserException("Only admins can view all groups");
+        }
+
+        return chatRepository.findAllGroupChats().stream()
+                .map(ChatDto::new)
+                .collect(Collectors.toList());
     }
 
 

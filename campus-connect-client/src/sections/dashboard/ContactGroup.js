@@ -20,14 +20,13 @@ import {
     Typography,
 } from "@mui/material";
 import CreateAvatar from "../../utils/createAvatar";
-import {CaretRight, Plus, PushPin, Star, Trash, X,SignOut} from "phosphor-react";
+import {CaretRight, Plus, PushPin, SignOut, Star, X} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
 import {FetchAllUsers, SelectRoomId, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
 import axios from "../../utils/axios";
 import Snackbar from "@mui/material/Snackbar";
 import {useWebSocket} from "../../contexts/WebSocketContext";
-import DeleteIcon from '@mui/icons-material/Delete';
 import {SetCurrentConversation, SetCurrentGroup, UpdatePinnedStatus} from "../../redux/slices/conversation";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -243,7 +242,7 @@ const AddUserDialog = ({open, handleClose, groupId}) => {
                 })
             );
             handleClose();
-           
+
             dispatch(ToggleSidebar());
         } catch (error) {
             console.error("Error adding user:", error);
