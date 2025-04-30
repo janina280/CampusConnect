@@ -19,6 +19,10 @@ function Settings() {
   const dispatch = useDispatch();
   const [openStatistics, setOpenStatistics] = useState(false);
 
+  const {roles = []} = useSelector((state) => state.auth);
+
+  const isAdmin = roles.includes("ROLE_ADMIN");
+
   const handleCloseStatistics = () => {
     setOpenStatistics(false);
   };
@@ -64,6 +68,7 @@ function Settings() {
       icon: <Info size={20} />,
       title: "Statistics",
       onclick: () => setOpenStatistics(true),
+      show: isAdmin,
     }
 
   ];
@@ -106,21 +111,23 @@ function Settings() {
             </Stack>
             {/* List of options */}
             <Stack spacing={4}>
-              {list.map(({ key, icon, title, onclick }) => (
-                <React.Fragment key={key}>
-                  <Stack
-                    sx={{ cursor: "pointer" }}
-                    spacing={2}
-                    onClick={onclick}
-                  >
-                    <Stack direction={"row"} spacing={2} alignItems={"center"}>
-                      {icon}
+              {list.map(({key, icon, title, onclick, show}) => (
+                  show !== false && (
+                      <React.Fragment key={key}>
+                        <Stack
+                            sx={{cursor: "pointer"}}
+                            spacing={2}
+                            onClick={onclick}
+                        >
+                          <Stack direction={"row"} spacing={2} alignItems={"center"}>
+                            {icon}
 
-                      <Typography variant="body2">{title}</Typography>
-                    </Stack>
-                    {key !== 3 && <Divider/>}
-                  </Stack>
-                </React.Fragment>
+                            <Typography variant="body2">{title}</Typography>
+                          </Stack>
+                          {key !== 3 && <Divider/>}
+                        </Stack>
+                      </React.Fragment>
+                  )
               ))}
             </Stack>
           </Stack>

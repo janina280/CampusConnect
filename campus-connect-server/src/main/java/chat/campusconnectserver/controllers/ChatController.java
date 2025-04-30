@@ -177,7 +177,6 @@ public class ChatController {
         return new ResponseEntity<>(userDTOs, HttpStatus.OK);
     }
 
-
     @PatchMapping("/{chatId}/pin")
     public ResponseEntity<ApiResponse> pinChat(
             @PathVariable Long chatId,

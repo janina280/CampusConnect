@@ -2,11 +2,14 @@ package chat.campusconnectserver.security.oauth2;
 
 import chat.campusconnectserver.exception.OAuth2AuthenticationProcessingException;
 import chat.campusconnectserver.modal.AuthProvider;
+import chat.campusconnectserver.modal.Role;
 import chat.campusconnectserver.modal.User;
+import chat.campusconnectserver.repositories.RoleRepository;
 import chat.campusconnectserver.repositories.UserRepository;
 import chat.campusconnectserver.security.UserPrincipal;
 import chat.campusconnectserver.security.oauth2.user.OAuth2UserInfo;
 import chat.campusconnectserver.security.oauth2.user.OAuth2UserInfoFactory;
+import chat.campusconnectserver.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -18,11 +21,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -33,7 +41,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         } catch (AuthenticationException ex) {
             throw ex;
         } catch (Exception ex) {
-            // Throwing an instance of AuthenticationException will trigger the OAuth2AuthenticationFailureHandler
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
         }
     }
@@ -58,7 +65,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
 
-        return UserPrincipal.create(user, oAuth2User.getAttributes());
+        return UserPrincipal.create(user, (RoleService) oAuth2User.getAttributes());
     }
 
     private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
@@ -69,6 +76,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setName(oAuth2UserInfo.getName());
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setImageUrl(oAuth2UserInfo.getImageUrl());
+
+        Role role = roleRepository.findByName(Role.RoleName.ROLE_USER)
+                .orElseThrow(() -> new OAuth2AuthenticationProcessingException("Role ROLE_USER not found"));
+        user.setRoles(Set.of(role));
+
         return userRepository.save(user);
     }
 
@@ -77,5 +89,4 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         existingUser.setImageUrl(oAuth2UserInfo.getImageUrl());
         return userRepository.save(existingUser);
     }
-
 }

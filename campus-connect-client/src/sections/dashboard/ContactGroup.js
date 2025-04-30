@@ -121,7 +121,7 @@ const UnpinnedDialog = ({open, handleClose, chatId, onUnpin}) => {
     );
 };
 
-const RemoveMemberDialog = ({ open, onClose, onConfirm, user, chatId }) =>(
+const RemoveMemberDialog = ({open, onClose, onConfirm, member, chatId}) => (
     <Dialog open={open}
             TransitionComponent={Transition}
             keepMounted
@@ -130,24 +130,24 @@ const RemoveMemberDialog = ({ open, onClose, onConfirm, user, chatId }) =>(
         <DialogTitle>Confirmă eliminarea</DialogTitle>
         <DialogContent>
             <DialogContentText id="alert-dialog-slide-description">
-                Sigur vrei să-l elimini pe <b>{user?.name}</b> din grup?
+                Sigur vrei să-l elimini pe <b>{member?.name}</b> din grup?
             </DialogContentText>
         </DialogContent>
             <DialogActions>
                 <Button variant="outline" onClick={onClose}>Anulează</Button>
-                <Button variant="destructive" onClick={() => onConfirm(user.id)}>Confirmă</Button>
+                <Button variant="destructive" onClick={() => onConfirm(member.id)}>Confirmă</Button>
                 </DialogActions>
 
     </Dialog>
 );
 
-const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
+const LeaveChatDialog = ({open, handleClose, onLeaveSuccess}) => {
     const [loading, setLoading] = useState(false);
     const chatId = useSelector((state) => state.conversation.group_chat.current_group_conversation.id);
     const token = useSelector((state) => state.auth.accessToken);
     const {socket} = useWebSocket();
     const dispatch = useDispatch();
-    const handleDeleteGroup = () => {
+    const handleLeaveGroup = () => {
         setLoading(true);
 
         fetch(`http://localhost:8080/${chatId}`, {
@@ -161,17 +161,17 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
             .then((data) => {
                 if (data.success) {
                     socket.emit("/app/groups", "Bearer " + token);
-                    onDeleteSuccess();
+                    onLeaveSuccess();
                     dispatch(
                         showSnackbar({
                             severity: "success",
-                            message: "Group deleted successfully!",
+                            message: "Leave successfully!",
                         })
                     );
                 }
             })
             .catch((error) => {
-                console.error('Error deleting chat:', error);
+                console.error('Error leaving group:', error);
             })
             .finally(() => {
                 setLoading(false);
@@ -194,7 +194,7 @@ const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={handleDeleteGroup} disabled={loading}>
+                <Button onClick={handleLeaveGroup} disabled={loading}>
                     {loading ? "Leaving..." : "Yes"}
                 </Button>
             </DialogActions>
@@ -312,13 +312,18 @@ const ContactGroup = () => {
     const isGroup = !!current_group_conversation;
 
     const isDesktop = useResponsive("up", "md");
-    const [openDelete, setOpenDelete] = useState(false);
+    const [openLeave, setOpenLeave] = useState(false);
     const [conversation, setConversation] = useState(null);
     const [openAddUser, setOpenAddUser] = useState(false);
     const [openPinned, setOpenPinned] = useState(false);
     const [openUnpinned, setOpenUnpinned] = useState(false);
     const [groupMembers, setGroupMembers] = useState([]);
     const token = useSelector((state) => state.auth.accessToken);
+    const {roles = []} = useSelector((state) => state.auth);
+
+    const isAdmin = roles.includes("ROLE_ADMIN");
+    const isTutor = roles.includes("ROLE_TUTOR");
+    const adminOrTutor = isAdmin || isTutor;
 
     const handleCloseAddUser = () => {
         setOpenAddUser(false);
@@ -342,8 +347,8 @@ const ContactGroup = () => {
         }
     }, [chat_type, current_group_conversation, groupId]);
 
-    const handleDeleteSuccess = () => {
-        setOpenDelete(false);
+    const handleLeaveSuccess = () => {
+        setOpenLeave(false);
         dispatch(SetCurrentGroup({room_id: null}));
         dispatch(SelectRoomId({room_id: null}));
         dispatch(ToggleSidebar());
@@ -359,7 +364,12 @@ const ContactGroup = () => {
 
     const handleRemoveMember = async (userId) => {
         try {
-            await axios.delete(`/api/groups/${groupId}/members/${userId}`);
+            await axios.put(`http://localhost:8080/${groupId}/remove/${userId}`, {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
             setGroupMembers(prev => prev.filter(m => m.id !== userId));
         } catch (err) {
             console.error("Eroare la eliminarea membrului", err);
@@ -480,10 +490,10 @@ const ContactGroup = () => {
                                             <CreateAvatar name={user.name} imageUrl={user.img} size={40} />
                                             <Typography variant="body2">{user.name}</Typography>
                                         </Stack>
-
+                                        {isAdmin && (
                                         <Button onClick={() => handleOpenRemoveDialog(user)}>
                                             <X className="w-4 h-4 text-red-500 hover:text-red-700" />
-                                        </Button>
+                                        </Button>)}
                                     </Stack>
                                 ))
                             ) : (
@@ -493,7 +503,9 @@ const ContactGroup = () => {
                     </Stack>
 
                     <Divider/>
+
                     <Stack direction="row" alignItems={"center"} spacing={2}>
+                        {adminOrTutor && (
                         <Button
                             onClick={() => setOpenAddUser(true)}
                             startIcon={<Plus/>}
@@ -501,15 +513,16 @@ const ContactGroup = () => {
                             sx={{width: "100%"}}
                         >
                             Add
-                        </Button>
+                        </Button>)}
                         <Button
-                            onClick={() => setOpenDelete(true)}
+                            onClick={() => setOpenLeave(true)}
                             startIcon={<SignOut/>}
                             variant="outlined"
                             sx={{width: "100%"}}
                         >
                             Leave
                         </Button>
+                        {adminOrTutor && (
                         <Button
                             onClick={() => {
                                 if (conversation?.pinned) {
@@ -523,13 +536,13 @@ const ContactGroup = () => {
                             sx={{width: "100%"}}
                         >
                             {conversation?.pinned ? 'Unpin' : 'Pin'}
-                        </Button>
+                        </Button>)}
                     </Stack>
 
                 </Stack>
             </Stack>
-            {openDelete && <DeleteChatDialog open={openDelete} handleClose={() => setOpenDelete(false)}
-                                             onDeleteSuccess={handleDeleteSuccess}/>}
+            {openLeave && <LeaveChatDialog open={openLeave} handleClose={() => setOpenLeave(false)}
+                                           onLeaveSuccess={handleLeaveSuccess}/>}
             {<AddUserDialog open={openAddUser} handleClose={handleCloseAddUser} groupId={groupId}/>}
             {openPinned && (
                 <PinnedDialog

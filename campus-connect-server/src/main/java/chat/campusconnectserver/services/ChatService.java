@@ -168,18 +168,17 @@ public class ChatService {
 
         Chat chat = opt.get();
 
-        boolean isTutor = reqUser.getRoles().stream()
-                .anyMatch(role -> role.getName() == Role.RoleName.ROLE_TUTOR);
+        boolean hasPrivilegedRole = reqUser.getRoles().stream()
+                .anyMatch(role -> role.getName().equals(Role.RoleName.ROLE_ADMIN) ||
+                        role.getName().equals(Role.RoleName.ROLE_TUTOR));
 
-        boolean isAdmin = chat.getAdmins().contains(reqUser);
-
-        if (isAdmin || isTutor) {
+        if (hasPrivilegedRole) {
             chat.getUsers().remove(user);
             chat.getAdmins().remove(user);
             return chatRepository.save(chat);
         }
 
-        if (chat.getUsers().contains(reqUser) && reqUser.getId().equals(user.getId())) {
+        if (reqUser.getId().equals(user.getId())) {
             chat.getUsers().remove(user);
             chat.getAdmins().remove(user);
             return chatRepository.save(chat);
@@ -187,6 +186,7 @@ public class ChatService {
 
         throw new UserException("You can't remove another user");
     }
+
 
 
     public ChatDto addUserToGroup(Long userId, Long chatId, User reqUser) throws UserException, ChatException {
@@ -240,13 +240,6 @@ public class ChatService {
             throw new ChatException("User not part of this chat");
         }
 
-        boolean isTutorOrAdmin = user.getRoles().stream()
-                .anyMatch(role -> role.getName() == Role.RoleName.ROLE_TUTOR || role.getName() == Role.RoleName.ROLE_ADMIN);
-
-        if (!isTutorOrAdmin) {
-            throw new UserException("Only tutors or admins can pin chats");
-        }
-
         chat.setPinned(true);
         chatRepository.save(chat);
     }
@@ -258,13 +251,6 @@ public class ChatService {
 
         if (!chat.getUsers().contains(user)) {
             throw new ChatException("User not part of this chat");
-        }
-
-        boolean isTutorOrAdmin = user.getRoles().stream()
-                .anyMatch(role -> role.getName() == Role.RoleName.ROLE_TUTOR || role.getName() == Role.RoleName.ROLE_ADMIN);
-
-        if (!isTutorOrAdmin) {
-            throw new UserException("Only tutors or admins can unpin chats");
         }
 
         chat.setPinned(false);

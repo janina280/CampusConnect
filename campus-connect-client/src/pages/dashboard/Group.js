@@ -23,7 +23,11 @@ const Group = () => {
     const dispatch = useDispatch();
     const token = useSelector((state) => state.auth.accessToken);
     const {user_id} = useSelector((state) => state.auth);
+    const {roles = []} = useSelector((state) => state.auth);
 
+    const isAdmin = roles.includes("ROLE_ADMIN");
+    const isTutor = roles.includes("ROLE_TUTOR");
+    const canCreateGroup = isAdmin || isTutor;
     const [queryGroup, setQueryGroup] = useState("");
     const {groups} = useSelector((state) => state.conversation.group_chat);
     const {availableGroups} = useSelector((state) => state.auth);
@@ -88,6 +92,7 @@ const Group = () => {
                             />
                         </Search>
                     </Stack>
+                    {canCreateGroup && (
                     <Stack
                         direction="row"
                         justifyContent="space-between"
@@ -97,7 +102,7 @@ const Group = () => {
                         <IconButton onClick={() => setOpenDialog(true)}>
                             <Plus style={{color: theme.palette.primary.main}}/>
                         </IconButton>
-                    </Stack>
+                    </Stack>)}
                     <Divider/>
                     <Stack
                         spacing={2}

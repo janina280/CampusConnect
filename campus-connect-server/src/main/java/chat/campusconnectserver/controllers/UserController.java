@@ -49,7 +49,7 @@ public class UserController {
             @Valid @RequestBody UserDto updatedUserDto,
             @CurrentUser UserPrincipal currentUser) {
 
-        if (!currentUser.getId().equals(currentUser.getId())) {
+        if (!currentUser.getId().equals(updatedUserDto.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
 

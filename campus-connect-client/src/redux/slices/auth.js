@@ -1,6 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import axios from "../../utils/axios";
 import {showSnackbar} from "./app";
+import {jwtDecode} from 'jwt-decode';
 
 const initialState = {
     isLoggedIn: false,
@@ -8,7 +9,8 @@ const initialState = {
     isLoading: false,
     availableChats: [],
     availableGroups: [],
-    user_id:""
+    user_id: "",
+    roles: []
 };
 
 const slice = createSlice({
@@ -23,11 +25,13 @@ const slice = createSlice({
             state.isLoggedIn = action.payload.isLoggedIn;
             state.accessToken = action.payload.accessToken;
             state.user_id = action.payload.user_id;
+            state.roles = action.payload.roles;
         },
         signOut(state, action) {
             state.isLoggedIn = false;
             state.accessToken = "";
             state.user_id = null;
+            state.roles = [];
         },
         search(state, action) {
             state.availableChats = action.payload.availableChats;
@@ -60,11 +64,14 @@ export function LoginUser(fromValues) {
                 }
             )
             .then(function (response) {
+                const decodedToken = jwtDecode(response.data.accessToken);
+                console.log('Decoded Token:', decodedToken);
                 dispatch(
                     slice.actions.logIn({
                         isLoggedIn: true,
                         accessToken: response.data.accessToken,
                         user_id: response.data.userId,
+                        roles: decodedToken.roles || []
                     })
                 );
                 window.localStorage.setItem("user_id", response.data.userId);
