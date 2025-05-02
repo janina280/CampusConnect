@@ -43,7 +43,7 @@ const StyledBadge = styled(Badge)(({theme}) => ({
 
 const UserElement = ({img, name, online, id, onClick}) => {
     const theme = useTheme();
-
+    const imageUrl = img ? `http://localhost:8080/${img.replace("\\", "/")}` : '';
     return (
         <StyledChatBox sx={{
             width: "100%",
@@ -64,10 +64,10 @@ const UserElement = ({img, name, online, id, onClick}) => {
                             anchorOrigin={{vertical: "bottom", horizontal: "right"}}
                             variant="dot"
                         >
-                            <CreateAvatar name={name} imageUrl={img} size={56}/>
+                            <CreateAvatar name={name} imageUrl={imageUrl} size={56}/>
                         </StyledBadge>
                     ) : (
-                        <CreateAvatar name={name} imageUrl={img} size={56}/>
+                        <CreateAvatar name={name} imageUrl={imageUrl} size={56}/>
                     )}
                     <Stack spacing={0.4}>
                         <Typography variant="subtitle2">{name}</Typography>

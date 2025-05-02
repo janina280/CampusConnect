@@ -50,7 +50,6 @@ public class ChatService {
         return new ChatDto(chat);
     }
 
-
     public Chat findChatById(Long chatId) throws ChatException {
         Optional<Chat> chat = chatRepository.findWithUsersById(chatId);
         if (chat.isPresent()) {
@@ -58,7 +57,6 @@ public class ChatService {
         }
         throw new ChatException("Chat not found with id " + chatId);
     }
-
 
     public List<ChatDto> findAllChatByUserId(Long userId) throws UserException {
         User user = userService.findUserById(userId);
@@ -76,6 +74,7 @@ public class ChatService {
 
         return chatRepository.findGroupChatsByUser(user).stream().map(ChatDto::new).toList();
     }
+
     public List<ChatDto> searchGroupByName(String groupName, Long userId) throws UserException {
         User user = userService.findUserById(userId);
         if (user == null) {
@@ -123,8 +122,6 @@ public class ChatService {
 
         return new ChatDto(group);
     }
-
-
 
     public Chat renameGroup(Long chatId, String groupName, User reqUserId) throws UserException, ChatException {
         Optional<Chat> opt = chatRepository.findById(chatId);
@@ -186,8 +183,6 @@ public class ChatService {
 
         throw new UserException("You can't remove another user");
     }
-
-
 
     public ChatDto addUserToGroup(Long userId, Long chatId, User reqUser) throws UserException, ChatException {
         Optional<Chat> opt = chatRepository.findById(chatId);

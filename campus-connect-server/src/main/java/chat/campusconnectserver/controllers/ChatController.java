@@ -44,7 +44,6 @@ public class ChatController {
 
     @Transactional
     @MessageMapping("/chat-create")
-    //@SendTo("/chat/chat-create-response")
     public ChatDto createChatHandle(@RequestBody SingleChatRequest singleChatRequest) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(singleChatRequest.getJwtString().substring(7));
 
@@ -58,7 +57,6 @@ public class ChatController {
 
     @Transactional
     @MessageMapping("/group-create")
-    //@SendTo("/group/group-create-response")
     public ChatDto createGroupHandle(GroupChatRequest req) throws UserException {
         User reqUser = userService.findUserProfile(req.getJwt());
 
@@ -70,7 +68,6 @@ public class ChatController {
         return group;
     }
 
-
     @GetMapping("/{chatId}")
     public ResponseEntity<Chat> findChatByIdHandle(@PathVariable Long chatId) throws ChatException {
         Chat chat = chatService.findChatById(chatId);
@@ -80,7 +77,6 @@ public class ChatController {
 
     @Transactional
     @MessageMapping("/chats")
-    //@SendTo("/chat/chats-response")
     public List<ChatDto> findAllChatByUserHandle(@RequestHeader("Authorization") String jwt) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
@@ -93,7 +89,6 @@ public class ChatController {
 
     @Transactional
     @MessageMapping("/groups")
-    //@SendTo("/group/groups-response")
     public List<ChatDto> findAllGroupChatsByUserHandle(@RequestHeader("Authorization") String jwt) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(jwt.substring(7));
 
@@ -124,7 +119,6 @@ public class ChatController {
         }
         return group;
     }
-
 
     @PutMapping("/{chatId}/remove/{userId}")
     public ResponseEntity<Chat> removeUserFromGroupHandle(@PathVariable Long chatId, @PathVariable Long userId, @RequestHeader("Authorization") String jwt) throws UserException, ChatException {

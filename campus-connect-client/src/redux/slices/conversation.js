@@ -79,7 +79,7 @@ const slice = createSlice({
                     pinned: el.pinned,
                     about: user?.about,
                     online: user?.status === "Online",
-                    img: faker.image.avatar()
+                    img: user?.imageUrl,
                 };
             });
 
@@ -156,7 +156,7 @@ const slice = createSlice({
                         pinned: el.pinned,
                         about: el?.about,
                         online: el?.status === "Online",
-                        img: faker.image.avatar()
+                        img: el?.img
                     };
                 }
             });
@@ -174,7 +174,7 @@ const slice = createSlice({
                 user_id: user.id,
                 name: user?.name,
                 online: user.online ? "Online" : "Offline",
-                img: faker.image.avatar(),
+                img: user.img,
                 msg: lastMessage?.content,
                 time: lastMessage?.createdAt ?? "",
                 unread: this_conversation.unread,
@@ -267,7 +267,7 @@ const slice = createSlice({
                         about: el?.about,
                         starred: el.starred || false,
                         online: el?.status === "Online",
-                        img: faker.image.avatar()
+                        img: el.img
                     }
                 }
             );

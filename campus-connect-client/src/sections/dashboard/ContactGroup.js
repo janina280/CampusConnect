@@ -121,21 +121,21 @@ const UnpinnedDialog = ({open, handleClose, chatId, onUnpin}) => {
     );
 };
 
-const RemoveMemberDialog = ({open, onClose, onConfirm, member, chatId}) => (
+const RemoveMemberDialog = ({open, onClose, onConfirm, member}) => (
     <Dialog open={open}
             TransitionComponent={Transition}
             keepMounted
             onClose={onClose}
             aria-describedby="alert-dialog-slide-description">
-        <DialogTitle>Confirmă eliminarea</DialogTitle>
+        <DialogTitle>Remove member</DialogTitle>
         <DialogContent>
             <DialogContentText id="alert-dialog-slide-description">
-                Sigur vrei să-l elimini pe <b>{member?.name}</b> din grup?
+                Are you sure you want to remove <b>{member?.name}</b> this group?
             </DialogContentText>
         </DialogContent>
             <DialogActions>
-                <Button variant="outline" onClick={onClose}>Anulează</Button>
-                <Button variant="destructive" onClick={() => onConfirm(member.id)}>Confirmă</Button>
+                <Button variant="outline" onClick={onClose}>Cancel</Button>
+                <Button variant="destructive" onClick={() => onConfirm(member.id)}>Yes</Button>
                 </DialogActions>
 
     </Dialog>
@@ -371,8 +371,14 @@ const ContactGroup = () => {
                     }
                 });
             setGroupMembers(prev => prev.filter(m => m.id !== userId));
+            dispatch(
+                showSnackbar({
+                    severity: "success",
+                    message: "User removed successfully!",
+                })
+            );
         } catch (err) {
-            console.error("Eroare la eliminarea membrului", err);
+            console.error("Error to remove member", err);
         } finally {
             setRemoveDialogOpen(false);
             setSelectedMember(null);

@@ -54,6 +54,8 @@ const ChatElement = ({
     if (!selectedChatId) {
         isSelected = false;
     }
+
+    const imageUrl = img ? `http://localhost:8080/${img.replace("\\", "/")}` : '';
     return (<StyledChatBox
         onClick={() => {
             dispatch(SelectRoomId({room_id: id}));
@@ -77,8 +79,8 @@ const ChatElement = ({
                     anchorOrigin={{vertical: "bottom", horizontal: "right"}}
                     variant="dot"
                 >
-                    <CreateAvatar name={name} imageUrl={img} size={56}/>
-                </StyledBadge>) : (<CreateAvatar name={name} imageUrl={img} size={56}/>)}
+                    <CreateAvatar name={name} imageUrl={imageUrl} size={56}/>
+                </StyledBadge>) : (<CreateAvatar name={name} imageUrl={imageUrl} size={56}/>)}
                 <Stack spacing={0.3}>
                     <Typography variant="subtitle2">{name}</Typography>
                     <Typography variant="caption">{truncateText(msg, 20)}</Typography>

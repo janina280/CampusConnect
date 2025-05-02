@@ -1,14 +1,12 @@
 import React, {useEffect, useState} from "react";
-import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Slide, Typography} from "@mui/material";
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography} from "@mui/material";
 import axios from "axios";
 import {useSelector} from "react-redux";
 import {Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
 
-
 const Statistics = ({open, handleClose}) => {
     const token = useSelector((state) => state.auth.accessToken);
     const [groups, setGroups] = useState([]);
-
     useEffect(() => {
         if (open) {
             axios.get("http://localhost:8080/admin/groups", {
@@ -23,16 +21,12 @@ const Statistics = ({open, handleClose}) => {
         name: group.name,
         messages: group.messages.length,
     }));
-    const Transition = React.forwardRef(function Transition(props, ref) {
-        return <Slide direction="up" ref={ref} {...props} />;
-    });
 
     return (
         <Dialog
             open={open}
             onClose={handleClose}
             keepMounted
-            TransitionComponent={Transition}
             fullWidth
             maxWidth={false}
             PaperProps={{

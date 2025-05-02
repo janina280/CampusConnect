@@ -9,6 +9,7 @@ import Privacy from "../../sections/settings/Privacy";
 import {useDispatch, useSelector} from "react-redux";
 import {FetchUserProfile} from "../../redux/slices/app";
 import Statistics from "../../sections/settings/Statistics";
+import UserStatistics from "../../sections/settings/UserStatistics";
 
 function Settings() {
   const theme = useTheme();
@@ -18,33 +19,30 @@ function Settings() {
   const { open } = useSelector((store) => store.app.sideBar);
   const dispatch = useDispatch();
   const [openStatistics, setOpenStatistics] = useState(false);
-
+  const [openStatisticsUser, setOpenStatisticsUser] = useState(false);
   const {roles = []} = useSelector((state) => state.auth);
-
   const isAdmin = roles.includes("ROLE_ADMIN");
+  const {user} = useSelector((state) => state.app);
+  const token = useSelector((state) => state.auth.accessToken);
 
   const handleCloseStatistics = () => {
     setOpenStatistics(false);
   };
-
+  const handleCloseStatisticsUser = () => {
+    setOpenStatisticsUser(false);
+  };
   const handleOpenPrivacy = () => {
     setOpenPrivacy(true);
   };
-
   const handleClosePrivacy = () => {
     setOpenPrivacy(false);
   };
-
   const handleOpenShortcuts = () => {
     setOpenShortcuts(true);
   };
   const handleCloseShortcuts = () => {
     setOpenShortcuts(false);
   };
-
-  const { user} = useSelector((state) => state.app);
-
-  const token = useSelector((state) => state.auth.accessToken);
 
   useEffect(() => {
     dispatch(FetchUserProfile())
@@ -66,10 +64,18 @@ function Settings() {
     {
       key: 3,
       icon: <Info size={20} />,
-      title: "Statistics",
+      title: "Group Statistics",
       onclick: () => setOpenStatistics(true),
       show: isAdmin,
+    },
+    {
+      key: 4,
+      icon: <Info size={20}/>,
+      title: "User Statistics",
+      onclick: () => setOpenStatisticsUser(true),
+      show: isAdmin,
     }
+
 
   ];
 
@@ -101,7 +107,7 @@ function Settings() {
             <Stack direction={"row"} spacing={3}>
               <CreateAvatar
                 name={user.name}
-                imageUrl={user.imageUrl}
+                imageUrl={`http://localhost:8080/${user.imageUrl}`}
                 size={56}
               />
               <Stack spacing={0.5}>
@@ -124,7 +130,7 @@ function Settings() {
 
                             <Typography variant="body2">{title}</Typography>
                           </Stack>
-                          {key !== 3 && <Divider/>}
+                          {key !== 4 && <Divider/>}
                         </Stack>
                       </React.Fragment>
                   )
@@ -160,6 +166,9 @@ function Settings() {
       )}
       {openStatistics && (
           <Statistics open={openStatistics} handleClose={handleCloseStatistics}/>
+      )}
+      {openStatisticsUser && (
+          <UserStatistics open={openStatisticsUser} handleClose={handleCloseStatisticsUser}/>
       )}
 
     </>

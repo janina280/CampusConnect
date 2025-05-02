@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useTheme} from "@mui/material/styles";
 import Logo from "../../assets/Images/logo.ico";
 import {Nav_Buttons, Profile_Menu} from "../../data";
@@ -6,15 +6,8 @@ import {Gear} from "phosphor-react";
 import {useDispatch, useSelector} from "react-redux";
 import CreateAvatar from "../../utils/createAvatar";
 import {LogoutUser} from "../../redux/slices/auth";
-import {
-    Box,
-    Divider,
-    Menu,
-    MenuItem,
-    IconButton,
-    Stack,
-} from "@mui/material";
-import {useNavigate, useLocation} from "react-router-dom";
+import {Box, Divider, IconButton, Menu, MenuItem, Stack,} from "@mui/material";
+import {useLocation, useNavigate} from "react-router-dom";
 import {FetchUserProfile, SelectChatType} from "../../redux/slices/app";
 
 const getMenuPath = (index) => {
@@ -222,7 +215,7 @@ const SideBar = () => {
                     >
                         <CreateAvatar
                             name={user.name}
-                            imageUrl={user.imageUrl}
+                            imageUrl={`http://localhost:8080/${user.imageUrl}`}
                             size={56}
                         />
                     </Box>

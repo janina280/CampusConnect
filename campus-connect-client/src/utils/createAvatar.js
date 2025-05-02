@@ -1,9 +1,16 @@
-
 import React from 'react';
-import { Avatar } from '@mui/material';
+import {Avatar} from '@mui/material';
 
-// Funcția pentru a crea avatarul pe baza primei litere din nume
 const CreateAvatar = ({ name, imageUrl, size = 56 }) => {
+  const COLORS = {
+    primary: '#1976d2',
+    info: '#0288d1',
+    success: '#2e7d32',
+    warning: '#ed6c02',
+    error: '#d32f2f',
+    default: '#9e9e9e',
+  };
+
   const PRIMARY_NAME = ['A', 'N', 'H', 'L', 'Q', '9', '8'];
   const INFO_NAME = ['F', 'G', 'T', 'I', 'J', '1', '2', '3'];
   const SUCCESS_NAME = ['K', 'D', 'Y', 'B', 'O', '4', '5'];
@@ -15,29 +22,25 @@ const CreateAvatar = ({ name, imageUrl, size = 56 }) => {
   }
 
   function getAvatarColor(name) {
-    if (PRIMARY_NAME.includes(getFirstCharacter(name))) return 'primary';
-    if (INFO_NAME.includes(getFirstCharacter(name))) return 'info';
-    if (SUCCESS_NAME.includes(getFirstCharacter(name))) return 'success';
-    if (WARNING_NAME.includes(getFirstCharacter(name))) return 'warning';
-    if (ERROR_NAME.includes(getFirstCharacter(name))) return 'error';
-    return 'default';
+    const firstChar = getFirstCharacter(name);
+    if (PRIMARY_NAME.includes(firstChar)) return COLORS.primary;
+    if (INFO_NAME.includes(firstChar)) return COLORS.info;
+    if (SUCCESS_NAME.includes(firstChar)) return COLORS.success;
+    if (WARNING_NAME.includes(firstChar)) return COLORS.warning;
+    if (ERROR_NAME.includes(firstChar)) return COLORS.error;
+    return COLORS.default;
   }
 
-  const avatarData = imageUrl
-    ? { src: imageUrl } 
-    : { name: getFirstCharacter(name), color: getAvatarColor(name) }; 
+  const avatarStyle = {
+    width: size,
+    height: size,
+    backgroundColor: imageUrl ? undefined : getAvatarColor(name),
+  };
 
   return (
-    <Avatar
-      sx={{ width: size, height: size }}
-      alt={name}
-      src={avatarData.src || null}
-      style={{
-        backgroundColor: avatarData.color,
-      }}
-    >
-      {avatarData.name}
-    </Avatar>
+      <Avatar sx={avatarStyle} alt={name} src={imageUrl || undefined}>
+        {!imageUrl && getFirstCharacter(name)}
+      </Avatar>
   );
 };
 
