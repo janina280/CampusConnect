@@ -21,7 +21,7 @@ import static java.lang.System.currentTimeMillis;
 @RequiredArgsConstructor
 public class FileService {
 
-    //@Value("${application.file.uploads.media-output-path}")
+    @Value("${application.file.uploads.media-output-path}")
     private String fileUploadPath;
 
     public String saveFile(

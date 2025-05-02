@@ -176,7 +176,6 @@ const Contact = () => {
     const dispatch = useDispatch();
 
     const {current_conversation} = useSelector((state) => state.conversation.direct_chat);
-    const {current_group_conversation} = useSelector((state) => state.conversation.group_chat);
     const {chat_type} = useSelector((store) => store.app);
     const authToken = useSelector((state) => state.auth.accessToken);
     const theme = useTheme();
@@ -212,10 +211,8 @@ const Contact = () => {
     useEffect(() => {
         if (chat_type === "individual") {
             setConversation(current_conversation);
-        } else {
-            setConversation(current_group_conversation);
         }
-    }, [chat_type, current_conversation, current_group_conversation])
+    }, [chat_type, current_conversation])
 
     const handleDeleteSuccess = () => {
         setOpenDelete(false);
@@ -261,7 +258,7 @@ const Contact = () => {
                     <Stack alignItems="center" direction="row" spacing={2}>
                         <CreateAvatar
                             name={conversation?.name}
-                            imageUrl={conversation?.img}
+                            imageUrl={`http://localhost:8080/${conversation?.img}`}
                             size={56}
                         />
                         <Stack spacing={0.5}>

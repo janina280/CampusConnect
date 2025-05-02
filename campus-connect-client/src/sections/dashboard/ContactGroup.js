@@ -493,7 +493,9 @@ const ContactGroup = () => {
                                         key={user.id}
                                     >
                                         <Stack direction="row" alignItems="center" spacing={2}>
-                                            <CreateAvatar name={user.name} imageUrl={user.img} size={40} />
+                                            <CreateAvatar name={user.name}
+                                                          imageUrl={`http://localhost:8080/${user.imageUrl}`}
+                                                          size={40}/>
                                             <Typography variant="body2">{user.name}</Typography>
                                         </Stack>
                                         {isAdmin && (

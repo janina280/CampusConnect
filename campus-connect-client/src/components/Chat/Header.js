@@ -1,10 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {
-    Box,
-    IconButton,
-    Stack,
-    Typography,
-} from "@mui/material";
+import {Box, IconButton, Stack, Typography,} from "@mui/material";
 import {useTheme} from "@mui/material/styles";
 import {MagnifyingGlass} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
@@ -67,7 +62,7 @@ const ChatHeader = () => {
                         >
                             <CreateAvatar
                                 name={conversation?.name}
-                                imageUrl={conversation?.img}
+                                imageUrl={`http://localhost:8080/${conversation?.img}`}
                                 size={56}
                             />
                         </StyledBadge>

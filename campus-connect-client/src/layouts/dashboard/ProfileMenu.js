@@ -1,12 +1,9 @@
 import React from "react";
-import { Avatar, Box, Fade, Menu, MenuItem, Stack } from "@mui/material";
-
-import { faker } from "@faker-js/faker";
-
-import { Profile_Menu } from "../../data";
-import { useDispatch, useSelector } from "react-redux";
-import { LogoutUser } from "../../redux/slices/auth";
-import { useNavigate } from "react-router-dom";
+import {Avatar, Box, Fade, Menu, MenuItem, Stack} from "@mui/material";
+import {Profile_Menu} from "../../data";
+import {useDispatch, useSelector} from "react-redux";
+import {LogoutUser} from "../../redux/slices/auth";
+import {useNavigate} from "react-router-dom";
 
 
 const ProfileMenu = () => {
@@ -21,9 +18,6 @@ const ProfileMenu = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const user_id = window.localStorage.getItem("user_id");
-
   const user_name = user?.firstName;
  
 

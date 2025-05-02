@@ -156,7 +156,7 @@ const slice = createSlice({
                         pinned: el.pinned,
                         about: el?.about,
                         online: el?.status === "Online",
-                        img: el?.img
+                        img: el?.imageUrl
                     };
                 }
             });
@@ -174,7 +174,7 @@ const slice = createSlice({
                 user_id: user.id,
                 name: user?.name,
                 online: user.online ? "Online" : "Offline",
-                img: user.img,
+                img: user.imageUrl,
                 msg: lastMessage?.content,
                 time: lastMessage?.createdAt ?? "",
                 unread: this_conversation.unread,
