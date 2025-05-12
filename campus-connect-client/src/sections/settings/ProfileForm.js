@@ -34,7 +34,7 @@ const ProfileForm = () => {
   const {user_id} = useSelector((state) => state.auth);
   const token = useSelector((state) => state.auth.accessToken);
   const {user} = useSelector((state) => state.app);
-  const dispatch = useDispatch();  // Adăugat pentru dispatch
+  const dispatch = useDispatch();
 
   const [selectedImage, setSelectedImage] = useState(null);
 

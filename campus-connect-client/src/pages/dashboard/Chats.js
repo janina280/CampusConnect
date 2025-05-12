@@ -31,8 +31,6 @@ const Chats = () => {
 
     const users = useSelector((state) => state.auth.availableChats);
     const [selectedChat, setSelectedChat] = useState(null);
-    const {current_conversation} = useSelector((state) => state.conversation.direct_chat.current_conversation || []);
-    const {room_id} = useSelector((state) => state.app);
 
     useEffect(() => {
 
@@ -105,12 +103,8 @@ const Chats = () => {
                 <Stack
                     direction="row"
                     alignItems={"center"}
-                    justifyContent={"space-between"}
                 >
                     <Typography variant="h5">CampusConnect</Typography>
-                    <IconButton>
-                        <CircleDashed/>
-                    </IconButton>
                 </Stack>
                 <Stack sx={{width: "100%"}}>
                     <Search>
@@ -125,13 +119,7 @@ const Chats = () => {
                         />
                     </Search>
                 </Stack>
-                <Stack spacing={1}>
-                    <Stack direction={"row"} alignItems={"center"} spacing={1.5}>
-                        <ArchiveBox size={24}/>
-                        <Button> Archive</Button>
-                    </Stack>
-                    <Divider/>
-                </Stack>
+                <Divider/>
                 <Stack
                     spacing={2}
                     direction="column"

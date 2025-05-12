@@ -28,10 +28,13 @@ import axios from "../../utils/axios";
 import Snackbar from "@mui/material/Snackbar";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 import {SetCurrentConversation, SetCurrentGroup, UpdatePinnedStatus} from "../../redux/slices/conversation";
-
+import { BASE_URL } from "../../config";
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
+
+
+
 
 const PinnedDialog = ({open, handleClose, chatId, onPin}) => {
 
@@ -40,7 +43,7 @@ const PinnedDialog = ({open, handleClose, chatId, onPin}) => {
     const handlePinChat = async () => {
         try {
             await axios.patch(
-                `http://localhost:8080/${chatId}/pin`,
+                `${BASE_URL}/${chatId}/pin`,
                 {},
                 {headers: {Authorization: `Bearer ${authToken}`}}
             );
@@ -84,7 +87,7 @@ const UnpinnedDialog = ({open, handleClose, chatId, onUnpin}) => {
     const handleUnpinChat = async () => {
         try {
             await axios.patch(
-                `http://localhost:8080/${chatId}/unpin`,
+                `${BASE_URL}/${chatId}/unpin`,
                 {},
                 {headers: {Authorization: `Bearer ${authToken}`}}
             );
@@ -150,7 +153,7 @@ const LeaveChatDialog = ({open, handleClose, onLeaveSuccess}) => {
     const handleLeaveGroup = () => {
         setLoading(true);
 
-        fetch(`http://localhost:8080/${chatId}`, {
+        fetch(`${BASE_URL}/${chatId}`, {
             method: 'DELETE',
             headers: {
                 "Content-Type": "application/json",
@@ -269,10 +272,28 @@ const AddUserDialog = ({open, handleClose, groupId}) => {
                             onChange={(e) => setSelectedUser(e.target.value)}
                             label="Select User"
                             variant="outlined"
+                            MenuProps={{
+                                PaperProps: {
+                                    style: {
+                                        maxHeight: 48 * 5.5,
+                                    },
+                                },
+                            }}
                         >
                             {users.map((user) => (
                                 <MenuItem key={user.id} value={user.id}>
-                                    {user.name}
+                                    <Stack alignItems="center" direction="row" spacing={2}>
+                                        <CreateAvatar
+                                            name={user?.name}
+                                            imageUrl={`${BASE_URL}/${user.imageUrl}`}
+                                            size={36}
+                                        />
+                                        <Stack spacing={0.5}>
+                                            <Typography variant="article" fontWeight={400}>
+                                                {user?.name}
+                                            </Typography>
+                                        </Stack>
+                                    </Stack>
                                 </MenuItem>
                             ))}
                         </Select>
@@ -320,7 +341,6 @@ const ContactGroup = () => {
     const [groupMembers, setGroupMembers] = useState([]);
     const token = useSelector((state) => state.auth.accessToken);
     const {roles = []} = useSelector((state) => state.auth);
-
     const isAdmin = roles.includes("ROLE_ADMIN");
     const isTutor = roles.includes("ROLE_TUTOR");
     const adminOrTutor = isAdmin || isTutor;
@@ -331,7 +351,7 @@ const ContactGroup = () => {
 
     const fetchGroupMembers = () => {
         axios
-            .get(`http://localhost:8080/${groupId}/users`, {
+            .get(`${BASE_URL}/${groupId}/users`, {
                 headers: {Authorization: `Bearer ${token}`},
             })
             .then((response) => {
@@ -364,7 +384,7 @@ const ContactGroup = () => {
 
     const handleRemoveMember = async (userId) => {
         try {
-            await axios.put(`http://localhost:8080/${groupId}/remove/${userId}`, {},
+            await axios.put(`${BASE_URL}/${groupId}/remove/${userId}`, {},
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -494,7 +514,7 @@ const ContactGroup = () => {
                                     >
                                         <Stack direction="row" alignItems="center" spacing={2}>
                                             <CreateAvatar name={user.name}
-                                                          imageUrl={`http://localhost:8080/${user.imageUrl}`}
+                                                          imageUrl={`${BASE_URL}/${user.imageUrl}`}
                                                           size={40}/>
                                             <Typography variant="body2">{user.name}</Typography>
                                         </Stack>

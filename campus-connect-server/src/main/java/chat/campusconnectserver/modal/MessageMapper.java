@@ -1,6 +1,7 @@
 package chat.campusconnectserver.modal;
 
 import chat.campusconnectserver.dtos.UserDto;
+import chat.campusconnectserver.payload.response.MessageResponse;
 import chat.campusconnectserver.util.FileUtils;
 import org.springframework.stereotype.Service;
 

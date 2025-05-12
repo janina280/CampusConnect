@@ -6,7 +6,7 @@ import CreateAvatar from "../utils/createAvatar";
 import {useDispatch, useSelector} from "react-redux";
 import {SelectRoomId} from "../redux/slices/app";
 import {fSmartTime} from "../utils/formatTime";
-
+import { BASE_URL } from "../config";
 const truncateText = (string, n) => {
     return string?.length > n ? `${string?.slice(0, n)}...` : string;
 };
@@ -50,12 +50,11 @@ const ChatElement = ({
     const {room_id} = useSelector((state) => state.app);
     const selectedChatId = room_id?.toString();
     let isSelected = +selectedChatId === id;
-
     if (!selectedChatId) {
         isSelected = false;
     }
 
-    const imageUrl = img ? `http://localhost:8080/${img.replace("\\", "/")}` : '';
+    const imageUrl = img ? `${BASE_URL}/${img.replace("\\", "/")}` : '';
     return (<StyledChatBox
         onClick={() => {
             dispatch(SelectRoomId({room_id: id}));

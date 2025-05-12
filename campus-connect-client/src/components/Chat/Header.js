@@ -50,29 +50,16 @@ const ChatHeader = () => {
                     }}
                     spacing={2}
                     direction="row"
+                    alignItems="center"
                 >
-                    <Box>
-                        <StyledBadge
-                            overlap="circular"
-                            anchorOrigin={{
-                                vertical: "bottom",
-                                horizontal: "right",
-                            }}
-                            variant="dot"
-                        >
-                            <CreateAvatar
-                                name={conversation?.name}
-                                imageUrl={`http://localhost:8080/${conversation?.img}`}
-                                size={56}
-                            />
-                        </StyledBadge>
-                    </Box>
-                    <Stack spacing={0.2}>
-                        <Typography variant="subtitle2">
+                    <CreateAvatar
+                        name={conversation?.name}
+                        imageUrl={`http://localhost:8080/${conversation?.img}`}
+                        size={56}
+                    />
+                    <Stack>
+                        <Typography variant="subtitle2" align="center">
                             {conversation?.name}
-                        </Typography>
-                        <Typography variant="caption">
-                            {"Online"}
                         </Typography>
                     </Stack>
                 </Stack>

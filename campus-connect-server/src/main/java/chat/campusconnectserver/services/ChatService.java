@@ -6,7 +6,7 @@ import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Chat;
 import chat.campusconnectserver.modal.Role;
 import chat.campusconnectserver.modal.User;
-import chat.campusconnectserver.payload.GroupChatRequest;
+import chat.campusconnectserver.payload.request.GroupChatRequest;
 import chat.campusconnectserver.repositories.ChatRepository;
 import chat.campusconnectserver.repositories.UserRepository;
 import jakarta.transaction.Transactional;

@@ -1,11 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {Box, Divider, IconButton, Stack, Typography} from "@mui/material";
 import {useTheme} from "@mui/material/styles";
-import {CaretLeft, Info, Keyboard, Lock,} from "phosphor-react";
-import Shortcuts from "../../sections/settings/Shortcuts";
+import {CaretLeft, Info} from "phosphor-react";
 import NoChatSVG from "../../assets/Illustration/NoChat";
 import CreateAvatar from "../../utils/createAvatar";
-import Privacy from "../../sections/settings/Privacy";
 import {useDispatch, useSelector} from "react-redux";
 import {FetchUserProfile} from "../../redux/slices/app";
 import Statistics from "../../sections/settings/Statistics";
@@ -14,8 +12,6 @@ import UserStatistics from "../../sections/settings/UserStatistics";
 function Settings() {
   const theme = useTheme();
 
-  const [openShortcuts, setOpenShortcuts] = useState(false);
-  const [openPrivacy, setOpenPrivacy] = useState(false);
   const { open } = useSelector((store) => store.app.sideBar);
   const dispatch = useDispatch();
   const [openStatistics, setOpenStatistics] = useState(false);
@@ -31,18 +27,6 @@ function Settings() {
   const handleCloseStatisticsUser = () => {
     setOpenStatisticsUser(false);
   };
-  const handleOpenPrivacy = () => {
-    setOpenPrivacy(true);
-  };
-  const handleClosePrivacy = () => {
-    setOpenPrivacy(false);
-  };
-  const handleOpenShortcuts = () => {
-    setOpenShortcuts(true);
-  };
-  const handleCloseShortcuts = () => {
-    setOpenShortcuts(false);
-  };
 
   useEffect(() => {
     dispatch(FetchUserProfile())
@@ -51,25 +35,13 @@ function Settings() {
   const list = [
     {
       key: 1,
-      icon: <Lock size={20} />,
-      title: "Privacy",
-      onclick: handleOpenPrivacy,
-    },
-    {
-      key: 2,
-      icon: <Keyboard size={20} />,
-      title: "Keyboard Shortcuts",
-      onclick: handleOpenShortcuts,
-    },
-    {
-      key: 3,
       icon: <Info size={20} />,
       title: "Group Statistics",
       onclick: () => setOpenStatistics(true),
       show: isAdmin,
     },
     {
-      key: 4,
+      key: 2,
       icon: <Info size={20}/>,
       title: "User Statistics",
       onclick: () => setOpenStatisticsUser(true),
@@ -130,7 +102,7 @@ function Settings() {
 
                             <Typography variant="body2">{title}</Typography>
                           </Stack>
-                          {key !== 4 && <Divider/>}
+                          {key !== 2 && <Divider/>}
                         </Stack>
                       </React.Fragment>
                   )
@@ -158,12 +130,6 @@ function Settings() {
           </Stack>
         </Box>
       </Stack>
-      {openShortcuts && (
-        <Shortcuts open={openShortcuts} handleClose={handleCloseShortcuts} />
-      )}
-      {openPrivacy && (
-        <Privacy open={openPrivacy} handleClose={handleClosePrivacy} />
-      )}
       {openStatistics && (
           <Statistics open={openStatistics} handleClose={handleCloseStatistics}/>
       )}

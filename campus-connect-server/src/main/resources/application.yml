@@ -1,8 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/campus-connect?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
+    url: jdbc:postgresql://localhost:5432/campus_connect?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
     username: postgres
-    password: postgres
+    password: janina
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 
   mvc:
       pattern:
@@ -43,4 +48,13 @@ app:
       - http://localhost:3000/oauth2/redirect
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
+
+application:
+  file:
+    uploads:
+      media-output-path: uploads
+
+
+
+
 

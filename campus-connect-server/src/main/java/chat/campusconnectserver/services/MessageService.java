@@ -4,9 +4,10 @@ import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.MessageException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.*;
-import chat.campusconnectserver.payload.MessageRequest;
+import chat.campusconnectserver.payload.request.MessageRequest;
 import chat.campusconnectserver.repositories.ChatRepository;
 import chat.campusconnectserver.repositories.MessageRepository;
+import chat.campusconnectserver.util.FileService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -27,16 +28,16 @@ public class MessageService {
     private final MessageMapper mapper;
     private final ChatService chatService;
     private final ChatRepository chatRepository;
-    // private final FileService fileService;
+     private final FileService fileService;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository, UserService userService, MessageMapper mapper, ChatService chatService, ChatRepository chatRepository) {
+    public MessageService(MessageRepository messageRepository, UserService userService, MessageMapper mapper, ChatService chatService, ChatRepository chatRepository, FileService fileService) {
         this.messageRepository = messageRepository;
         this.userService = userService;
         this.mapper = mapper;
         this.chatService = chatService;
         this.chatRepository = chatRepository;
-        // this.fileService = fileService;
+         this.fileService = fileService;
     }
 
     public Message sendMessage(MessageRequest req, User user) throws UserException, ChatException {
@@ -62,16 +63,6 @@ public class MessageService {
         chatService.saveChat(chat);
 
         return message;
-    }
-
-    @Transactional
-    public void setMessagesToSeen(Long chatId, Authentication authentication) {
-        Chat chat = chatRepository.findById(chatId)
-                .orElseThrow(() -> new RuntimeException("Chat not found"));
-        //  final Long recipientId = getRecipientId(chat, authentication);
-
-        messageRepository.setMessagesToSeenByChatId(chatId, MessageState.seen);
-
     }
 
     public String formatMessageTime(LocalDateTime timestamp) {
@@ -119,24 +110,26 @@ public class MessageService {
         throw new UserException("You can't delete another user's message" + reqUser.getName());
     }
 
-    public void uploadMediaMessage(Long chatId, MultipartFile file, Authentication authentication) {
-        Chat chat = chatRepository.findById(chatId)
+    public void uploadMediaMessage(String chatId, MultipartFile file, String messageType, User user) {
+        Chat chat = chatRepository.findById(Long.valueOf(chatId))
                 .orElseThrow(() -> new RuntimeException("Chat not found"));
 
-        final Long senderId = getSenderId(chat, authentication);
-        //   final Long receiverId = getRecipientId(chat, authentication);
+        final String senderId = String.valueOf(user.getId());
+        final String filePath = fileService.saveFile(file, Long.valueOf(senderId));
 
-        // final String filePath = fileService.saveFile(file, senderId);
         Message message = new Message();
-        //   message.setReceiverId(String.valueOf(receiverId));
-        message.setSenderId(senderId.toString());
+        message.setSenderId(senderId);
         message.setState(MessageState.sent);
-        message.setType(MessageType.image);
-        //  message.setMediaFilePath(filePath);
+        message.setMediaFilePath(filePath);
         message.setChat(chat);
-        messageRepository.save(message);
 
+        MessageType type = MessageType.valueOf(messageType.toLowerCase());
+        message.setType(type);
+
+        messageRepository.save(message);
     }
+
+
 
     private Long getSenderId(Chat chat, Authentication authentication) {
 

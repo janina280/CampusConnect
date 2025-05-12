@@ -1,12 +1,10 @@
 package chat.campusconnectserver.modal;
 
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -57,32 +55,6 @@ public class Chat {
    @JoinColumn(name = "receiver_id")
     private User receiver;
 
-    @Transient
-    public long getUnreadMessages(String senderId) {
-        return this.messages
-                .stream()
-                //.filter(m -> m.getReceiverId().equals(senderId))
-                .filter(m -> MessageState.sent == m.getState())
-                .count();
-    }
-
-    @Transient
-    public String getLastMessage() {
-        if (messages != null && !messages.isEmpty()) {
-            if (messages.get(0).getType() != MessageType.text) {
-                return "Attachment";
-            }
-            return messages.get(0).getContent();
-        }
-        return null;
-    }
-    @Transient
-    public LocalDateTime getLastMessageTime() {
-        if (messages != null && !messages.isEmpty()) {
-            return messages.get(0).getCreatedDate();
-        }
-        return null;
-    }
 
 public Chat(){
 

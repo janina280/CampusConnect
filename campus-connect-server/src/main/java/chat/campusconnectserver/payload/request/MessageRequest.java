@@ -1,4 +1,4 @@
-package chat.campusconnectserver.payload;
+package chat.campusconnectserver.payload.request;
 
 import chat.campusconnectserver.modal.MessageType;
 import lombok.*;

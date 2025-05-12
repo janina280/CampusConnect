@@ -7,8 +7,8 @@ import chat.campusconnectserver.modal.Chat;
 import chat.campusconnectserver.modal.Message;
 import chat.campusconnectserver.modal.MessageMapper;
 import chat.campusconnectserver.modal.User;
-import chat.campusconnectserver.payload.ApiResponse;
-import chat.campusconnectserver.payload.MessageRequest;
+import chat.campusconnectserver.payload.request.MessageRequest;
+import chat.campusconnectserver.payload.response.ApiResponse;
 import chat.campusconnectserver.services.ChatService;
 import chat.campusconnectserver.services.MessageService;
 import chat.campusconnectserver.services.UserService;
@@ -20,6 +20,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -80,7 +81,6 @@ public class MessageController {
             return;
         }
 
-
         for (var chatUser : messages.get(0).getChat().getUsers()) {
             var messageResponse = messageMapper.toMessagesResponse(messages);
 
@@ -96,6 +96,18 @@ public class MessageController {
         }
 
     }
+
+    @PostMapping("/upload")
+    public ResponseEntity<ApiResponse> uploadMedia(
+            @RequestParam("chatId") String chatId,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("type") String type,
+            @RequestBody User user
+    ) {
+        messageService.uploadMediaMessage(chatId, file, type, user);
+        return new ResponseEntity<>(new ApiResponse("File sent successfully", false), HttpStatus.OK);
+    }
+
 
     @DeleteMapping("/{messageId}")
     public ResponseEntity<ApiResponse> deleteMessagesHandler(@PathVariable Long messageId, @RequestHeader("Authorization") String jwt) throws UserException, MessageException {
