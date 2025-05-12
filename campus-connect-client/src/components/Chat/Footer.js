@@ -1,14 +1,16 @@
 import {Box, Fab, IconButton, InputAdornment, Stack, TextField, Tooltip,} from "@mui/material";
-import {Camera, File, Image, LinkSimple, PaperPlaneTilt, Smiley} from "phosphor-react";
+import {Camera, File, LinkSimple, PaperPlaneTilt, Smiley} from "phosphor-react";
 import {styled, useTheme} from "@mui/material/styles";
 import React, {useRef, useState} from "react";
 import useResponsive from "../../hooks/useResponsive";
-
+import axios from "../../utils/axios";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 
 import {useSelector} from "react-redux";
 import {useWebSocket} from "../../contexts/WebSocketContext";
+import {showSnackbar} from "../../redux/slices/app";
+import {dispatch} from "../../redux/store";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
     "& .MuiInputBase-input": {
@@ -159,17 +161,34 @@ const Footer = () => {
     };
 
     const handleFileUpload = (file) => {
-        const messageData = {
-            jwtString: "Bearer " + token,
-            chatId: room_id,
-            type: file.type.startsWith("image/") ? "image" : "file",
-            fileName: file.name,
-            fileType: file.type,
-        };
         const reader = new FileReader();
         reader.onload = () => {
-            messageData.content = reader.result;
-            socket.emit("/app/send-message", messageData);
+            const formData = new FormData();
+            formData.append("media", file);
+            axios
+                .post(
+                    "api/message/upload",
+                    formData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "content-type": "multipart/form-data",
+                        },
+                    }
+                )
+                .then(function (response) {
+                    const messageData = {
+                        jwtString: "Bearer " + token,
+                        chatId: room_id,
+                        type: file.type.startsWith("image/") ? "image" : "document",
+                        media: response.data
+                    };
+                    socket.emit("/app/send-message", messageData);
+                })
+                .catch((error) => {
+                    console.log(error);
+                    dispatch(showSnackbar({severity: "error", message: error.response.data.message}));
+                });
         };
         reader.readAsDataURL(file);
     };

@@ -97,15 +97,28 @@ public class MessageController {
 
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<ApiResponse> uploadMedia(
-            @RequestParam("chatId") String chatId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("type") String type,
-            @RequestBody User user
+    @GetMapping("/media")
+    public ResponseEntity<byte[]> getMedia(
+            @RequestParam("mediaId") String mediaId,
+            @RequestHeader("Authorization") String jwt
     ) {
-        messageService.uploadMediaMessage(chatId, file, type, user);
-        return new ResponseEntity<>(new ApiResponse("File sent successfully", false), HttpStatus.OK);
+        User user = userService.findUserProfile(jwt);
+
+        byte[] mediaContent = messageService.getMediaMessage(mediaId, user);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + mediaId)
+                .body(mediaContent);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadMedia(
+            @RequestBody MultipartFile file,
+            @RequestHeader("Authorization") String jwt
+    ) {
+        User user = userService.findUserProfile(jwt);
+        var filePath = messageService.uploadMediaMessage(file, user);
+        return new ResponseEntity<>(filePath, HttpStatus.OK);
     }
 
 

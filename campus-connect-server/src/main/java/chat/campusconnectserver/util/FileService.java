@@ -24,6 +24,18 @@ public class FileService {
     @Value("${application.file.uploads.media-output-path}")
     private String fileUploadPath;
 
+    public byte[] getFile(@Nonnull Long userId, @Nonnull String fileName) {
+        final String filePath = fileUploadPath + separator + "users" + separator + userId + separator + fileName;
+        Path file = Paths.get(filePath);
+        try {
+            log.info("Retrieving file from: " + filePath);
+            return Files.readAllBytes(file);
+        } catch (IOException e) {
+            log.error("Failed to read file: " + filePath, e);
+            return null;
+        }
+    }
+
     public String saveFile(
             @Nonnull MultipartFile sourceFile,
             @Nonnull Long userId

@@ -10,7 +10,6 @@ import chat.campusconnectserver.repositories.MessageRepository;
 import chat.campusconnectserver.util.FileService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,6 +46,7 @@ public class MessageService {
         message.setChat(chat);
         message.setUser(user);
         message.setContent(req.getContent());
+        message.setMediaFilePath(req.getMedia());
 
         message.setCreatedDate(LocalDateTime.now());
 
@@ -110,30 +110,12 @@ public class MessageService {
         throw new UserException("You can't delete another user's message" + reqUser.getName());
     }
 
-    public void uploadMediaMessage(String chatId, MultipartFile file, String messageType, User user) {
-        Chat chat = chatRepository.findById(Long.valueOf(chatId))
-                .orElseThrow(() -> new RuntimeException("Chat not found"));
-
-        final String senderId = String.valueOf(user.getId());
-        final String filePath = fileService.saveFile(file, Long.valueOf(senderId));
-
-        Message message = new Message();
-        message.setSenderId(senderId);
-        message.setState(MessageState.sent);
-        message.setMediaFilePath(filePath);
-        message.setChat(chat);
-
-        MessageType type = MessageType.valueOf(messageType.toLowerCase());
-        message.setType(type);
-
-        messageRepository.save(message);
+    public String uploadMediaMessage(MultipartFile file, User user) {
+        return fileService.saveFile(file, Long.valueOf(user.getId().toString()));
     }
 
-
-
-    private Long getSenderId(Chat chat, Authentication authentication) {
-
-        return chat.getSender().getId();
+    public byte[] getMediaMessage(String filePath, User user) {
+        return fileService.getFile(user.getId(), filePath);
     }
 
 
