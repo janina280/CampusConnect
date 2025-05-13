@@ -113,14 +113,13 @@ public class MessageController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadMedia(
-            @RequestBody MultipartFile file,
+            @RequestParam("media") MultipartFile file,
             @RequestHeader("Authorization") String jwt
     ) {
         User user = userService.findUserProfile(jwt);
         var filePath = messageService.uploadMediaMessage(file, user);
         return new ResponseEntity<>(filePath, HttpStatus.OK);
     }
-
 
     @DeleteMapping("/{messageId}")
     public ResponseEntity<ApiResponse> deleteMessagesHandler(@PathVariable Long messageId, @RequestHeader("Authorization") String jwt) throws UserException, MessageException {

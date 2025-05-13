@@ -139,6 +139,7 @@ const Footer = () => {
             content: linkify(value),
             chatId: room_id,
             type: containsUrl(value) ? "link" : "text",
+
         };
 
         socket.emit("/app/send-message", messageData);
