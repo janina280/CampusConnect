@@ -84,18 +84,18 @@ const ConversationStarredGroup = ({isMobile, menu}) => {
 
                         case "msg":
                             switch (el.subtype) {
-                                case "img":
+                                case "image":
                                     return (
                                         // Media Message
                                         <MediaMsg el={el} menu={menu}/>
                                     );
 
-                                case "doc":
+                                case "document":
                                     return (
                                         // Doc Message
                                         <DocMsg el={el} menu={menu}/>
                                     );
-                                case "Link":
+                                case "link":
                                     return (
                                         //  Link Message
                                         <LinkMsg el={el} menu={menu}/>

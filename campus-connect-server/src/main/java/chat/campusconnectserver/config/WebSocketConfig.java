@@ -18,5 +18,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/group", "/user", "/chat");
         registry.setUserDestinationPrefix("/user");
     }
+    @Override
+    public void configureWebSocketTransport(org.springframework.web.socket.config.annotation.WebSocketTransportRegistration registration) {
+        registration.setMessageSizeLimit(1048576);
+        registration.setSendBufferSizeLimit(1048576);
+        registration.setSendTimeLimit(10000);
+    }
 
 }

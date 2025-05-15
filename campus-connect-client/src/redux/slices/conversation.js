@@ -66,7 +66,7 @@ const slice = createSlice({
                             new Date(msg.createdAt) > new Date(latest.createdAt) ? msg : latest,
                         messages[0]
                     )
-                    : {content: "You can start messaging with...", createdAt: null};
+                    : {content: "You can start messaging with...", createdAt: null, type: "text"};
 
                 return {
                     id: el.id,
@@ -80,23 +80,22 @@ const slice = createSlice({
                     about: user?.about,
                     online: user?.status === "Online",
                     img: user?.imageUrl,
+                    lastMessageType: lastMessage?.type || "text",
                 };
             });
 
             const sortedList = list.sort((a, b) => {
-                // 1. sortăm după pinned
                 if (a.pinned && !b.pinned) return -1;
                 if (!a.pinned && b.pinned) return 1;
 
-                // 2. sortăm după timp (descrescător)
                 if (!a.time) return 1;
                 if (!b.time) return -1;
                 return new Date(b.time) - new Date(a.time);
             });
 
             state.direct_chat.conversations = sortedList;
-        },
-
+        }
+        ,
 
         fetchDirectGroups(state, action) {
             user_id = window.localStorage.getItem("user_id");
@@ -107,24 +106,23 @@ const slice = createSlice({
 
                 const lastMessage = messages.length > 0
                     ? messages.reduce((latest, msg) => msg.createdAt > latest.createdAt ? msg : latest, messages[0])
-                    : {content: "You can start messaging with...", createdAt: null};
+                    : {content: "You can start messaging with...", createdAt: null, type: "text"};
 
                 return {
                     id: el.id,
                     name: el.name,
                     msg: lastMessage?.content,
                     time: lastMessage?.createdAt ?? "",
+                    lastMessageType: lastMessage?.type || "text",
                     unread: 0,
                     pinned: el.pinned,
                     img: faker.image.avatar(),
                 };
             });
             const sortedListGroup = list.sort((a, b) => {
-                // 1. sortăm după pinned
                 if (a.pinned && !b.pinned) return -1;
                 if (!a.pinned && b.pinned) return 1;
 
-                // 2. sortăm după timp (descrescător)
                 if (!a.time) return 1;
                 if (!b.time) return -1;
                 return new Date(b.time) - new Date(a.time);
@@ -181,7 +179,6 @@ const slice = createSlice({
                 pinned: this_conversation.pinned,
             });
         },
-
 
         setCurrentConversation(state, action) {
             state.direct_chat.current_conversation = action.payload;

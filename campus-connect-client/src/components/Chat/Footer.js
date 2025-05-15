@@ -136,7 +136,7 @@ const Footer = () => {
 
         const messageData = {
             jwtString: "Bearer " + token,
-            content: linkify(value),
+            content: value,
             chatId: room_id,
             type: containsUrl(value) ? "link" : "text",
 

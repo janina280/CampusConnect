@@ -122,7 +122,8 @@ public class MessageController {
     }
 
     @DeleteMapping("/{messageId}")
-    public ResponseEntity<ApiResponse> deleteMessagesHandler(@PathVariable Long messageId, @RequestHeader("Authorization") String jwt) throws UserException, MessageException {
+    public ResponseEntity<ApiResponse> deleteMessagesHandler(@PathVariable Long messageId,
+                                                             @RequestHeader("Authorization") String jwt) throws UserException, MessageException {
         User user = userService.findUserProfile(jwt);
 
         messageService.deleteMessage(messageId, user);
@@ -134,4 +135,19 @@ public class MessageController {
     public Message markMessageAsStarred(@PathVariable Long messageId) {
         return messageService.markMessageAsStarred(messageId);
     }
+
+    @GetMapping("/{chatId}/shared")
+    public ResponseEntity<List<Message>> getSharedMessagesForChat(@PathVariable Long chatId, @RequestHeader("Authorization") String jwt) {
+        User user = userService.findUserProfile(jwt);
+        List<Message> messages = messageService.getSharedMessagesForChat(chatId);
+        return ResponseEntity.ok(messages);
+    }
+
+    @GetMapping("/count-media/{chatId}")
+    public ResponseEntity<Long> countSharedMedia(@PathVariable Long chatId) {
+        long count = messageService.countSharedMedia(chatId);
+        return ResponseEntity.ok(count);
+    }
+
+
 }

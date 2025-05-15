@@ -129,6 +129,14 @@ public class MessageService {
         return message;
     }
 
+    public List<Message> getSharedMessagesForChat(Long chatId) {
+        return messageRepository.findSharedMessagesByChatId(chatId);
+    }
+
+    public long countSharedMedia(Long chatId) {
+        return messageRepository.countMediaItems(chatId);
+    }
+
 }
 
 

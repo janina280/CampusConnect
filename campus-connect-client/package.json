@@ -9,6 +9,7 @@
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@hookform/resolvers": "^3.9.1",
+    "@microlink/react": "^5.5.23",
     "@mui/icons-material": "^5.14.0",
     "@mui/material": "^5.16.14",
     "@react-buddy/ide-toolbox": "^2.4.0",
@@ -40,6 +41,7 @@
     "redux-persist": "^6.0.0",
     "simplebar-react": "^2.4.3",
     "sockjs-client": "^1.6.1",
+    "styled-components": "^6.1.18",
     "stylis-plugin-rtl": "^2.0.2",
     "web-vitals": "^2.1.4",
     "yup": "^1.4.0"

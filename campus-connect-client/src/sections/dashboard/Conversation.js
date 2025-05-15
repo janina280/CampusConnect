@@ -4,11 +4,10 @@ import {alpha, useTheme} from "@mui/material/styles";
 import {DotsThreeVertical, DownloadSimple, FileText as FileIcon} from "phosphor-react";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import {LinkPreview} from "@dhaiwat10/react-link-preview";
 import {useDispatch} from "react-redux";
 import {starMessage} from "../../redux/slices/conversation";
 import {fSmartTime} from "../../utils/formatTime";
-
+import Microlink from "@microlink/react";
 
 const MessageOption = ({el}) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -36,7 +35,6 @@ const MessageOption = ({el}) => {
             title: "Delete Message",
         },
     ];
-
 
     return (
         <>
@@ -266,12 +264,55 @@ const DocMsg = ({el, menu}) => {
         return "application/octet-stream";
     };
 
+    const guessMimeTypeFromExtension = (filename) => {
+        const ext = filename.split('.').pop().toLowerCase();
+        switch (ext) {
+            case 'pdf':
+                return 'application/pdf';
+            case 'doc':
+                return 'application/msword';
+            case 'docx':
+                return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+            case 'xls':
+                return 'application/vnd.ms-excel';
+            case 'xlsx':
+                return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            default:
+                return 'application/octet-stream';
+        }
+    };
+
     useEffect(() => {
-        if (!el.media || el.media.length < 100) return;
+        const media = el.media || el.mediaFilePath;
+        if (!media) return;
 
-        const mimeType = getMimeTypeFromBase64(el.media);
+        const isBase64 = /^[A-Za-z0-9+/=]+$/.test(media) && media.length > 100;
+        let extension = "bin";
 
-        const byteCharacters = atob(el.media);
+        if (!isBase64) {
+            const normalizedPath = media.replaceAll("\\", "/");
+            const fileUrl = `http://localhost:8080/${normalizedPath}`;
+            setFileBlobUrl(fileUrl);
+
+            const pathParts = normalizedPath.split("/");
+            const fileNameFromPath = pathParts[pathParts.length - 1] || "";
+            const mimeType = guessMimeTypeFromExtension(fileNameFromPath);
+
+            extension = mimeType.includes("wordprocessingml") ? "docx" :
+                mimeType.includes("spreadsheetml") ? "xlsx" :
+                    mimeType.split("/")[1] || "bin";
+
+            setFileName(`document.${extension}`);
+            return;
+        }
+
+        // base64 branch
+        const mimeType = getMimeTypeFromBase64(media);
+        extension = mimeType.includes("wordprocessingml") ? "docx" :
+            mimeType.includes("spreadsheetml") ? "xlsx" :
+                mimeType.split("/")[1] || "bin";
+
+        const byteCharacters = atob(media);
         const byteArrays = [];
         for (let offset = 0; offset < byteCharacters.length; offset += 512) {
             const slice = byteCharacters.slice(offset, offset + 512);
@@ -285,18 +326,14 @@ const DocMsg = ({el, menu}) => {
         const blob = new Blob(byteArrays, {type: mimeType});
         const blobUrl = URL.createObjectURL(blob);
         setFileBlobUrl(blobUrl);
-
-        const extension = mimeType.includes("wordprocessingml") ? "docx" :
-            mimeType.includes("spreadsheetml") ? "xlsx" :
-                mimeType.split("/")[1] || "bin";
-
-        const name = el.fileName || el.name || `document.${extension}`;
-        setFileName(name.endsWith(`.${extension}`) ? name : `${name}.${extension}`);
+        setFileName(`document.${extension}`);
 
         return () => {
             URL.revokeObjectURL(blobUrl);
         };
-    }, [el.media]);
+    }, [el.media, el.mediaFilePath]);
+
+
 
     const handleDownload = () => {
         const link = document.createElement("a");
@@ -309,7 +346,7 @@ const DocMsg = ({el, menu}) => {
 
     return (
         <Stack direction="row" justifyContent={isIncoming ? "start" : "end"}>
-            {(isIncoming || el.sender?.name) && (
+            {(isIncoming && el.sender?.name) && (
                 <Typography
                     variant="caption"
                     sx={{color: theme.palette.text.secondary, pl: 1, pb: 0.5}}
@@ -336,7 +373,7 @@ const DocMsg = ({el, menu}) => {
                         spacing={2}
                         alignItems="center"
                         sx={{
-                            backgroundColor: theme.palette.background.paper,
+                            backgroundColor: theme.palette.grey[200],
                             borderRadius: 1,
                             minWidth: 200,
                         }}
@@ -367,6 +404,7 @@ const DocMsg = ({el, menu}) => {
         </Stack>
     );
 };
+
 const LinkMsg = ({el, menu}) => {
     const theme = useTheme();
     const isIncoming = !el.outgoing;
@@ -394,18 +432,20 @@ const LinkMsg = ({el, menu}) => {
                 }}
             >
                 <Stack spacing={2}>
-
                     <Box
                         sx={{
                             backgroundColor: theme.palette.background.paper,
                             borderRadius: 1,
                             p: 1,
+                            width: '100%',
+                            maxWidth: '500px',
                         }}
                     >
-                        <LinkPreview
-                            url={el.message}
+                        <Microlink
+                            url={el.message || el.content}
+                            size="large"
                             width="100%"
-                            fallback={<Typography>Preview indisponibil</Typography>}
+                            style={{maxWidth: '100%'}}
                         />
                     </Box>
 
@@ -414,7 +454,8 @@ const LinkMsg = ({el, menu}) => {
                         color={isIncoming ? theme.palette.text.primary : "#fff"}
                         sx={{wordBreak: "break-word"}}
                     >
-                        {el.message}
+                        <a href={el.message || el.content} target="_blank"
+                           rel="noopener noreferrer">{el.message || el.content}</a>
                     </Typography>
                 </Stack>
             </Box>
@@ -423,6 +464,7 @@ const LinkMsg = ({el, menu}) => {
         </Stack>
     );
 };
+
 
 const ReplyMsg = ({el, menu}) => {
     const theme = useTheme();
@@ -476,6 +518,7 @@ const ReplyMsg = ({el, menu}) => {
         </Stack>
     );
 };
+
 const Timeline = ({el}) => {
     const theme = useTheme();
     const messageTime = fSmartTime(el.createdAt);

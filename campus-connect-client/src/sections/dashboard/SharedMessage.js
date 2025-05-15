@@ -1,22 +1,12 @@
-import React from "react";
-import { useTheme } from "@mui/material/styles";
-import {
-  Box,
-  IconButton,
-  Stack,
-  Typography,
-  Tabs,
-  Tab,
-  Grid,
-} from "@mui/material";
-import { ArrowLeft } from "phosphor-react";
+import React, {useEffect, useState} from "react";
+import {useTheme} from "@mui/material/styles";
+import {Box, Grid, IconButton, Stack, Tab, Tabs, Typography,} from "@mui/material";
+import {ArrowLeft} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
-import { useDispatch } from "react-redux";
-import { UpdateSidebarType } from "../../redux/slices/app";
-import { faker } from "@faker-js/faker";
-import { DocMsg, LinkMsg } from "./Conversation";
-import { Shared_docs, Shared_links } from "../../data";
-import {Conversation} from "../../pages/dashboard/Conversation";
+import {useDispatch, useSelector} from "react-redux";
+import {UpdateSidebarType} from "../../redux/slices/app";
+import {DocMsg, LinkMsg, MediaMsg} from "./Conversation";
+import axios from "../../utils/axios";
 
 const Media = () => {
   const dispatch = useDispatch();
@@ -30,8 +20,33 @@ const Media = () => {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+    const [sharedMessages, setSharedMessages] = useState([]);
+    const {room_id} = useSelector((state) => state.app);
+    const token = useSelector((state) => state.auth.accessToken);
+    useEffect(() => {
+        const fetchSharedMessages = async () => {
+            try {
+                const res = await axios.get(`/api/message/${room_id}/shared`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                console.log("Shared messages response:", res.data);
+                setSharedMessages(res.data);
+            } catch (err) {
+                console.error("Eroare la fetch shared messages", err);
+            }
+        };
 
-  return (
+        fetchSharedMessages();
+    }, [room_id]);
+
+    const mediaMessages = sharedMessages.filter(msg => msg.type === "image");
+    const linkMessages = sharedMessages.filter(msg => msg.type === "link");
+    const docMessages = sharedMessages.filter(msg => msg.type === "document");
+
+
+    return (
     <Box sx={{ width: !isDesktop ? "100vw" : 320, maxHeight: "100vh" }}>
       <Stack sx={{ height: "100%" }}>
         <Box
@@ -76,29 +91,27 @@ const Media = () => {
           spacing={3}
           padding={value === 1 ? 1 : 3}
         >
-           <Conversation starred={true} />
           {(() => {
             switch (value) {
-              case 0:
-                return (
-                  <Grid container spacing={2}>
-                    {[0, 1, 2, 3, 4, 5, 6].map((el) => (
-                      <Grid item xs={4}>
-                        <img
-                          src={faker.image}
-                          alt={faker.internet}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
-                );
-              case 1:
-                return Shared_links.map((el) => <LinkMsg el={el} />);
+                case 0:
+                    return (
+                        <Grid container spacing={2}>
+                            {mediaMessages.map((msg) => (
+                                <Grid item xs={12} key={msg.id}>
+                                    <MediaMsg el={msg}/>
+                                </Grid>
+                            ))}
+                        </Grid>
 
-              case 2:
-                return Shared_docs.map((el) => <DocMsg el={el} />);
+                    );
 
-              default:
+                case 1:
+                    return linkMessages.map((msg) => <LinkMsg el={msg}/>);
+
+                case 2:
+                    return docMessages.map((msg) => <DocMsg el={msg}/>);
+
+                default:
                 break;
             }
           })()}

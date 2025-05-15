@@ -28,13 +28,12 @@ import axios from "../../utils/axios";
 import Snackbar from "@mui/material/Snackbar";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 import {SetCurrentConversation, SetCurrentGroup, UpdatePinnedStatus} from "../../redux/slices/conversation";
-import { BASE_URL } from "../../config";
+import {BASE_URL} from "../../config";
+import {faker} from "@faker-js/faker";
+
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-
-
-
 
 const PinnedDialog = ({open, handleClose, chatId, onPin}) => {
 
@@ -43,7 +42,7 @@ const PinnedDialog = ({open, handleClose, chatId, onPin}) => {
     const handlePinChat = async () => {
         try {
             await axios.patch(
-                `${BASE_URL}/${chatId}/pin`,
+                `${chatId}/pin`,
                 {},
                 {headers: {Authorization: `Bearer ${authToken}`}}
             );
@@ -87,7 +86,7 @@ const UnpinnedDialog = ({open, handleClose, chatId, onUnpin}) => {
     const handleUnpinChat = async () => {
         try {
             await axios.patch(
-                `${BASE_URL}/${chatId}/unpin`,
+                `${chatId}/unpin`,
                 {},
                 {headers: {Authorization: `Bearer ${authToken}`}}
             );
@@ -153,7 +152,7 @@ const LeaveChatDialog = ({open, handleClose, onLeaveSuccess}) => {
     const handleLeaveGroup = () => {
         setLoading(true);
 
-        fetch(`${BASE_URL}/${chatId}`, {
+        fetch(`${chatId}`, {
             method: 'DELETE',
             headers: {
                 "Content-Type": "application/json",
@@ -344,6 +343,8 @@ const ContactGroup = () => {
     const isAdmin = roles.includes("ROLE_ADMIN");
     const isTutor = roles.includes("ROLE_TUTOR");
     const adminOrTutor = isAdmin || isTutor;
+    const [sharedMediaCount, setSharedMediaCount] = useState(0);
+    const authToken = useSelector((state) => state.auth.accessToken);
 
     const handleCloseAddUser = () => {
         setOpenAddUser(false);
@@ -351,7 +352,7 @@ const ContactGroup = () => {
 
     const fetchGroupMembers = () => {
         axios
-            .get(`${BASE_URL}/${groupId}/users`, {
+            .get(`${groupId}/users`, {
                 headers: {Authorization: `Bearer ${token}`},
             })
             .then((response) => {
@@ -366,6 +367,27 @@ const ContactGroup = () => {
             fetchGroupMembers();
         }
     }, [chat_type, current_group_conversation, groupId]);
+
+    useEffect(() => {
+        const fetchSharedMediaCount = async () => {
+            try {
+                const response = await axios.get(
+                    `api/message/count-media/${current_group_conversation?.id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${authToken}`,
+                        },
+                    }
+                );
+                setSharedMediaCount(response.data);
+            } catch (error) {
+                console.error("Error fetching media count:", error);
+            }
+        };
+        if (current_group_conversation?.id) {
+            fetchSharedMediaCount();
+        }
+    }, [current_group_conversation]);
 
     const handleLeaveSuccess = () => {
         setOpenLeave(false);
@@ -384,7 +406,7 @@ const ContactGroup = () => {
 
     const handleRemoveMember = async (userId) => {
         try {
-            await axios.put(`${BASE_URL}/${groupId}/remove/${userId}`, {},
+            await axios.put(`${groupId}/remove/${userId}`, {},
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -470,13 +492,13 @@ const ContactGroup = () => {
                             }}
                             endIcon={<CaretRight/>}
                         >
-                            401
+                            {sharedMediaCount}
                         </Button>
                     </Stack>
                     <Stack direction={"row"} alignItems="center" spacing={2}>
                         {[1, 2, 3].map((el) => (
                             <Box>
-                                {/* <img src={faker.image.city()} alt={faker.internet.userName()} /> */}
+                                {<img src={faker.image.avatar()} alt={faker.internet.userName()}/>}
                             </Box>
                         ))}
                     </Stack>

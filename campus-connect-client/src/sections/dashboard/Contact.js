@@ -19,10 +19,13 @@ import {CaretRight, PushPin, Star, X,} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
 import {SelectRoomId, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
-import axios from "axios";
+import axios from "../../utils/axios";
 import {SetCurrentConversation, UpdatePinnedStatus} from "../../redux/slices/conversation";
 import {useWebSocket} from "../../contexts/WebSocketContext";
-import { BASE_URL } from "../../config";
+
+import {faker} from "@faker-js/faker";
+import {BASE_URL} from "../../config";
+
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -42,7 +45,7 @@ const PinDialog = ({
     const handleAction = async () => {
         try {
             await axios.patch(
-                `${BASE_URL}/${chatId}/${actionType}`,
+                `${chatId}/${actionType}`,
                 {},
                 { headers: { Authorization: `Bearer ${authToken}` } }
             );
@@ -56,6 +59,7 @@ const PinDialog = ({
             console.error(`Error during ${actionType} chat:`, error);
         }
     };
+
 
     return (
         <Dialog
@@ -152,12 +156,13 @@ const Contact = () => {
 
     const [commonGroups, setCommonGroups] = useState([]);
     const [conversation, setConversation] = useState(null);
+    const [sharedMediaCount, setSharedMediaCount] = useState(0);
 
     useEffect(() => {
         const fetchCommonGroups = async () => {
             try {
                 const response = await axios.get
-                (`${BASE_URL}/common-groups/${current_conversation.user_id}`,
+                (`common-groups/${current_conversation.user_id}`,
                     {headers: {Authorization: `Bearer ${authToken}`}});
                 setCommonGroups(response.data);
             } catch (error) {
@@ -169,6 +174,7 @@ const Contact = () => {
 
             fetchCommonGroups();
         }
+
     }, [current_conversation]);
 
 
@@ -177,6 +183,29 @@ const Contact = () => {
             setConversation(current_conversation);
         }
     }, [chat_type, current_conversation])
+
+    useEffect(() => {
+        const fetchSharedMediaCount = async () => {
+            try {
+                const response = await axios.get(
+                    `api/message/count-media/${current_conversation?.id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${authToken}`,
+                        },
+                    }
+                );
+                setSharedMediaCount(response.data);
+            } catch (error) {
+                console.error("Error fetching media count:", error);
+            }
+        };
+
+        if (current_conversation?.id) {
+            fetchSharedMediaCount();
+        }
+    }, [current_conversation]);
+
 
     const handleDeleteSuccess = () => {
         setOpenDelete(false);
@@ -256,13 +285,13 @@ const Contact = () => {
                             }}
                             endIcon={<CaretRight/>}
                         >
-                            401
+                            {sharedMediaCount}
                         </Button>
                     </Stack>
                     <Stack direction={"row"} alignItems="center" spacing={2}>
-                        {[1, 2, 3].map((el) => (<Box>
-                            {/* <img src={faker.image.city()} alt={faker.internet.userName()} /> */}
-                        </Box>))}
+                        {[1, 2, 3].map((el) => <Box>
+                            {<img src={faker.image.avatar()} alt={faker.internet.userName()}/>}
+                        </Box>)}
                     </Stack>
                     <Divider/>
                     <Stack

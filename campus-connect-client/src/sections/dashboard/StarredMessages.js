@@ -1,10 +1,10 @@
 import React from "react";
-import { useTheme } from "@mui/material/styles";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
-import { ArrowLeft } from "phosphor-react";
+import {useTheme} from "@mui/material/styles";
+import {Box, IconButton, Stack, Typography} from "@mui/material";
+import {ArrowLeft} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
-import { useDispatch, useSelector } from "react-redux";
-import { UpdateSidebarType } from "../../redux/slices/app";
+import {useDispatch, useSelector} from "react-redux";
+import {UpdateSidebarType} from "../../redux/slices/app";
 
 import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline} from "./Conversation";
 
@@ -71,7 +71,7 @@ const ConversationStarred = ({ isMobile, menu }) => {
     const { current_messages } = useSelector((state) => state.conversation.direct_chat);
 
     const starredMessages = current_messages.filter((current_messages) => current_messages.starred === true);
-    console.log("Starred Messages:", starredMessages);
+
     return (
         <Box p={isMobile ? 1 : 3}>
             <Stack spacing={3}>
@@ -85,18 +85,18 @@ const ConversationStarred = ({ isMobile, menu }) => {
 
                         case "msg":
                             switch (el.subtype) {
-                                case "img":
+                                case "image":
                                     return (
                                         // Media Message
                                         <MediaMsg el={el} menu={menu} />
                                     );
 
-                                case "doc":
+                                case "document":
                                     return (
                                         // Doc Message
                                         <DocMsg el={el} menu={menu} />
                                     );
-                                case "Link":
+                                case "link":
                                     return (
                                         //  Link Message
                                         <LinkMsg el={el} menu={menu} />
