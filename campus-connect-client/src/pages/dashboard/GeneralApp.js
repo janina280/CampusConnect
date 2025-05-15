@@ -30,7 +30,7 @@ const GeneralApp = () => {
                 sx={{
                     height: "100%",
                     width: open ? `calc(100vw - 740px )` : "calc(100vw - 420px )",
-                    backgroundColor: theme.palette.mode === "light" ? "#F8FAFF" : theme.palette.background.paper,
+                    backgroundColor: theme.palette.mode === "light" ? "#F8FAFF" : "transparent",
                     borderBottom: searchParams.get("type") === "individual-chat" && searchParams.get("id") ? "0px" : "1px solid #F8FAFF",
                 }}
             >

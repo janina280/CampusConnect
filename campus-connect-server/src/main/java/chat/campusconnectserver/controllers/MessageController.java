@@ -22,7 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/message")
@@ -148,6 +151,21 @@ public class MessageController {
         long count = messageService.countSharedMedia(chatId);
         return ResponseEntity.ok(count);
     }
+
+    @GetMapping("/last-3-images/{chatId}")
+    public ResponseEntity<List<Map<String, Object>>> getLast3ImagesByChatId(@PathVariable Long chatId) {
+        List<Message> messages = messageService.getLast3ImagesByChatId(chatId);
+
+        List<Map<String, Object>> response = messages.stream().map(msg -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", msg.getId());
+            map.put("mediaFilePath", msg.getMediaFilePath());
+            return map;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
+    }
+
 
 
 }

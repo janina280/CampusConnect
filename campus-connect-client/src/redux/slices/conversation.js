@@ -1,5 +1,4 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {faker} from "@faker-js/faker";
 import axios from "axios";
 
 let user_id = window.localStorage.getItem("user_id");
@@ -116,7 +115,7 @@ const slice = createSlice({
                     lastMessageType: lastMessage?.type || "text",
                     unread: 0,
                     pinned: el.pinned,
-                    img: faker.image.avatar(),
+                    img: el?.imageUrl,
                 };
             });
             const sortedListGroup = list.sort((a, b) => {
@@ -289,7 +288,7 @@ const slice = createSlice({
                         about: el?.about,
                         starred: el.starred || false,
                         online: el?.status === "Online",
-                        img: faker.image.avatar()
+                        img: el?.imageUrl
                     }
                 }
             );
@@ -317,7 +316,7 @@ const slice = createSlice({
                 users: this_conversation.users,
                 name: this_conversation.name,
                 online: this_conversation.online ? "Online" : "Offline",
-                img: faker.image.avatar(),
+                img: this_conversation.imageUrl,
                 msg: lastMessage.content,
                 time: lastMessage?.formattedTime ?? "",
                 unread: this_conversation.unread,

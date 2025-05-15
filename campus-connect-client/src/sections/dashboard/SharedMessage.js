@@ -97,7 +97,7 @@ const Media = () => {
                     return (
                         <Grid container spacing={2}>
                             {mediaMessages.map((msg) => (
-                                <Grid item xs={12} key={msg.id}>
+                                <Grid item xs={12} sm={6} md={6} key={msg.id}>
                                     <MediaMsg el={msg}/>
                                 </Grid>
                             ))}

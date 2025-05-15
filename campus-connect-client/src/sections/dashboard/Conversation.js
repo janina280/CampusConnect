@@ -160,20 +160,26 @@ const MediaMsg = ({el, menu}) => {
     };
 
     useEffect(() => {
-        const fetchImage = async () => {
+        const prepareImage = async () => {
             try {
-                if (el.media.length > 100) {
+                if (el.media && el.media.length > 100) {
                     const mimeType = getMimeTypeFromBase64(el.media);
                     const imageUrl = `data:${mimeType};base64,${el.media}`;
                     setImage(imageUrl);
                     setFileName("image." + mimeType.split("/")[1]);
+                } else if (el.mediaFilePath) {
+                    const fileUrl = `http://localhost:8080/${el.mediaFilePath}`;
+                    setImage(fileUrl);
+                    const fileExtension = fileUrl.split(".").pop();
+                    setFileName("image." + fileExtension);
                 }
             } catch (error) {
-                console.error("Error fetching image:", error);
+                console.error("Error loading image:", error);
             }
         };
-        fetchImage();
-    }, [el.media]);
+
+        prepareImage();
+    }, [el.media, el.mediaPathFile]);
 
     const handleDownload = () => {
         const link = document.createElement("a");
@@ -306,7 +312,6 @@ const DocMsg = ({el, menu}) => {
             return;
         }
 
-        // base64 branch
         const mimeType = getMimeTypeFromBase64(media);
         extension = mimeType.includes("wordprocessingml") ? "docx" :
             mimeType.includes("spreadsheetml") ? "xlsx" :

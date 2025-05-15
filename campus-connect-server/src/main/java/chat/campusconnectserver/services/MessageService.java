@@ -10,8 +10,11 @@ import chat.campusconnectserver.repositories.MessageRepository;
 import chat.campusconnectserver.util.FileService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -136,6 +139,14 @@ public class MessageService {
     public long countSharedMedia(Long chatId) {
         return messageRepository.countMediaItems(chatId);
     }
+
+    public List<Message> getLast3ImagesByChatId(Long chatId) {
+        Pageable pageable = PageRequest.of(0, 3);
+        return messageRepository.findByChatIdAndTypeOrderByTimestampDesc(chatId, MessageType.image, pageable);
+    }
+
+
+
 
 }
 

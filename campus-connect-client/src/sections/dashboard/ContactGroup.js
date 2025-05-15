@@ -29,7 +29,7 @@ import Snackbar from "@mui/material/Snackbar";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 import {SetCurrentConversation, SetCurrentGroup, UpdatePinnedStatus} from "../../redux/slices/conversation";
 import {BASE_URL} from "../../config";
-import {faker} from "@faker-js/faker";
+import Last3Images from "../../components/Last3Images";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -427,6 +427,28 @@ const ContactGroup = () => {
         }
     };
 
+    const handleGroupImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file || !conversation?.id) return;
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+            await axios.put(`${BASE_URL}/groups/${conversation.id}/image`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+
+            //dispatch(fetchConversationById(conversation.id));
+        } catch (error) {
+            console.error("Eroare la schimbarea imaginii grupului", error);
+        }
+    };
+
+
     return (
         <Box sx={{width: !isDesktop ? "100vw" : 320, maxHeight: "100vh"}}>
             <Stack sx={{height: "100%"}}>
@@ -467,12 +489,41 @@ const ContactGroup = () => {
                     p={3}
                     spacing={3}
                 >
-                    <Stack alignItems="center" direction="row" spacing={2}>
-                        <CreateAvatar
-                            name={conversation?.name}
-                            imageUrl={conversation?.img}
-                            size={56}
-                        />
+                    <Stack direction="row" spacing={2} alignItems="center">
+                        <Box sx={{position: "relative", width: 56, height: 56}}>
+                            <CreateAvatar
+                                name={conversation?.name}
+                                imageUrl={conversation?.img}
+                                size={56}
+                            />
+                            {adminOrTutor && (
+                                <>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        id="group-img-upload"
+                                        style={{display: "none"}}
+                                        onChange={handleGroupImageChange}
+                                    />
+                                    <label htmlFor="group-img-upload">
+                                        <IconButton
+                                            size="small"
+                                            sx={{
+                                                position: "absolute",
+                                                bottom: 0,
+                                                right: 0,
+                                                backgroundColor: "white",
+                                                boxShadow: 1,
+                                            }}
+                                            component="span"
+                                        >
+                                            <Plus size={16}/>
+                                        </IconButton>
+                                    </label>
+                                </>
+                            )}
+                        </Box>
+
                         <Stack spacing={0.5}>
                             <Typography variant="article" fontWeight={600}>
                                 {conversation?.name}
@@ -496,11 +547,7 @@ const ContactGroup = () => {
                         </Button>
                     </Stack>
                     <Stack direction={"row"} alignItems="center" spacing={2}>
-                        {[1, 2, 3].map((el) => (
-                            <Box>
-                                {<img src={faker.image.avatar()} alt={faker.internet.userName()}/>}
-                            </Box>
-                        ))}
+                        <Last3Images chatId={conversation?.id}/>
                     </Stack>
                     <Divider/>
                     <Stack

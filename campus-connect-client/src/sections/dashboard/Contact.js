@@ -22,9 +22,8 @@ import {SelectRoomId, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../.
 import axios from "../../utils/axios";
 import {SetCurrentConversation, UpdatePinnedStatus} from "../../redux/slices/conversation";
 import {useWebSocket} from "../../contexts/WebSocketContext";
-
-import {faker} from "@faker-js/faker";
 import {BASE_URL} from "../../config";
+import Last3Images from "../../components/Last3Images";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -289,9 +288,7 @@ const Contact = () => {
                         </Button>
                     </Stack>
                     <Stack direction={"row"} alignItems="center" spacing={2}>
-                        {[1, 2, 3].map((el) => <Box>
-                            {<img src={faker.image.avatar()} alt={faker.internet.userName()}/>}
-                        </Box>)}
+                        <Last3Images chatId={conversation?.id}/>
                     </Stack>
                     <Divider/>
                     <Stack
@@ -372,7 +369,6 @@ const Contact = () => {
                     }
                 />
             )}
-
 
         </Box>
     );

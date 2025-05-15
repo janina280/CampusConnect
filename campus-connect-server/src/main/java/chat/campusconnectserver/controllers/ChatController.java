@@ -7,19 +7,23 @@ import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.Chat;
 import chat.campusconnectserver.modal.User;
 import chat.campusconnectserver.payload.request.AddUserInGroupRequest;
-import chat.campusconnectserver.payload.response.ApiResponse;
 import chat.campusconnectserver.payload.request.GroupChatRequest;
 import chat.campusconnectserver.payload.request.SingleChatRequest;
+import chat.campusconnectserver.payload.response.ApiResponse;
 import chat.campusconnectserver.security.TokenProvider;
 import chat.campusconnectserver.services.ChatService;
 import chat.campusconnectserver.services.UserService;
+import chat.campusconnectserver.util.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -33,13 +37,15 @@ public class ChatController {
     private final TokenProvider tokenProvider;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final FileService fileService;
 
     @Autowired
-    public ChatController(ChatService chatService, UserService userService, TokenProvider tokenProvider, SimpMessagingTemplate simpMessagingTemplate) {
+    public ChatController(ChatService chatService, UserService userService, TokenProvider tokenProvider, SimpMessagingTemplate simpMessagingTemplate, FileService fileService) {
         this.chatService = chatService;
         this.userService = userService;
         this.tokenProvider = tokenProvider;
         this.simpMessagingTemplate = simpMessagingTemplate;
+        this.fileService = fileService;
     }
 
     @Transactional
@@ -71,7 +77,6 @@ public class ChatController {
     @GetMapping("/{chatId}")
     public ResponseEntity<Chat> findChatByIdHandle(@PathVariable Long chatId) throws ChatException {
         Chat chat = chatService.findChatById(chatId);
-
         return new ResponseEntity<>(chat, HttpStatus.OK);
     }
 
@@ -202,6 +207,48 @@ public class ChatController {
         List<ChatDto> groups = chatService.findAllGroupsForAdmin(currentUserId);
 
         return new ResponseEntity<>(groups, HttpStatus.OK);
+    }
+
+    @PutMapping("/{chatId}/image")
+    public ResponseEntity<ApiResponse> updateGroupImage(
+            @PathVariable Long chatId,
+            @RequestPart("image") MultipartFile image,
+            @RequestHeader("Authorization") String jwt
+    ) throws UserException, ChatException {
+        Long userId = tokenProvider.getUserIdFromToken(jwt.substring(7));
+
+        Chat chat = chatService.findChatById(chatId);
+        if (!chat.isGroup()) {
+            throw new ChatException("Only group chats can have images");
+        }
+
+        boolean isAdmin = chat.getAdmins().stream().anyMatch(admin -> admin.getId().equals(userId));
+        if (!isAdmin) {
+            throw new ChatException("Only admins can update the group image");
+        }
+
+        String imagePath = fileService.saveGroupImage(image, chatId);
+        if (imagePath == null) {
+            throw new ChatException("Failed to save image");
+        }
+
+        chat.setImg(imagePath);
+        Chat updatedChat = chatService.saveChat(chat);
+
+        return new ResponseEntity<>(new ApiResponse("Group image updated", true), HttpStatus.OK);
+    }
+
+    @GetMapping("/groups/{groupId}/image/{fileName}")
+    public ResponseEntity<byte[]> getGroupImage(
+            @PathVariable Long groupId,
+            @PathVariable String fileName
+    ) {
+        byte[] file = fileService.getGroupFile(groupId, fileName);
+        if (file == null) return ResponseEntity.notFound().build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG);
+        return new ResponseEntity<>(file, headers, HttpStatus.OK);
     }
 
 

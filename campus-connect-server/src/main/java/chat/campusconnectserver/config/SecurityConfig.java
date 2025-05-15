@@ -71,10 +71,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // Configurație CORS implicită
-                .csrf(csrf -> csrf.disable()) // Dezactivare CSRF
-                .formLogin(AbstractHttpConfigurer::disable) // Dezactivare login form
-                .httpBasic(AbstractHttpConfigurer::disable) // Dezactivare HTTP Basic Auth
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling.authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 )
@@ -105,7 +105,6 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
                 )
-                // Configurare politică pentru sesiuni fără a folosi `sessionManagement()`
                 .securityContext(securityContext -> securityContext.requireExplicitSave(false))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
