@@ -44,6 +44,11 @@ public class FileService {
         return uploadFile(sourceFile, fileUploadSubPath);
     }
 
+    public String saveGroupImage(@Nonnull MultipartFile sourceFile, @Nonnull Long groupId) {
+        final String groupFolder = "groups" + separator + groupId;
+        return uploadFile(sourceFile, groupFolder);
+    }
+
     private String uploadFile(
             @Nonnull MultipartFile sourceFile,
             @Nonnull String fileUploadSubPath
@@ -81,4 +86,15 @@ public class FileService {
         }
         return fileName.substring(lastDotIndex + 1).toLowerCase();
     }
+
+    public byte[] getGroupFile(@Nonnull Long groupId, @Nonnull String fileName) {
+        String path = fileUploadPath + separator + "groups" + separator + groupId + separator + fileName;
+        try {
+            return Files.readAllBytes(Paths.get(path));
+        } catch (IOException e) {
+            log.error("Failed to read group image: " + path, e);
+            return null;
+        }
+    }
+
 }

@@ -8,6 +8,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {FetchUserProfile} from "../../redux/slices/app";
 import Statistics from "../../sections/settings/Statistics";
 import UserStatistics from "../../sections/settings/UserStatistics";
+import {BASE_URL} from "../../config";
+import UserRoleManagement from "../../sections/settings/RoleUsers";
 
 function Settings() {
   const theme = useTheme();
@@ -16,6 +18,7 @@ function Settings() {
   const dispatch = useDispatch();
   const [openStatistics, setOpenStatistics] = useState(false);
   const [openStatisticsUser, setOpenStatisticsUser] = useState(false);
+  const [openRole, setOpenRole] = useState(false);
   const {roles = []} = useSelector((state) => state.auth);
   const isAdmin = roles.includes("ROLE_ADMIN");
   const {user} = useSelector((state) => state.app);
@@ -27,6 +30,9 @@ function Settings() {
   const handleCloseStatisticsUser = () => {
     setOpenStatisticsUser(false);
   };
+  const handleCloseRole = () => {
+    setOpenRole(false);
+  }
 
   useEffect(() => {
     dispatch(FetchUserProfile())
@@ -46,8 +52,14 @@ function Settings() {
       title: "User Statistics",
       onclick: () => setOpenStatisticsUser(true),
       show: isAdmin,
+    },
+    {
+      key: 3,
+      icon: <Info size={20}/>,
+      title: "Role Users",
+      onclick: () => setOpenRole(true),
+      show: isAdmin,
     }
-
 
   ];
 
@@ -79,7 +91,7 @@ function Settings() {
             <Stack direction={"row"} spacing={3}>
               <CreateAvatar
                 name={user.name}
-                imageUrl={`http://localhost:8080/${user.imageUrl}`}
+                imageUrl={`${BASE_URL}/${user.imageUrl}`}
                 size={56}
               />
               <Stack spacing={0.5}>
@@ -102,7 +114,7 @@ function Settings() {
 
                             <Typography variant="body2">{title}</Typography>
                           </Stack>
-                          {key !== 2 && <Divider/>}
+                          {key !== 3 && <Divider/>}
                         </Stack>
                       </React.Fragment>
                   )
@@ -126,7 +138,7 @@ function Settings() {
             justifyContent={"center"}
           >
             <NoChatSVG />
-            <Typography variant="subtitle2">Customize your experience. Adjust your settings below.</Typography>
+            <Typography variant="subtitle2">Customize your experience.</Typography>
           </Stack>
         </Box>
       </Stack>
@@ -136,7 +148,7 @@ function Settings() {
       {openStatisticsUser && (
           <UserStatistics open={openStatisticsUser} handleClose={handleCloseStatisticsUser}/>
       )}
-
+      {openRole && (<UserRoleManagement open={openRole} handleClose={handleCloseRole}/>)}
     </>
   );
 }
