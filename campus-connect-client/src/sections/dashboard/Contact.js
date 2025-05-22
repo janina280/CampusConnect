@@ -24,6 +24,8 @@ import {SetCurrentConversation, UpdatePinnedStatus} from "../../redux/slices/con
 import {useWebSocket} from "../../contexts/WebSocketContext";
 import {BASE_URL} from "../../config";
 import Last3Images from "../../components/Last3Images";
+import {varHover} from "../../components/animate";
+import {motion} from "framer-motion";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -284,6 +286,7 @@ const Contact = () => {
                         justifyContent={"space-between"}
                     >
                         <Typography variant="subtitle2">Media, Links & Docs</Typography>
+
                         <Button
                             onClick={() => {
                                 dispatch(UpdateSidebarType("SHARED"));
@@ -330,9 +333,10 @@ const Contact = () => {
                             </Stack>))) : (<Typography variant="caption">No groups in common</Typography>)}
                     </Stack>
                     <Divider/>
-
+                    <motion.div variants={varHover(1.05)} whileHover="hover">
                     <Stack direction="row" alignItems={"center"} spacing={2}>
-                        <Button
+
+                    <Button
                             onClick={() => {
                                 if (conversation?.pinned) {
                                     setOpenUnpinned(true);
@@ -348,11 +352,13 @@ const Contact = () => {
                         </Button>
 
                     </Stack>
+                    </motion.div>
                 </Stack>
             </Stack>
             {openDelete && <DeleteChatDialog open={openDelete} handleClose={() => setOpenDelete(false)}
                                              onDeleteSuccess={handleDeleteSuccess}/>}
             {(openPinned || openUnpinned) && (
+
                 <PinDialog
                     open={openPinned || openUnpinned}
                     handleClose={() => {

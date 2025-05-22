@@ -13,6 +13,8 @@ import UserRoleManagement from "../../sections/settings/RoleUsers";
 import BarChartIcon from '@mui/icons-material/BarChart';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import {motion} from "framer-motion";
+import {varHover} from "../../components/animate";
 
 function Settings() {
   const theme = useTheme();
@@ -107,6 +109,7 @@ function Settings() {
             <Stack spacing={4}>
               {list.map(({key, icon, title, onclick, show}) => (
                   show !== false && (
+                      <motion.div variants={varHover(1.05)} whileHover="hover">
                       <React.Fragment key={key}>
                         <Stack
                             sx={{cursor: "pointer"}}
@@ -121,6 +124,7 @@ function Settings() {
                           {key !== 3 && <Divider/>}
                         </Stack>
                       </React.Fragment>
+                      </motion.div>
                   )
               ))}
             </Stack>

@@ -9,6 +9,7 @@ import {starMessage} from "../../redux/slices/conversation";
 import {fSmartTime} from "../../utils/formatTime";
 import Microlink from "@microlink/react";
 import {showSnackbar} from "../../redux/slices/app";
+import {BASE_URL} from "../../config";
 
 const MessageOption = ({el}) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -145,7 +146,7 @@ const TextMsg = ({el, menu}) => {
     );
 };
 
-const MediaMsg = ({el, menu}) => {
+const MediaMsg = ({el}) => {
     const theme = useTheme();
     const isIncoming = !el.outgoing;
 
@@ -170,7 +171,7 @@ const MediaMsg = ({el, menu}) => {
                     setImage(imageUrl);
                     setFileName("image." + mimeType.split("/")[1]);
                 } else if (el.mediaFilePath) {
-                    const fileUrl = `http://localhost:8080/${el.mediaFilePath}`;
+                    const fileUrl = `${BASE_URL}/${el.mediaFilePath}`;
                     setImage(fileUrl);
                     const fileExtension = fileUrl.split(".").pop();
                     setFileName("image." + fileExtension);
@@ -256,7 +257,7 @@ const MediaMsg = ({el, menu}) => {
     );
 };
 
-const DocMsg = ({el, menu}) => {
+const DocMsg = ({el}) => {
     const theme = useTheme();
     const isIncoming = !el.outgoing;
 
@@ -298,7 +299,7 @@ const DocMsg = ({el, menu}) => {
 
         if (!isBase64) {
             const normalizedPath = media.replaceAll("\\", "/");
-            const fileUrl = `http://localhost:8080/${normalizedPath}`;
+            const fileUrl = `${BASE_URL}/${normalizedPath}`;
             setFileBlobUrl(fileUrl);
 
             const pathParts = normalizedPath.split("/");
@@ -409,7 +410,7 @@ const DocMsg = ({el, menu}) => {
     );
 };
 
-const LinkMsg = ({el, menu}) => {
+const LinkMsg = ({el}) => {
     const theme = useTheme();
     const isIncoming = !el.outgoing;
 

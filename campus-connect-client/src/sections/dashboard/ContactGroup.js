@@ -35,6 +35,8 @@ import {
 } from "../../redux/slices/conversation";
 import {BASE_URL} from "../../config";
 import Last3Images from "../../components/Last3Images";
+import {varHover} from "../../components/animate";
+import {motion} from "framer-motion";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -583,10 +585,14 @@ const ContactGroup = () => {
                                                           size={40}/>
                                             <Typography variant="body2">{user.name}</Typography>
                                         </Stack>
+
                                         {isAdmin && (
-                                            <Button onClick={() => handleOpenRemoveDialog(user)}>
-                                                <X className="w-4 h-4 text-red-500 hover:text-red-700"/>
-                                            </Button>)}
+                                            <motion.div variants={varHover(1.05)} whileHover="hover">
+                                                <Button onClick={() => handleOpenRemoveDialog(user)}>
+                                                    <X className="w-4 h-4 text-red-500 hover:text-red-700"/>
+                                                </Button>
+                                            </motion.div>)}
+
                                     </Stack>
                                 ))
                             ) : (
@@ -597,40 +603,47 @@ const ContactGroup = () => {
 
                     <Divider/>
 
-                    <Stack direction="row" alignItems={"center"} spacing={2}>
+                    <Stack direction="row" alignItems={"center"} spacing={0.5}>
                         {adminOrTutor && (
+                            <motion.div variants={varHover(1.05)} whileHover="hover">
+                                <Button
+                                    onClick={() => setOpenAddUser(true)}
+                                    startIcon={<Plus/>}
+                                    variant="outlined"
+                                    sx={{width: "100%"}}
+                                >
+                                    Add
+                                </Button>
+                            </motion.div>)}
+                        <motion.div variants={varHover(1.05)} whileHover="hover">
                             <Button
-                                onClick={() => setOpenAddUser(true)}
-                                startIcon={<Plus/>}
+                                onClick={() => setOpenLeave(true)}
+                                startIcon={<SignOut/>}
                                 variant="outlined"
                                 sx={{width: "100%"}}
                             >
-                                Add
-                            </Button>)}
-                        <Button
-                            onClick={() => setOpenLeave(true)}
-                            startIcon={<SignOut/>}
-                            variant="outlined"
-                            sx={{width: "100%"}}
-                        >
-                            Leave
-                        </Button>
+                                Leave
+                            </Button>
+                        </motion.div>
                         {adminOrTutor && (
-                            <Button
-                                onClick={() => {
-                                    if (current_group_conversation?.pinned) {
-                                        setOpenUnpinned(true);
-                                    } else {
-                                        setOpenPinned(true);
-                                    }
-                                }}
-                                startIcon={current_group_conversation?.pinned ? <PushPin/> : <PushPin/>}
-                                variant="outlined"
-                                sx={{width: "100%"}}
-                            >
-                                {current_group_conversation?.pinned ? 'Unpin' : 'Pin'}
-                            </Button>)}
+                            <motion.div variants={varHover(1.05)} whileHover="hover">
+                                <Button
+                                    onClick={() => {
+                                        if (current_group_conversation?.pinned) {
+                                            setOpenUnpinned(true);
+                                        } else {
+                                            setOpenPinned(true);
+                                        }
+                                    }}
+                                    startIcon={current_group_conversation?.pinned ? <PushPin/> : <PushPin/>}
+                                    variant="outlined"
+                                    sx={{width: "100%"}}
+                                >
+                                    {current_group_conversation?.pinned ? 'Unpin' : 'Pin'}
+                                </Button>
+                            </motion.div>)}
                     </Stack>
+
 
                 </Stack>
             </Stack>

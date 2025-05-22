@@ -21,7 +21,6 @@ const DashboardLayout = () => {
     const {isConnected, socket} = useWebSocket();
     const conversations = useSelector((state) => state.conversation.direct_chat.conversations);
     const current_conversation = useSelector((state) => state.conversation.direct_chat.current_conversation);
-
     const current_conversationRef = useRef(current_conversation);
     const dispatch = useDispatch();
 
@@ -30,76 +29,89 @@ const DashboardLayout = () => {
     }, [current_conversation]);
 
     useEffect(() => {
-        if (isLoggedIn) {
-            if (!isConnected) return;
+        if (!isLoggedIn || !isConnected) return;
 
-            socket.on(`/user/${user_id}/group/group-create-response`, (data) => {
-                dispatch(AddDirectGroupConversation({conversation: data}));
-            })
+        // === HANDLERS ===
+        const handleGroupCreate = (data) => {
+            dispatch(AddDirectGroupConversation({conversation: data}));
+        };
 
-            socket.on(`/user/${user_id}/group/user-add-response`, (data) => {
-                dispatch(AddUserToGroupConversation({conversation: data}));
-            });
+        const handleUserAdd = (data) => {
+            dispatch(AddUserToGroupConversation({conversation: data}));
+        };
 
-            socket.on(`/user/${user_id}/message/chat`, (newMessage) => {
-                dispatch(FetchCurrentMessages({messages: newMessage}));
-            });
+        const handleChatCreate = (data) => {
+            const existingConversation = conversations.find((el) => el?.id === data.id);
+            if (existingConversation) {
+                dispatch(UpdateDirectConversation({conversation: data}));
+            } else {
+                dispatch(AddDirectConversation({conversation: data}));
+            }
+            dispatch(SelectChatType({chat_type: "individual"}));
+            dispatch(SelectRoomId({room_id: data.id}));
+        };
 
-            socket.on(`/user/${user_id}/message/message-send-response`, (message) => {
-                if (message.group === true) {
-                    dispatch(AddDirectMessageGroup({
-                        id: message.id,
-                        type: "msg",
-                        subtype: message.type,
-                        message: message.content,
-                        outgoing: message.senderId === user_id,
-                        senderId: message.senderId,
-                        sender: message.sender,
-                        state: message.state,
-                        createdAt: message.createdAt,
-                        media: message.media,
-                        formattedTime: message.formattedTime,
-                        chatId: message.chatId,
-                    }));
-                } else {
-                    if (current_conversationRef.current?.id === message.chatId) {
-                        dispatch(AddDirectMessage({
-                            id: message.id,
-                            type: "msg",
-                            subtype: message.type,
-                            message: message.content,
-                            outgoing: message.senderId === user_id,
-                            senderId: message.senderId,
-                            sender: message.sender,
-                            state: message.state,
-                            createdAt: message.createdAt,
-                            media: message.media,
-                            formattedTime: message.formattedTime,
-                            chatId: message.chatId,
-                        }));
-                    }
-                }
-            });
+        const handleMessageSendResponse = (message) => {
+            const isGroup = message.group === true;
+            const payload = {
+                id: message.id,
+                type: "msg",
+                subtype: message.type,
+                message: message.content,
+                outgoing: message.senderId === user_id,
+                senderId: message.senderId,
+                sender: message.sender,
+                state: message.state,
+                createdAt: message.createdAt,
+                media: message.media,
+                formattedTime: message.formattedTime,
+                chatId: message.chatId,
+            };
 
-            socket.on(`/user/${user_id}/message/group`, (newMessage) => {
-                dispatch(FetchCurrentMessagesGroup({messages: newMessage}));
-            });
-            socket.on(`/user/${user_id}/chat/chat-create-response`, (data) => {
-                const existingConversation = conversations.find((el) => el?.id === data.id);
-                if (existingConversation) {
-                    dispatch(UpdateDirectConversation({conversation: data}));
-                } else {
-                    dispatch(AddDirectConversation({conversation: data}));
-                }
-                dispatch(SelectChatType({chat_type: "individual"}));
-                dispatch(SelectRoomId({room_id: data.id}));
-            });
+            if (isGroup) {
+                dispatch(AddDirectMessageGroup(payload));
+            } else if (current_conversationRef.current?.id === message.chatId) {
+                dispatch(AddDirectMessage(payload));
+            }
+        };
 
-        }
-    }, [isLoggedIn, isConnected]);
+        const handlePrivateMessage = (data) => {
+            dispatch(FetchCurrentMessages({messages: data}));
+        };
+
+        const handleGroupMessage = (data) => {
+            dispatch(FetchCurrentMessagesGroup({messages: data}));
+        };
+
+        // === EVENT NAMES ===
+        const groupCreateEvent = `/user/${user_id}/group/group-create-response`;
+        const userAddEvent = `/user/${user_id}/group/user-add-response`;
+        const chatCreateEvent = `/user/${user_id}/chat/chat-create-response`;
+        const messageSendEvent = `/user/${user_id}/message/message-send-response`;
+        const chatEvent = `/user/${user_id}/message/chat`;
+        const groupMessageEvent = `/user/${user_id}/message/group`;
+
+        // === ATTACH EVENTS ===
+        socket.on(groupCreateEvent, handleGroupCreate);
+        socket.on(userAddEvent, handleUserAdd);
+        socket.on(chatCreateEvent, handleChatCreate);
+        socket.on(messageSendEvent, handleMessageSendResponse);
+        socket.on(chatEvent, handlePrivateMessage);
+        socket.on(groupMessageEvent, handleGroupMessage);
+
+        // === CLEANUP ===
+        return () => {
+            socket.off(groupCreateEvent, handleGroupCreate);
+            socket.off(userAddEvent, handleUserAdd);
+            socket.off(chatCreateEvent, handleChatCreate);
+            socket.off(messageSendEvent, handleMessageSendResponse);
+            socket.off(chatEvent, handlePrivateMessage);
+            socket.off(groupMessageEvent, handleGroupMessage);
+        };
+    }, [isLoggedIn, isConnected, user_id, conversations]);
 
     if (!isLoggedIn) {
-        return <Navigate to={"/auth/login"}/>;
+        return <Navigate to="/auth/login"/>;
     }
 
     return (

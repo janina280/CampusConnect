@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useTheme} from "@mui/material/styles";
-import {Box, Divider, IconButton, Stack, Typography} from "@mui/material";
+import {Box, Divider, Stack, Typography} from "@mui/material";
 import {MagnifyingGlass, Plus} from "phosphor-react";
 import {Search, SearchIconWrapper, StyledInputBase,} from "../../components/Search";
 import {SimpleBarStyle} from "../../components/Scrollbar";
@@ -12,7 +12,8 @@ import {useWebSocket} from "../../contexts/WebSocketContext";
 import BottomNav from "../../layouts/dashboard/BottomNav";
 import useResponsive from "../../hooks/useResponsive";
 import {searchGroup} from "../../redux/slices/auth";
-
+import {IconButtonAnimate, varHover} from "../../components/animate";
+import {motion} from "framer-motion";
 
 const Group = () => {
     const theme = useTheme();
@@ -99,9 +100,9 @@ const Group = () => {
                         alignItems="center"
                     >
                         <Typography variant="subtitle2">Create New Group</Typography>
-                        <IconButton onClick={() => setOpenDialog(true)}>
+                        <IconButtonAnimate onClick={() => setOpenDialog(true)}>
                             <Plus style={{color: theme.palette.primary.main}}/>
-                        </IconButton>
+                        </IconButtonAnimate>
                     </Stack>)}
                     <Divider/>
                     <Stack
@@ -124,11 +125,13 @@ const Group = () => {
                                         groups
                                             .filter((group) => group.pinned)
                                             .map((group) => (
+                                                <motion.div variants={varHover(1.05)} whileHover="hover">
                                                 <ChatElement
                                                     key={group.id}
                                                     {...group}
                                                     onClick={() => handleGroupSelect(group.id)}
                                                 />
+                                                </motion.div>
                                             ))
                                     ) : (""
                                     )}
@@ -147,11 +150,13 @@ const Group = () => {
                                             ? groups.filter((group) => !group.pinned)
                                             : availableGroups
                                     ).map((group) => (
+                                        <motion.div variants={varHover(1.05)} whileHover="hover">
                                         <ChatElement
                                             key={group.id}
                                             {...group}
                                             onClick={() => handleGroupSelect(group.id)}
                                         />
+                                        </motion.div>
                                     ))
                                 ) : ("")}
                             </Stack>

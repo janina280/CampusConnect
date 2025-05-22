@@ -2,7 +2,6 @@ import {Box, Stack} from "@mui/material";
 import React, {useEffect, useRef} from "react";
 import {useTheme} from "@mui/material/styles";
 import {SimpleBarStyle} from "../../components/Scrollbar";
-
 import {ChatFooter, ChatHeader} from "../../components/Chat";
 import useResponsive from "../../hooks/useResponsive";
 import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline,} from "../../sections/dashboard/Conversation";

@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {
-    Button,
     Dialog,
     DialogActions,
     DialogContent,
@@ -23,6 +22,8 @@ import {showSnackbar} from "../../redux/slices/app";
 import CreateAvatar from "../../utils/createAvatar";
 import {BASE_URL} from "../../config";
 import axios from "../../utils/axios";
+import {FabButtonAnimate} from "../../components/animate";
+import * as PropTypes from "prop-types";
 
 const roles = ["user", "admin", "tutor"];
 
@@ -35,6 +36,14 @@ const getUserRole = (user) => {
     return "";
 };
 
+function FabButtonAnimateButton(props) {
+    return null;
+}
+
+FabButtonAnimateButton.propTypes = {
+    variant: PropTypes.string,
+    children: PropTypes.node
+};
 const UserRoleManagement = ({open, handleClose}) => {
     const token = useSelector((state) => state.auth.accessToken);
     const [users, setUsers] = useState([]);
@@ -124,9 +133,9 @@ const UserRoleManagement = ({open, handleClose}) => {
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose} variant="contained">
+                <FabButtonAnimate onClick={handleClose} variant="contained">
                     Close
-                </Button>
+                </FabButtonAnimate>
             </DialogActions>
         </Dialog>
     );

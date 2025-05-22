@@ -1,5 +1,5 @@
 import React from "react";
-import {Badge, Box, Stack, Typography} from "@mui/material";
+import {Avatar, Badge, Box, Stack, Typography} from "@mui/material";
 import {alpha, styled, useTheme} from "@mui/material/styles";
 import {ChatCircle} from "phosphor-react";
 import CreateAvatar from "../utils/createAvatar";
@@ -28,6 +28,7 @@ const ChatElement = ({img, name, msg, time, unread, id, lastMessageType}) => {
         isSelected = false;
     }
     const imageUrl = img ? `${BASE_URL}/${img.replace("\\", "/")}` : '';
+
     const message = "You can start messaging with...";
 
     const formatLastMessage = () => {
@@ -52,7 +53,13 @@ const ChatElement = ({img, name, msg, time, unread, id, lastMessageType}) => {
         >
             <Stack direction="row" alignItems={"center"} justifyContent="space-between">
                 <Stack direction="row" spacing={2}>
-                    <CreateAvatar name={name} imageUrl={imageUrl} size={56}/>
+                    {
+                        id === "ai_chat" ? (
+                            <Avatar src={img} sx={{width: 56, height: 56}}/>
+                        ) : (
+                            <CreateAvatar name={name} imageUrl={imageUrl} size={56}/>
+                        )
+                    }
                     <Stack spacing={0.3}>
                         <Typography variant="subtitle2">{name}</Typography>
                         <Typography variant="caption">

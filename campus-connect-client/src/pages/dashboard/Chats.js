@@ -13,6 +13,9 @@ import {searchUser} from "../../redux/slices/auth";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 import {UserElement} from "../../components/UserElement";
 import {showSnackbar} from "../../redux/slices/app";
+import {motion} from "framer-motion";
+import {varHover} from "../../components/animate";
+import Robot from "../../assets/Images/robot.png";
 
 const Chats = () => {
     const theme = useTheme();
@@ -85,7 +88,8 @@ const Chats = () => {
                     message: "Chat created successfully!",
                 })
             );
-        } catch (error) {
+        }
+        catch (error) {
             dispatch(
                 showSnackbar({
                     severity: "error",
@@ -152,13 +156,15 @@ const Chats = () => {
                                         users
                                             .filter((user) => user.name)
                                             .map((chat) => (
-                                                <UserElement
-                                                    key={chat.id}
-                                                    {...chat}
-                                                    onClick={() => handleCreateChat(chat.id)}
-                                                    showMessageIcon={true}
-                                                    existingChat={!!conversations.find(c => c.user_id === chat.id)}
-                                                />
+                                                <motion.div variants={varHover(1.05)} whileHover="hover">
+                                                    <UserElement
+                                                        key={chat.id}
+                                                        {...chat}
+                                                        onClick={() => handleCreateChat(chat.id)}
+                                                        showMessageIcon={true}
+                                                        existingChat={!!conversations.find(c => c.user_id === chat.id)}
+                                                    />
+                                                </motion.div>
                                             ))
                                     ) : (
                                         <Typography variant="body2">No users found.</Typography>
@@ -170,13 +176,18 @@ const Chats = () => {
                                         <Typography variant="subtitle2" sx={{color: "#676767"}}>
                                             Pinned
                                         </Typography>
+                                        <motion.div variants={varHover(1.05)} whileHover="hover">
+                                            <ChatElement name={"Campus AI"} id={"ai_chat"} img={Robot}></ChatElement>
+                                        </motion.div>
                                         {conversations
                                             .filter((chat) => chat.pinned && !chat.group)
                                             .map((chat) => {
                                                 return (
-                                                    <ChatElement
-                                                        {...chat}
-                                                    />
+                                                    <motion.div variants={varHover(1.05)} whileHover="hover">
+                                                        <ChatElement
+                                                            {...chat}
+                                                        />
+                                                    </motion.div>
                                                 );
                                             })}
                                     </Stack>
@@ -188,9 +199,11 @@ const Chats = () => {
                                             .filter((chat) => !chat.pinned && !chat.group)
                                             .map((chat) => {
                                                 return (
-                                                    <ChatElement
-                                                        {...chat}
-                                                    />
+                                                    <motion.div variants={varHover(1.05)} whileHover="hover">
+                                                        <ChatElement
+                                                            {...chat}
+                                                        />
+                                                    </motion.div>
                                                 );
                                             })}
                                     </Stack>

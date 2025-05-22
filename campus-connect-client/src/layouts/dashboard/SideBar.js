@@ -6,10 +6,12 @@ import {Gear} from "phosphor-react";
 import {useDispatch, useSelector} from "react-redux";
 import CreateAvatar from "../../utils/createAvatar";
 import {LogoutUser} from "../../redux/slices/auth";
-import {Box, Divider, IconButton, Menu, MenuItem, Stack,} from "@mui/material";
+import {Box, Divider, Menu, MenuItem, Stack,} from "@mui/material";
 import {useLocation, useNavigate} from "react-router-dom";
 import {FetchUserProfile, SelectChatType} from "../../redux/slices/app";
 import {BASE_URL} from "../../config";
+import {IconButtonAnimate, varHover} from "../../components/animate";
+import {motion} from "framer-motion";
 
 const getMenuPath = (index) => {
     switch (index) {
@@ -134,12 +136,14 @@ const SideBar = () => {
                                         borderRadius: 1.5,
                                     }}
                                 >
-                                    <IconButton sx={{width: "max-content", color: "#fff"}}>
+                                    <motion.div variants={varHover(1.05)} whileHover="hover">
+                                        <IconButtonAnimate sx={{width: "max-content", color: "#fff"}}>
                                         {el.icon}
-                                    </IconButton>
+                                        </IconButtonAnimate>
+                                    </motion.div>
                                 </Box>
                             ) : (
-                                <IconButton
+                                <IconButtonAnimate
                                     key={el.index}
                                     onClick={() => {
                                         setSelected(el.index);
@@ -163,7 +167,8 @@ const SideBar = () => {
                                     }}
                                 >
                                     {el.icon}
-                                </IconButton>
+                                </IconButtonAnimate>
+
                             )
                         )}
 
@@ -177,12 +182,12 @@ const SideBar = () => {
                                         borderRadius: 1.5,
                                     }}
                                 >
-                                    <IconButton sx={{width: "max-content", color: "#fff"}}>
+                                    <IconButtonAnimate sx={{width: "max-content", color: "#fff"}}>
                                         <Gear/>
-                                    </IconButton>
+                                    </IconButtonAnimate>
                                 </Box>
                             ) : (
-                                <IconButton
+                                <IconButtonAnimate
                                     onClick={() => {
                                         navigate(getPath(2));
                                         setSelected(2);
@@ -196,7 +201,7 @@ const SideBar = () => {
                                     }}
                                 >
                                     <Gear/>
-                                </IconButton>
+                                </IconButtonAnimate>
                             )
                         )}
                     </Stack>
@@ -205,7 +210,6 @@ const SideBar = () => {
                 {/* Bottom Section */}
                 <Stack spacing={4}>
                     {/* Avatar */}
-
                     <Box
                         id="basic-button"
                         aria-controls={open ? "basic-menu" : undefined}

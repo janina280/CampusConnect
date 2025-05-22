@@ -6,7 +6,6 @@ import useResponsive from "../../hooks/useResponsive";
 import {ToggleSidebar} from "../../redux/slices/app";
 import {useDispatch, useSelector} from "react-redux";
 import CreateAvatar from "../../utils/createAvatar";
-import StyledBadge from "../StyledBadge";
 
 const ChatHeader = () => {
     const dispatch = useDispatch();

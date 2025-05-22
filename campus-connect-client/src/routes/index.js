@@ -7,7 +7,6 @@ import DashboardLayout from "../layouts/dashboard";
 // config
 import {DEFAULT_PATH} from "../config";
 import LoadingScreen from "../components/LoadingScreen";
-import Test from "../layouts/dashboard/index-test";
 import AuthLayout from "../layouts/auth";
 import OAuth2RedirectHandler from "../sections/auth/OAuth2RedirectHandler";
 
@@ -55,10 +54,6 @@ export default function Router() {
         { path: "conversation", element: <Conversation /> },
         { path: "profile", element: <ProfilePage /> },
         { path: "*", element: <Navigate to="/404" replace /> },
-        {
-          path: "/test",
-          element: <Test />
-        },
       ],
     },
     { path: "*", element: <Navigate to="/404" replace /> },

@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography} from "@mui/material";
+import {Box, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography} from "@mui/material";
 import {useSelector} from "react-redux";
 import {Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
 import axios from "../../utils/axios";
+import {FabButtonAnimate} from "../../components/animate";
 
 const Statistics = ({open, handleClose}) => {
     const token = useSelector((state) => state.auth.accessToken);
@@ -88,9 +89,9 @@ const Statistics = ({open, handleClose}) => {
                 )}
             </DialogContent>
             <DialogActions>
-                <Button variant="contained" onClick={handleClose}>
+                <FabButtonAnimate variant="contained" onClick={handleClose}>
                     OK
-                </Button>
+                </FabButtonAnimate>
             </DialogActions>
         </Dialog>
     );

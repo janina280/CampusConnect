@@ -2,10 +2,10 @@ import {Client} from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
 const SOCKET_URL = "http://localhost:8080/ws";
-
 class WebSocketService {
     constructor() {
         this.stompClient = null;
+        this.subscriptions = {};
     }
 
     connect() {
@@ -47,9 +47,22 @@ class WebSocketService {
             await this.connect();
         }
 
-        this.stompClient.subscribe(topic, (message) => {
+        const subscription = this.stompClient.subscribe(topic, (message) => {
             callback(JSON.parse(message.body));
         });
+
+        this.subscriptions[topic] = subscription;
+    }
+
+    off(topic) {
+        const subscription = this.subscriptions[topic];
+        if (subscription) {
+            subscription.unsubscribe();
+            delete this.subscriptions[topic];
+            console.log(`Unsubscribed from ${topic}`);
+        } else {
+            console.warn(`No active subscription for topic: ${topic}`);
+        }
     }
 
     async emit(destination, message) {
@@ -65,6 +78,8 @@ class WebSocketService {
     }
 
     disconnect() {
+        Object.values(this.subscriptions).forEach((sub) => sub.unsubscribe());
+        this.subscriptions = {};
         if (this.stompClient) {
             this.stompClient.deactivate();
             console.log("WebSocket connection closed.");

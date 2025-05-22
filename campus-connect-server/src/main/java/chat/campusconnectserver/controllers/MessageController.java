@@ -69,7 +69,7 @@ public class MessageController {
 
         List<Message> messages = messageService.getChatsMessages(chatId, user);
 
-        if (messages.isEmpty()) {
+        if (!messages.isEmpty()) {
             Chat chat = chatService.findChatById(chatId);
 
             String destination = chat.isGroup()
@@ -81,23 +81,7 @@ public class MessageController {
                     destination,
                     messageMapper.toMessagesResponse(messages)
             );
-            return;
         }
-
-        for (var chatUser : messages.get(0).getChat().getUsers()) {
-            var messageResponse = messageMapper.toMessagesResponse(messages);
-
-            String destination = messages.get(0).getChat().isGroup()
-                    ? "/message/group"
-                    : "/message/chat";
-
-            simpMessagingTemplate.convertAndSendToUser(
-                    chatUser.getId().toString(),
-                    destination,
-                    messageResponse
-            );
-        }
-
     }
 
     @GetMapping("/media")
@@ -165,7 +149,6 @@ public class MessageController {
 
         return ResponseEntity.ok(response);
     }
-
 
 
 }
