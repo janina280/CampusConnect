@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
-import {Alert, Box, Button, Divider, IconButton, Snackbar, Stack, Typography,} from "@mui/material";
-import {ArchiveBox, CircleDashed, MagnifyingGlass} from "phosphor-react";
+import {Alert, Box, Divider, Snackbar, Stack, Typography,} from "@mui/material";
+import {MagnifyingGlass} from "phosphor-react";
 import {SimpleBarStyle} from "../../components/Scrollbar";
 import BottomNav from "../../layouts/dashboard/BottomNav";
 import {Search, SearchIconWrapper, StyledInputBase,} from "../../components/Search";
@@ -53,6 +53,15 @@ const Chats = () => {
     };
 
     const handleCreateChat = (userId) => {
+        if (userId === user_id) {
+            dispatch(
+                showSnackbar({
+                    severity: "warning",
+                    message: "You cannot create a chat with yourself.",
+                })
+            );
+            return;
+        }
         const existingChat = conversations.find((chat) => chat.user_id === userId);
 
         if (existingChat) {
@@ -77,7 +86,6 @@ const Chats = () => {
                 })
             );
         } catch (error) {
-            console.error("Error creating chat:", error);
             dispatch(
                 showSnackbar({
                     severity: "error",

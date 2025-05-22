@@ -6,7 +6,7 @@ import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
 import {UpdateSidebarType} from "../../redux/slices/app";
 
-import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline} from "./Conversation";
+import {TextMsg, Timeline} from "./Conversation";
 
 const StarredMessagesGroup = () => {
     const dispatch = useDispatch();
@@ -84,29 +84,6 @@ const ConversationStarredGroup = ({isMobile, menu}) => {
 
                         case "msg":
                             switch (el.subtype) {
-                                case "image":
-                                    return (
-                                        // Media Message
-                                        <MediaMsg el={el} menu={menu}/>
-                                    );
-
-                                case "document":
-                                    return (
-                                        // Doc Message
-                                        <DocMsg el={el} menu={menu}/>
-                                    );
-                                case "link":
-                                    return (
-                                        //  Link Message
-                                        <LinkMsg el={el} menu={menu}/>
-                                    );
-
-                                case "reply":
-                                    return (
-                                        //  ReplyMessage
-                                        <ReplyMsg el={el} menu={menu}/>
-                                    );
-
                                 default:
                                     return (
                                         // Text Message

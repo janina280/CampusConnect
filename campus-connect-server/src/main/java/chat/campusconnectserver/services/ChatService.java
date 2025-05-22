@@ -33,6 +33,9 @@ public class ChatService {
     }
 
     public ChatDto createChat(Long firstUserId, Long secondUserId) throws UserException {
+        if (firstUserId.equals(secondUserId)) {
+            throw new UserException("You cannot create a chat with yourself.");
+        }
         User firstUser = userService.findUserById(firstUserId);
         User secondUser = userService.findUserById(secondUserId);
 

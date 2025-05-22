@@ -8,6 +8,7 @@ import {useDispatch} from "react-redux";
 import {starMessage} from "../../redux/slices/conversation";
 import {fSmartTime} from "../../utils/formatTime";
 import Microlink from "@microlink/react";
+import {showSnackbar} from "../../redux/slices/app";
 
 const MessageOption = ({el}) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -24,15 +25,16 @@ const MessageOption = ({el}) => {
 
     const handleStarMessage = () => {
         dispatch(starMessage(el.id));
+        dispatch(showSnackbar({
+            severity: "success",
+            message: "Message starred!",
+        }))
         handleClose();
     };
 
     const Message_options = [
         {
             title: "Star message", action: handleStarMessage
-        },
-        {
-            title: "Delete Message",
         },
     ];
 
@@ -250,7 +252,6 @@ const MediaMsg = ({el, menu}) => {
                     </Typography>
                 </Stack>
             </Box>
-            {menu && <MessageOption/>}
         </Stack>
     );
 };
@@ -404,8 +405,6 @@ const DocMsg = ({el, menu}) => {
                     </Typography>
                 </Stack>
             </Box>
-
-            {menu && <MessageOption/>}
         </Stack>
     );
 };
@@ -464,8 +463,6 @@ const LinkMsg = ({el, menu}) => {
                     </Typography>
                 </Stack>
             </Box>
-
-            {menu && <MessageOption/>}
         </Stack>
     );
 };

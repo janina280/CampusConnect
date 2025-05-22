@@ -27,7 +27,12 @@ import {FetchAllUsers, SelectRoomId, showSnackbar, ToggleSidebar, UpdateSidebarT
 import axios from "../../utils/axios";
 import Snackbar from "@mui/material/Snackbar";
 import {useWebSocket} from "../../contexts/WebSocketContext";
-import {SetCurrentConversation, SetCurrentGroup, UpdatePinnedStatus} from "../../redux/slices/conversation";
+import {
+    SetCurrentConversation,
+    SetCurrentGroup,
+    UpdateGroupImage,
+    UpdatePinnedStatus
+} from "../../redux/slices/conversation";
 import {BASE_URL} from "../../config";
 import Last3Images from "../../components/Last3Images";
 
@@ -35,28 +40,38 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const PinnedDialog = ({open, handleClose, chatId, onPin}) => {
-
+const PinDialog = ({
+                       open,
+                       handleClose,
+                       chatId,
+                       onAction,
+                       actionType = "pin",
+                       title,
+                       message,
+                   }) => {
     const authToken = useSelector((state) => state.auth.accessToken);
     const dispatch = useDispatch();
-    const handlePinChat = async () => {
+
+    const handleAction = async () => {
         try {
             await axios.patch(
-                `${chatId}/pin`,
+                `${chatId}/${actionType}`,
                 {},
                 {headers: {Authorization: `Bearer ${authToken}`}}
             );
 
-            if (onPin) onPin();
+            if (onAction) onAction();
             handleClose();
             dispatch(SelectRoomId({room_id: null}));
             dispatch(SetCurrentConversation({room_id: null}));
             dispatch(ToggleSidebar());
-
-        } catch (error) {
-            console.error("Error pinning chat:", error);
+            dispatch(showSnackbar({severity: "success", message: `Group ${actionType}ed successfully!`}));
         }
-    };
+        catch (error) {
+            dispatch(showSnackbar({severity: "error", message: `Error during ${actionType} group:`}));
+            console.error(`Error during ${actionType} group:`, error);
+        }
+    }
 
     return (
         <Dialog
@@ -66,58 +81,15 @@ const PinnedDialog = ({open, handleClose, chatId, onPin}) => {
             onClose={handleClose}
             aria-describedby="alert-dialog-slide-description"
         >
-            <DialogTitle>Pin this chat</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                    Would you like to pin this chat?
+                    {message}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={handlePinChat}>Yes</Button>
-            </DialogActions>
-        </Dialog>
-    );
-};
-
-const UnpinnedDialog = ({open, handleClose, chatId, onUnpin}) => {
-    const authToken = useSelector((state) => state.auth.accessToken);
-    const dispatch = useDispatch();
-    const handleUnpinChat = async () => {
-        try {
-            await axios.patch(
-                `${chatId}/unpin`,
-                {},
-                {headers: {Authorization: `Bearer ${authToken}`}}
-            );
-
-            if (onUnpin) onUnpin();
-            handleClose();
-            dispatch(SelectRoomId({room_id: null}));
-            dispatch(SetCurrentConversation({room_id: null}));
-            dispatch(ToggleSidebar());
-        } catch (error) {
-            console.error("Error unpinning chat:", error);
-        }
-    };
-
-    return (
-        <Dialog
-            open={open}
-            TransitionComponent={Transition}
-            keepMounted
-            onClose={handleClose}
-            aria-describedby="alert-dialog-slide-description"
-        >
-            <DialogTitle>Unpin this chat</DialogTitle>
-            <DialogContent>
-                <DialogContentText id="alert-dialog-slide-description">
-                    Would you like to unpin this chat?
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={handleUnpinChat}>Yes</Button>
+                <Button onClick={handleAction}>Yes</Button>
             </DialogActions>
         </Dialog>
     );
@@ -135,10 +107,10 @@ const RemoveMemberDialog = ({open, onClose, onConfirm, member}) => (
                 Are you sure you want to remove <b>{member?.name}</b> this group?
             </DialogContentText>
         </DialogContent>
-            <DialogActions>
-                <Button variant="outline" onClick={onClose}>Cancel</Button>
-                <Button variant="destructive" onClick={() => onConfirm(member.id)}>Yes</Button>
-                </DialogActions>
+        <DialogActions>
+            <Button variant="outline" onClick={onClose}>Cancel</Button>
+            <Button variant="destructive" onClick={() => onConfirm(member.id)}>Yes</Button>
+        </DialogActions>
 
     </Dialog>
 );
@@ -164,12 +136,6 @@ const LeaveChatDialog = ({open, handleClose, onLeaveSuccess}) => {
                 if (data.success) {
                     socket.emit("/app/groups", "Bearer " + token);
                     onLeaveSuccess();
-                    dispatch(
-                        showSnackbar({
-                            severity: "success",
-                            message: "Leave successfully!",
-                        })
-                    );
                 }
             })
             .catch((error) => {
@@ -246,7 +212,8 @@ const AddUserDialog = ({open, handleClose, groupId}) => {
             handleClose();
 
             dispatch(ToggleSidebar());
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Error adding user:", error);
             dispatch(
                 showSnackbar({
@@ -291,6 +258,9 @@ const AddUserDialog = ({open, handleClose, groupId}) => {
                                             <Typography variant="article" fontWeight={400}>
                                                 {user?.name}
                                             </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {user?.email}
+                                            </Typography>
                                         </Stack>
                                     </Stack>
                                 </MenuItem>
@@ -333,18 +303,23 @@ const ContactGroup = () => {
 
     const isDesktop = useResponsive("up", "md");
     const [openLeave, setOpenLeave] = useState(false);
+
     const [conversation, setConversation] = useState(null);
+
     const [openAddUser, setOpenAddUser] = useState(false);
     const [openPinned, setOpenPinned] = useState(false);
     const [openUnpinned, setOpenUnpinned] = useState(false);
+    const [sharedMediaCount, setSharedMediaCount] = useState(0);
+
     const [groupMembers, setGroupMembers] = useState([]);
+
     const token = useSelector((state) => state.auth.accessToken);
     const {roles = []} = useSelector((state) => state.auth);
+
     const isAdmin = roles.includes("ROLE_ADMIN");
     const isTutor = roles.includes("ROLE_TUTOR");
+
     const adminOrTutor = isAdmin || isTutor;
-    const [sharedMediaCount, setSharedMediaCount] = useState(0);
-    const authToken = useSelector((state) => state.auth.accessToken);
 
     const handleCloseAddUser = () => {
         setOpenAddUser(false);
@@ -375,12 +350,13 @@ const ContactGroup = () => {
                     `api/message/count-media/${current_group_conversation?.id}`,
                     {
                         headers: {
-                            Authorization: `Bearer ${authToken}`,
+                            Authorization: `Bearer ${token}`,
                         },
                     }
                 );
                 setSharedMediaCount(response.data);
-            } catch (error) {
+            }
+            catch (error) {
                 console.error("Error fetching media count:", error);
             }
         };
@@ -394,6 +370,7 @@ const ContactGroup = () => {
         dispatch(SetCurrentGroup({room_id: null}));
         dispatch(SelectRoomId({room_id: null}));
         dispatch(ToggleSidebar());
+        dispatch(showSnackbar({severity: "success", message: "Group left successfully!"}));
     };
 
     const [selectedMember, setSelectedMember] = useState(null);
@@ -419,9 +396,11 @@ const ContactGroup = () => {
                     message: "User removed successfully!",
                 })
             );
-        } catch (err) {
+        }
+        catch (err) {
             console.error("Error to remove member", err);
-        } finally {
+        }
+        finally {
             setRemoveDialogOpen(false);
             setSelectedMember(null);
         }
@@ -429,25 +408,42 @@ const ContactGroup = () => {
 
     const handleGroupImageChange = async (e) => {
         const file = e.target.files[0];
-        if (!file || !conversation?.id) return;
+        if (!file || !current_group_conversation?.id) return;
 
         const formData = new FormData();
         formData.append("image", file);
 
         try {
-            await axios.put(`${BASE_URL}/groups/${conversation.id}/image`, formData, {
+            const response = await axios.put(`${current_group_conversation.id}/image`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    Authorization: `Bearer ${token}`,
                 },
             });
+            if (response.status === 200) {
+                dispatch(UpdateGroupImage({
+                    groupId: current_group_conversation.id,
+                    imageUrl: response.data.img
+                }));
+                dispatch(
+                    showSnackbar({
+                        severity: "success",
+                        message: "Image updated successfully!",
+                    })
+                );
+            }
 
-            //dispatch(fetchConversationById(conversation.id));
-        } catch (error) {
-            console.error("Eroare la schimbarea imaginii grupului", error);
+
+        }
+        catch (error) {
+            dispatch(
+                showSnackbar({
+                    severity: "error",
+                    message: "Failed to update image.",
+                })
+            );
         }
     };
-
 
     return (
         <Box sx={{width: !isDesktop ? "100vw" : 320, maxHeight: "100vh"}}>
@@ -492,8 +488,8 @@ const ContactGroup = () => {
                     <Stack direction="row" spacing={2} alignItems="center">
                         <Box sx={{position: "relative", width: 56, height: 56}}>
                             <CreateAvatar
-                                name={conversation?.name}
-                                imageUrl={conversation?.img}
+                                name={current_group_conversation?.name}
+                                imageUrl={`${BASE_URL}/${current_group_conversation?.img}?${Date.now()}`}
                                 size={56}
                             />
                             {adminOrTutor && (
@@ -526,7 +522,7 @@ const ContactGroup = () => {
 
                         <Stack spacing={0.5}>
                             <Typography variant="article" fontWeight={600}>
-                                {conversation?.name}
+                                {current_group_conversation?.name}
                             </Typography>
                         </Stack>
                     </Stack>
@@ -547,7 +543,7 @@ const ContactGroup = () => {
                         </Button>
                     </Stack>
                     <Stack direction={"row"} alignItems="center" spacing={2}>
-                        <Last3Images chatId={conversation?.id}/>
+                        <Last3Images chatId={current_group_conversation?.id}/>
                     </Stack>
                     <Divider/>
                     <Stack
@@ -588,9 +584,9 @@ const ContactGroup = () => {
                                             <Typography variant="body2">{user.name}</Typography>
                                         </Stack>
                                         {isAdmin && (
-                                        <Button onClick={() => handleOpenRemoveDialog(user)}>
-                                            <X className="w-4 h-4 text-red-500 hover:text-red-700" />
-                                        </Button>)}
+                                            <Button onClick={() => handleOpenRemoveDialog(user)}>
+                                                <X className="w-4 h-4 text-red-500 hover:text-red-700"/>
+                                            </Button>)}
                                     </Stack>
                                 ))
                             ) : (
@@ -603,14 +599,14 @@ const ContactGroup = () => {
 
                     <Stack direction="row" alignItems={"center"} spacing={2}>
                         {adminOrTutor && (
-                        <Button
-                            onClick={() => setOpenAddUser(true)}
-                            startIcon={<Plus/>}
-                            variant="outlined"
-                            sx={{width: "100%"}}
-                        >
-                            Add
-                        </Button>)}
+                            <Button
+                                onClick={() => setOpenAddUser(true)}
+                                startIcon={<Plus/>}
+                                variant="outlined"
+                                sx={{width: "100%"}}
+                            >
+                                Add
+                            </Button>)}
                         <Button
                             onClick={() => setOpenLeave(true)}
                             startIcon={<SignOut/>}
@@ -620,20 +616,20 @@ const ContactGroup = () => {
                             Leave
                         </Button>
                         {adminOrTutor && (
-                        <Button
-                            onClick={() => {
-                                if (conversation?.pinned) {
-                                    setOpenUnpinned(true);
-                                } else {
-                                    setOpenPinned(true);
-                                }
-                            }}
-                            startIcon={conversation?.pinned ? <PushPin/> : <PushPin/>}
-                            variant="outlined"
-                            sx={{width: "100%"}}
-                        >
-                            {conversation?.pinned ? 'Unpin' : 'Pin'}
-                        </Button>)}
+                            <Button
+                                onClick={() => {
+                                    if (current_group_conversation?.pinned) {
+                                        setOpenUnpinned(true);
+                                    } else {
+                                        setOpenPinned(true);
+                                    }
+                                }}
+                                startIcon={current_group_conversation?.pinned ? <PushPin/> : <PushPin/>}
+                                variant="outlined"
+                                sx={{width: "100%"}}
+                            >
+                                {current_group_conversation?.pinned ? 'Unpin' : 'Pin'}
+                            </Button>)}
                     </Stack>
 
                 </Stack>
@@ -641,24 +637,28 @@ const ContactGroup = () => {
             {openLeave && <LeaveChatDialog open={openLeave} handleClose={() => setOpenLeave(false)}
                                            onLeaveSuccess={handleLeaveSuccess}/>}
             {<AddUserDialog open={openAddUser} handleClose={handleCloseAddUser} groupId={groupId}/>}
-            {openPinned && (
-                <PinnedDialog
-                    open={openPinned}
-                    handleClose={() => setOpenPinned(false)}
-                    chatId={conversation?.id}
-                    onPin={() => {
-                        dispatch(UpdatePinnedStatus({id: conversation.id, pinned: true, isGroup}));
+            {(openPinned || openUnpinned) && (
+                <PinDialog
+                    open={openPinned || openUnpinned}
+                    handleClose={() => {
+                        if (openPinned) setOpenPinned(false);
+                        if (openUnpinned) setOpenUnpinned(false);
                     }}
-                />
-            )}
-            {openUnpinned && (
-                <UnpinnedDialog
-                    open={openUnpinned}
-                    handleClose={() => setOpenUnpinned(false)}
-                    chatId={conversation?.id}
-                    onUnpin={() => {
-                        dispatch(UpdatePinnedStatus({id: conversation.id, pinned: false, isGroup}));
+                    chatId={current_group_conversation?.id}
+                    actionType={openPinned ? "pin" : "unpin"}
+                    onAction={() => {
+                        dispatch(UpdatePinnedStatus({
+                            id: current_group_conversation.id,
+                            pinned: openPinned,
+                            isGroup: true
+                        }));
                     }}
+                    title={openPinned ? "Pin this group" : "Unpin this group"}
+                    message={
+                        openPinned
+                            ? "Would you like to pin this group?"
+                            : "Would you like to unpin this group?"
+                    }
                 />
             )}
             <RemoveMemberDialog

@@ -9,6 +9,7 @@ import {LogoutUser} from "../../redux/slices/auth";
 import {Box, Divider, IconButton, Menu, MenuItem, Stack,} from "@mui/material";
 import {useLocation, useNavigate} from "react-router-dom";
 import {FetchUserProfile, SelectChatType} from "../../redux/slices/app";
+import {BASE_URL} from "../../config";
 
 const getMenuPath = (index) => {
     switch (index) {
@@ -43,16 +44,16 @@ const SideBar = () => {
     const location = useLocation();
     const dispatch = useDispatch();
     const open = Boolean(anchorEl);
+    const {roles = []} = useSelector((state) => state.auth);
+    const isAdmin = roles.includes("ROLE_ADMIN");
 
     const token = useSelector(
         (state) => state.auth.accessToken);
 
-    // Handle Avatar menu click
     const handleAvatarClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
-    // Handle Menu Close
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -99,7 +100,6 @@ const SideBar = () => {
                 sx={{height: "100%"}}
                 spacing={3}
             >
-                {/* Top Section */}
                 <Stack alignItems={"center"} spacing={4}>
                     {/* Logo */}
                     <Box
@@ -168,36 +168,36 @@ const SideBar = () => {
                         )}
 
                         <Divider sx={{width: "48px"}}/>
-
-                        {/* Gear Icon */}
-                        {selected === 2 ? (
-                            <Box
-                                p={1}
-                                sx={{
-                                    backgroundColor: theme.palette.primary.main,
-                                    borderRadius: 1.5,
-                                }}
-                            >
-                                <IconButton sx={{width: "max-content", color: "#fff"}}>
+                        {isAdmin && (
+                            selected === 2 ? (
+                                <Box
+                                    p={1}
+                                    sx={{
+                                        backgroundColor: theme.palette.primary.main,
+                                        borderRadius: 1.5,
+                                    }}
+                                >
+                                    <IconButton sx={{width: "max-content", color: "#fff"}}>
+                                        <Gear/>
+                                    </IconButton>
+                                </Box>
+                            ) : (
+                                <IconButton
+                                    onClick={() => {
+                                        navigate(getPath(2));
+                                        setSelected(2);
+                                    }}
+                                    sx={{
+                                        width: "max-content",
+                                        color:
+                                            theme.palette.mode === "light"
+                                                ? "#000"
+                                                : theme.palette.text.primary,
+                                    }}
+                                >
                                     <Gear/>
                                 </IconButton>
-                            </Box>
-                        ) : (
-                            <IconButton
-                                onClick={() => {
-                                    navigate(getPath(2));
-                                    setSelected(2);
-                                }}
-                                sx={{
-                                    width: "max-content",
-                                    color:
-                                        theme.palette.mode === "light"
-                                            ? "#000"
-                                            : theme.palette.text.primary,
-                                }}
-                            >
-                                <Gear/>
-                            </IconButton>
+                            )
                         )}
                     </Stack>
                 </Stack>
@@ -215,7 +215,7 @@ const SideBar = () => {
                     >
                         <CreateAvatar
                             name={user.name}
-                            imageUrl={`http://localhost:8080/${user.imageUrl}`}
+                            imageUrl={`${BASE_URL}/${user.imageUrl}`}
                             size={56}
                         />
                     </Box>
@@ -239,30 +239,32 @@ const SideBar = () => {
                         }}
                     >
                         <Stack spacing={1} px={1}>
-                            {Profile_Menu.map((el, idx) => (
-                                <MenuItem
-                                    key={idx}
-                                    onClick={() => {
-                                        if (idx === 2) {
-                                            dispatch(LogoutUser());
-
-                                        } else {
-                                            navigate(getMenuPath(idx));
-                                        }
-                                        handleClose();
-                                    }}
-                                >
-                                    <Stack
-                                        sx={{width: 100}}
-                                        direction={"row"}
-                                        alignItems={"center"}
-                                        justifyContent={"space-between"}
+                            {Profile_Menu
+                                .filter(el => !(el.title === "Settings" && !isAdmin))
+                                .map((el, idx) => (
+                                    <MenuItem
+                                        key={idx}
+                                        onClick={() => {
+                                            if (el.title === "LogOut") {
+                                                dispatch(LogoutUser());
+                                            } else {
+                                                const path = getMenuPath(Profile_Menu.findIndex(item => item.title === el.title));
+                                                navigate(path);
+                                            }
+                                            handleClose();
+                                        }}
                                     >
-                                        <span>{el.title}</span>
-                                        {el.icon}
-                                    </Stack>
-                                </MenuItem>
-                            ))}
+                                        <Stack
+                                            sx={{width: 100}}
+                                            direction={"row"}
+                                            alignItems={"center"}
+                                            justifyContent={"space-between"}
+                                        >
+                                            <span>{el.title}</span>
+                                            {el.icon}
+                                        </Stack>
+                                    </MenuItem>
+                                ))}
                         </Stack>
                     </Menu>
                 </Stack>

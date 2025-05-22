@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 public class ChatController {
     private final ChatService chatService;
     private final UserService userService;
-
     private final TokenProvider tokenProvider;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -210,7 +209,7 @@ public class ChatController {
     }
 
     @PutMapping("/{chatId}/image")
-    public ResponseEntity<ApiResponse> updateGroupImage(
+    public ResponseEntity<Chat> updateGroupImage(
             @PathVariable Long chatId,
             @RequestPart("image") MultipartFile image,
             @RequestHeader("Authorization") String jwt
@@ -235,7 +234,8 @@ public class ChatController {
         chat.setImg(imagePath);
         Chat updatedChat = chatService.saveChat(chat);
 
-        return new ResponseEntity<>(new ApiResponse("Group image updated", true), HttpStatus.OK);
+        return new ResponseEntity<Chat>(updatedChat, HttpStatus.OK);
+
     }
 
     @GetMapping("/groups/{groupId}/image/{fileName}")

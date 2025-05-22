@@ -46,15 +46,18 @@ const PinDialog = ({
             await axios.patch(
                 `${chatId}/${actionType}`,
                 {},
-                { headers: { Authorization: `Bearer ${authToken}` } }
+                {headers: {Authorization: `Bearer ${authToken}`}}
             );
 
             if (onAction) onAction();
             handleClose();
-            dispatch(SelectRoomId({ room_id: null }));
-            dispatch(SetCurrentConversation({ room_id: null }));
+            dispatch(SelectRoomId({room_id: null}));
+            dispatch(SetCurrentConversation({room_id: null}));
             dispatch(ToggleSidebar());
-        } catch (error) {
+            dispatch(showSnackbar({severity: "success", message: `Chat ${actionType}ed successfully!`}));
+        }
+        catch (error) {
+            dispatch(showSnackbar({severity: "error", message: `Error during ${actionType} chat:`}));
             console.error(`Error during ${actionType} chat:`, error);
         }
     };
@@ -144,7 +147,7 @@ const Contact = () => {
 
     const {current_conversation} = useSelector((state) => state.conversation.direct_chat);
     const {chat_type} = useSelector((store) => store.app);
-    const authToken = useSelector((state) => state.auth.accessToken);
+    const token = useSelector((state) => state.auth.accessToken);
     const theme = useTheme();
     const isDesktop = useResponsive("up", "md");
 
@@ -162,9 +165,10 @@ const Contact = () => {
             try {
                 const response = await axios.get
                 (`common-groups/${current_conversation.user_id}`,
-                    {headers: {Authorization: `Bearer ${authToken}`}});
+                    {headers: {Authorization: `Bearer ${token}`}});
                 setCommonGroups(response.data);
-            } catch (error) {
+            }
+            catch (error) {
                 console.error("Error fetching common groups:", error);
             }
         };
@@ -190,12 +194,13 @@ const Contact = () => {
                     `api/message/count-media/${current_conversation?.id}`,
                     {
                         headers: {
-                            Authorization: `Bearer ${authToken}`,
+                            Authorization: `Bearer ${token}`,
                         },
                     }
                 );
                 setSharedMediaCount(response.data);
-            } catch (error) {
+            }
+            catch (error) {
                 console.error("Error fetching media count:", error);
             }
         };
@@ -211,6 +216,7 @@ const Contact = () => {
         dispatch(SelectRoomId({room_id: null}));
         dispatch(SetCurrentConversation({room_id: null}));
         dispatch(ToggleSidebar());
+        dispatch(showSnackbar({severity: "success", message: "Leaved successfully!"}));
     };
 
     return (
@@ -314,7 +320,7 @@ const Contact = () => {
                     <Stack spacing={2}>
                         {commonGroups.length > 0 ? (commonGroups.map((group) => (
                             <Stack key={group.id} direction="row" alignItems={"center"} spacing={2}>
-                                <CreateAvatar name={group.name} imageUrl={group.img} size={40}/>
+                                <CreateAvatar name={group.name} imageUrl={`${BASE_URL}/${group?.img}`} size={40}/>
                                 <Stack>
                                     <Typography variant="subtitle2">{group.name}</Typography>
                                     <Typography variant="caption">
@@ -336,7 +342,7 @@ const Contact = () => {
                             }}
                             startIcon={conversation?.pinned ? <PushPin/> : <PushPin/>}
                             variant="outlined"
-                            sx={{ width: "100%" }}
+                            sx={{width: "100%"}}
                         >
                             {conversation?.pinned ? 'Unpin' : 'Pin'}
                         </Button>

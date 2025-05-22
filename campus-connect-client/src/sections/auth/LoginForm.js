@@ -38,22 +38,25 @@ const LoginForm = () => {
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
 
-  const onSubmit = async (data) => {
-    setError("");
+    const onSubmit = async (data) => {
+        setError("");
 
-    try {
-      dispatch(LoginUser(data));
-    } catch (error) {
-      console.error(error);
-      reset();
-      setError("afterSubmit", {
-        ...error,
-        message: error.message,
-      });
-    }
-  };
+        try {
+            const result = await dispatch(LoginUser(data));
 
-  return (
+            if (result && result.success === false) {
+                setError(result.error);
+            }
+
+        }
+        catch (error) {
+            console.error("Login error:", error);
+            setError("Something went wrong. Please try again.");
+        }
+    };
+
+
+    return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
         {!!error && <Alert severity="error">{error}</Alert>}

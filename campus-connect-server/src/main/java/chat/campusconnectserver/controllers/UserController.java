@@ -48,7 +48,6 @@ public class UserController {
     }
 
     @GetMapping
-   // @PreAuthorize("hasRole('USER')")
     public User getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
         return userRepository.findById(userPrincipal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
@@ -85,19 +84,6 @@ public class UserController {
         UserDto updatedUserResponse = new UserDto(existingUser);
         return ResponseEntity.ok(updatedUserResponse);
     }
-
-
-   // @GetMapping("/all")
-    //public List<UserDto> getAllUsers() {
-      //  return userService.findAllUsers();
-    //}
-
-   // @PreAuthorize("hasRole('ADMIN')")
-    //@GetMapping("/admin")
-    //public ResponseEntity<List<UserDto>> getAllUsersForAdmin() {
-      //  List<UserDto> users = userService.findAllUsers();
-       // return ResponseEntity.ok(users);
-    //}
 
     @GetMapping("/all")
     @Transactional

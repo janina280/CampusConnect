@@ -115,7 +115,7 @@ const slice = createSlice({
                     lastMessageType: lastMessage?.type || "text",
                     unread: 0,
                     pinned: el.pinned,
-                    img: el?.imageUrl,
+                    img: el?.img,
                 };
             });
             const sortedListGroup = list.sort((a, b) => {
@@ -288,7 +288,7 @@ const slice = createSlice({
                         about: el?.about,
                         starred: el.starred || false,
                         online: el?.status === "Online",
-                        img: el?.imageUrl
+                        img: el?.img
                     }
                 }
             );
@@ -384,6 +384,23 @@ const slice = createSlice({
             }
         },
 
+        updateGroupImage(state, action) {
+            const {groupId, imageUrl} = action.payload;
+
+            state.group_chat.groups = state.group_chat.groups.map(group => {
+                if (group.id === groupId) {
+                    return {...group, img: imageUrl};
+                }
+                return group;
+            });
+
+            if (state.group_chat.current_group_conversation?.id === groupId) {
+                state.group_chat.current_group_conversation.img = imageUrl;
+            }
+        }
+
+        ,
+
         starMessage(state, action) {
             const starredMsg = action.payload;
 
@@ -402,7 +419,7 @@ const slice = createSlice({
             state.group_chat.current_messages_group = sortMessagesByTime(state.group_chat.current_messages_group);
         },
     }
-    });
+});
 
 // Reducer
 export default slice.reducer;
@@ -484,12 +501,17 @@ export const AddUserToGroupConversation = (conversation) => {
     }
 }
 
-export const UpdatePinnedStatus = ({ id, pinned, isGroup }) => {
+export const UpdatePinnedStatus = ({id, pinned, isGroup}) => {
     return async (dispatch, getState) => {
-        dispatch(slice.actions.updatePinnedStatus({ id, pinned, isGroup }));
+        dispatch(slice.actions.updatePinnedStatus({id, pinned, isGroup}));
     };
 };
 
+export const UpdateGroupImage = ({groupId, imageUrl}) => {
+    return async (dispatch) => {
+        dispatch(slice.actions.updateGroupImage({groupId, imageUrl}));
+    };
+};
 
 
 export const starMessage = (messageId) => async (dispatch, getState) => {
@@ -504,11 +526,11 @@ export const starMessage = (messageId) => async (dispatch, getState) => {
         const response = await axios.put(
             `http://localhost:8080/api/message/${messageId}/starred`,
             {},
-           {
+            {
                 headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
         if (response.status === 200) {
             dispatch(slice.actions.starMessage(response.data));

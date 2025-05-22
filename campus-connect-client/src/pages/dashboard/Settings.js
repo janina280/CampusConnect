@@ -1,15 +1,18 @@
 import React, {useEffect, useState} from "react";
 import {Box, Divider, IconButton, Stack, Typography} from "@mui/material";
 import {useTheme} from "@mui/material/styles";
-import {CaretLeft, Info} from "phosphor-react";
+import {CaretLeft} from "phosphor-react";
 import NoChatSVG from "../../assets/Illustration/NoChat";
 import CreateAvatar from "../../utils/createAvatar";
 import {useDispatch, useSelector} from "react-redux";
-import {FetchUserProfile} from "../../redux/slices/app";
+import {CloseSidebar, FetchUserProfile} from "../../redux/slices/app";
 import Statistics from "../../sections/settings/Statistics";
 import UserStatistics from "../../sections/settings/UserStatistics";
 import {BASE_URL} from "../../config";
 import UserRoleManagement from "../../sections/settings/RoleUsers";
+import BarChartIcon from '@mui/icons-material/BarChart';
+import InsertChartIcon from '@mui/icons-material/InsertChart';
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 function Settings() {
   const theme = useTheme();
@@ -35,28 +38,29 @@ function Settings() {
   }
 
   useEffect(() => {
+    dispatch(CloseSidebar());
     dispatch(FetchUserProfile())
   }, [token]);
 
   const list = [
     {
       key: 1,
-      icon: <Info size={20} />,
+      icon: <BarChartIcon size={20}/>,
       title: "Group Statistics",
       onclick: () => setOpenStatistics(true),
       show: isAdmin,
     },
     {
       key: 2,
-      icon: <Info size={20}/>,
+      icon: <InsertChartIcon size={20}/>,
       title: "User Statistics",
       onclick: () => setOpenStatisticsUser(true),
       show: isAdmin,
     },
     {
       key: 3,
-      icon: <Info size={20}/>,
-      title: "Role Users",
+      icon: <ManageAccountsIcon size={20}/>,
+      title: "Manage Roles",
       onclick: () => setOpenRole(true),
       show: isAdmin,
     }
@@ -96,7 +100,7 @@ function Settings() {
               />
               <Stack spacing={0.5}>
                 <Typography variant="article">{user.name}</Typography>
-                <Typography variant="body2">{user.about}</Typography>
+                <Typography variant="body2">{user.email}</Typography>
               </Stack>
             </Stack>
             {/* List of options */}
@@ -138,7 +142,7 @@ function Settings() {
             justifyContent={"center"}
           >
             <NoChatSVG />
-            <Typography variant="subtitle2">Customize your experience.</Typography>
+            <Typography variant="body2"> You can view and manage your statistics and roles here.</Typography>
           </Stack>
         </Box>
       </Stack>

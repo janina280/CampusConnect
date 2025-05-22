@@ -8,6 +8,7 @@ import chat.campusconnectserver.security.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public User findUserById(Long id) throws UserException {
         Optional<User> optional = userRepository.findById(id);
         if (optional.isPresent()) {
@@ -31,6 +33,14 @@ public class UserService {
         }
         throw new UserException("User not found with id" + id);
     }
+
+    @Transactional(readOnly = true)
+    public UserDto getUserDtoById(Long id) throws UserException {
+        User user = userRepository.findByIdWithRoles(id)
+                .orElseThrow(() -> new UserException("User not found with id " + id));
+        return new UserDto(user);
+    }
+
 
     public User findUserProfile(String jwt) {
         Long userId = tokenProvider.getUserIdFromToken(jwt.substring(7));

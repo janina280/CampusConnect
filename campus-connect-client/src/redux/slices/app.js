@@ -41,6 +41,9 @@ const slice = createSlice({
         toggleSideBar(state) {
             state.sideBar.open = !state.sideBar.open;
         },
+        closeSideBar(state) {
+            state.sideBar.open = false;
+        },
         updateSideBarType(state, action) {
             state.sideBar.type = action.payload.type;
         },
@@ -66,7 +69,11 @@ const slice = createSlice({
         },
         selectRoomId(state, action) {
             state.room_id = action.payload.room_id;
+        },
+        updateUserImage(state, action) {
+            state.user.imageUrl = action.payload.imageUrl;
         }
+
     },
 });
 
@@ -106,6 +113,12 @@ export function UpdateSidebarType(type) {
     };
 }
 
+export function CloseSidebar() {
+    return async (dispatch) => {
+        dispatch(slice.actions.closeSideBar());
+    };
+}
+
 export function UpdateTab(tab) {
     return async (dispatch, getState) => {
         dispatch(slice.actions.updateTab(tab));
@@ -126,6 +139,44 @@ export function SelectRoomId({room_id}) {
         dispatch(slice.actions.selectRoomId({room_id}));
     };
 }
+
+export const UploadUserImage = (file) => {
+    return async (dispatch, getState) => {
+        const token = getState().auth.accessToken;
+        const user_id = getState().auth.user_id;
+
+        const formData = new FormData();
+        formData.append(
+            "updatedUserDto",
+            new Blob([JSON.stringify({id: user_id})], {type: "application/json"})
+        );
+        formData.append("image", file);
+
+        try {
+            const res = await axios.put("/api/user/update", formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            if (res.status === 200) {
+                dispatch(
+                    slice.actions.updateUserImage({
+                        imageUrl: res.data.imageUrl,
+                    })
+                );
+                dispatch(showSnackbar({severity: "success", message: "Image updated"}));
+            } else {
+                console.error("Upload failed", res.status);
+            }
+        }
+        catch (err) {
+            console.error("Image upload error:", err);
+        }
+    };
+};
+
 
 export const FetchUserProfile = () => {
     return async (dispatch, getState) => {

@@ -5,8 +5,7 @@ import {ArrowLeft} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
 import {UpdateSidebarType} from "../../redux/slices/app";
-
-import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline} from "./Conversation";
+import {TextMsg, Timeline} from "./Conversation";
 
 const StarredMessages = () => {
     const dispatch = useDispatch();
@@ -15,13 +14,13 @@ const StarredMessages = () => {
 
     const isDesktop = useResponsive("up", "md");
 
-    const { current_messages } = useSelector((state) => state.conversation.direct_chat);
+    const {current_messages} = useSelector((state) => state.conversation.direct_chat);
 
     const starredMessages = current_messages.filter((current_messages) => current_messages.starred === true);
 
     return (
-        <Box sx={{ width: !isDesktop ? "100vw" : 320, maxHeight: "100vh" }}>
-            <Stack sx={{ height: "100%" }}>
+        <Box sx={{width: !isDesktop ? "100vw" : 320, maxHeight: "100vh"}}>
+            <Stack sx={{height: "100%"}}>
                 <Box
                     sx={{
                         boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
@@ -33,7 +32,7 @@ const StarredMessages = () => {
                     }}
                 >
                     <Stack
-                        sx={{ height: "100%", p: 2 }}
+                        sx={{height: "100%", p: 2}}
                         direction="row"
                         alignItems={"center"}
                         spacing={3}
@@ -43,7 +42,7 @@ const StarredMessages = () => {
                                 dispatch(UpdateSidebarType("CONTACT"));
                             }}
                         >
-                            <ArrowLeft />
+                            <ArrowLeft/>
                         </IconButton>
                         <Typography variant="subtitle2">Starred Messages</Typography>
                     </Stack>
@@ -57,7 +56,7 @@ const StarredMessages = () => {
                     }}
                     spacing={3}
                 >
-                    <ConversationStarred messages={starredMessages} />
+                    <ConversationStarred messages={starredMessages}/>
                 </Stack>
             </Stack>
         </Box>
@@ -67,8 +66,8 @@ const StarredMessages = () => {
 export default StarredMessages;
 
 
-const ConversationStarred = ({ isMobile, menu }) => {
-    const { current_messages } = useSelector((state) => state.conversation.direct_chat);
+const ConversationStarred = ({isMobile, menu}) => {
+    const {current_messages} = useSelector((state) => state.conversation.direct_chat);
 
     const starredMessages = current_messages.filter((current_messages) => current_messages.starred === true);
 
@@ -80,38 +79,15 @@ const ConversationStarred = ({ isMobile, menu }) => {
                         case "divider":
                             return (
                                 // Timeline
-                                <Timeline el={el} />
+                                <Timeline el={el}/>
                             );
 
                         case "msg":
                             switch (el.subtype) {
-                                case "image":
-                                    return (
-                                        // Media Message
-                                        <MediaMsg el={el} menu={menu} />
-                                    );
-
-                                case "document":
-                                    return (
-                                        // Doc Message
-                                        <DocMsg el={el} menu={menu} />
-                                    );
-                                case "link":
-                                    return (
-                                        //  Link Message
-                                        <LinkMsg el={el} menu={menu} />
-                                    );
-
-                                case "reply":
-                                    return (
-                                        //  ReplyMessage
-                                        <ReplyMsg el={el} menu={menu} />
-                                    );
-
                                 default:
                                     return (
                                         // Text Message
-                                        <TextMsg el={el} menu={menu} />
+                                        <TextMsg el={el} menu={menu}/>
                                     );
                             }
 
@@ -123,4 +99,4 @@ const ConversationStarred = ({ isMobile, menu }) => {
         </Box>
     );
 };
-export { ConversationStarred };
+export {ConversationStarred};

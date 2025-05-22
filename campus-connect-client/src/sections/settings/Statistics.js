@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from "react";
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography} from "@mui/material";
-import axios from "axios";
 import {useSelector} from "react-redux";
 import {Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
+import axios from "../../utils/axios";
 
 const Statistics = ({open, handleClose}) => {
     const token = useSelector((state) => state.auth.accessToken);
     const [groups, setGroups] = useState([]);
     useEffect(() => {
         if (open) {
-            axios.get("http://localhost:8080/admin/groups", {
+            axios.get(`admin/groups`, {
                 headers: {Authorization: `Bearer ${token}`},
             })
                 .then(res => setGroups(res.data))
@@ -59,10 +59,8 @@ const Statistics = ({open, handleClose}) => {
                             </ResponsiveContainer>
                         </Box>
 
-                        {/* Divider for separation */}
                         <Typography variant="h6" mt={4} mb={2}>📋 Group Details</Typography>
 
-                        {/* Scrollable and responsive grid list */}
                         <Box sx={{maxHeight: 300, overflowY: "auto"}}>
                             <Grid container spacing={2}>
                                 {groups.map(group => (

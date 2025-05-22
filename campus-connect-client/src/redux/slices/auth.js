@@ -82,13 +82,17 @@ export function LoginUser(fromValues) {
                 dispatch(
                     slice.actions.updateIsLoading({isLoading: false, error: false})
                 );
+                return {success: true};
             })
             .catch(function (error) {
-                dispatch(showSnackbar({severity: "error", message: error.response.data.message}));
-                dispatch(
-                    slice.actions.updateIsLoading({isLoading: false, error: false})
-                );
+                const data = error?.response?.data;
+                const errorMessage = "Login failed. Please try again.";
+
+                dispatch(showSnackbar({severity: "error", message: errorMessage}));
+                dispatch(slice.actions.updateIsLoading({isLoading: false, error: false}));
+                return {success: false, error: errorMessage};
             });
+
     };
 }
 

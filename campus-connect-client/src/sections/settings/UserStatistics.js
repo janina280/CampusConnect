@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@mui/material";
 import {useSelector} from "react-redux";
-import axios from "axios";
 import {Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import axios from "../../utils/axios";
 
 const UserStatistics = ({open, handleClose}) => {
     const token = useSelector((state) => state.auth.accessToken);
@@ -11,7 +11,7 @@ const UserStatistics = ({open, handleClose}) => {
     useEffect(() => {
         if (open) {
             axios
-                .get("http://localhost:8080/api/user/stats/messages", {
+                .get("api/user/stats/messages", {
                     headers: {Authorization: `Bearer ${token}`}
                 })
                 .then((res) => setUsers(res.data))

@@ -19,7 +19,9 @@ const ProfileMenu = () => {
     setAnchorEl(null);
   };
   const user_name = user?.firstName;
- 
+  const {roles = []} = useSelector((state) => state.auth);
+
+  const isAdmin = roles.includes("ROLE_ADMIN");
 
   return (
     <>
@@ -52,31 +54,32 @@ const ProfileMenu = () => {
       >
         <Box p={1}>
           <Stack spacing={1}>
-            {Profile_Menu.map((el, idx) => (
-              <MenuItem onClick={handleClose}>
-                <Stack
-                  onClick={() => {
-                    if(idx === 0) {
-                      navigate("/profile");
-                    }
-                    else if(idx === 1) {
-                      navigate("/settings");
-                    }
-                    else {
-                      dispatch(LogoutUser());
-                     // socket.emit("end", {user_id});
-                    }
-                  }}
-                  sx={{ width: 100 }}
-                  direction="row"
-                  alignItems={"center"}
-                  justifyContent="space-between"
-                >
-                  <span>{el.title}</span>
-                  {el.icon}
-                </Stack>{" "}
-              </MenuItem>
-            ))}
+            {Profile_Menu.map((el, idx) => {
+              if (el.title === "Settings" && !isAdmin) return null;
+
+              return (
+                  <MenuItem key={idx} onClick={handleClose}>
+                    <Stack
+                        onClick={() => {
+                          if (idx === 0) {
+                            navigate("/profile");
+                          } else if (idx === 1) {
+                            navigate("/settings");
+                          } else {
+                            dispatch(LogoutUser());
+                          }
+                        }}
+                        sx={{width: 100}}
+                        direction="row"
+                        alignItems={"center"}
+                        justifyContent="space-between"
+                    >
+                      <span>{el.title}</span>
+                      {el.icon}
+                    </Stack>
+                  </MenuItem>
+              );
+            })}
           </Stack>
         </Box>
       </Menu>

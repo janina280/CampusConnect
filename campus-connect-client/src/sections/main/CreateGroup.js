@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {Box, Button, Dialog, DialogContent, DialogTitle, Stack,} from "@mui/material";
+import {Box, Button, Chip, Dialog, DialogContent, DialogTitle, Stack,} from "@mui/material";
 import * as Yup from "yup";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
@@ -9,6 +9,8 @@ import RHFAutocomplete from "../../components/hook-form/RHFAutocomplete";
 import {useDispatch, useSelector} from "react-redux";
 import {FetchAllUsers, showSnackbar} from "../../redux/slices/app";
 import {useWebSocket} from "../../contexts/WebSocketContext";
+import CreateAvatar from "../../utils/createAvatar";
+import {BASE_URL} from "../../config";
 
 const CreateGroupForm = ({handleClose}) => {
     const dispatch = useDispatch();
@@ -59,7 +61,8 @@ const CreateGroupForm = ({handleClose}) => {
                 })
             );
             handleClose();
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Error creating group:", error);
             dispatch(
                 showSnackbar({
@@ -81,7 +84,33 @@ const CreateGroupForm = ({handleClose}) => {
                     options={all_users || []}
                     getOptionLabel={(option) => option.name}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
+                    renderOption={(props, option) => (
+                        <li {...props} key={option.id}>
+                            <CreateAvatar
+                                imageUrl={`${BASE_URL}/${option.imageUrl}`}
+                                src={option.imageUrl}
+                                alt={option.name}
+                                sx={{width: 24, height: 24, mr: 1}}
+                            />
+                            <div>
+                                <div>{option.name}</div>
+                                <div style={{fontSize: 12, color: "#888"}}>{option.email}</div>
+                            </div>
+                        </li>
+                    )}
+                    renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                            <Chip
+                                key={option.id}
+                                label={option.name}
+                                avatar={<CreateAvatar imageUrl={`${BASE_URL}/${option.imageUrl}`}
+                                                      src={option.imageUrl}/>}
+                                {...getTagProps({index})}
+                            />
+                        ))
+                    }
                 />
+
                 <Stack direction="row" justifyContent="end" spacing={2}>
                     <Button onClick={handleClose}>Cancel</Button>
                     <Button type="submit" variant="contained">
@@ -99,7 +128,7 @@ const CreateGroup = ({open, handleClose}) => {
             <DialogTitle>Create New Group</DialogTitle>
             <DialogContent>
                 <Box sx={{mt: 3}}>
-                <CreateGroupForm handleClose={handleClose}/>
+                    <CreateGroupForm handleClose={handleClose}/>
                 </Box>
             </DialogContent>
         </Dialog>

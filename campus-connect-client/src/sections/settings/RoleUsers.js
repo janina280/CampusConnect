@@ -8,6 +8,7 @@ import {
     MenuItem,
     Paper,
     Select,
+    Stack,
     Table,
     TableBody,
     TableCell,
@@ -16,8 +17,12 @@ import {
     TableRow,
     Typography
 } from "@mui/material";
-import axios from "axios";
 import {useSelector} from "react-redux";
+import {dispatch} from "../../redux/store";
+import {showSnackbar} from "../../redux/slices/app";
+import CreateAvatar from "../../utils/createAvatar";
+import {BASE_URL} from "../../config";
+import axios from "../../utils/axios";
 
 const roles = ["user", "admin", "tutor"];
 
@@ -36,7 +41,7 @@ const UserRoleManagement = ({open, handleClose}) => {
 
     useEffect(() => {
         if (open) {
-            axios.get("http://localhost:8080/api/user/all", {
+            axios.get(`api/user/all`, {
                 headers: {Authorization: `Bearer ${token}`}
             })
                 .then(res => setUsers(res.data))
@@ -45,7 +50,7 @@ const UserRoleManagement = ({open, handleClose}) => {
     }, [open, token]);
 
     const handleRoleChange = (userId, newRole) => {
-        axios.put(`http://localhost:8080/api/user/${userId}/role`, {
+        axios.put(`api/user/${userId}/role`, {
             role: `ROLE_${newRole.toUpperCase()}`
         }, {
             headers: {Authorization: `Bearer ${token}`}
@@ -56,6 +61,7 @@ const UserRoleManagement = ({open, handleClose}) => {
                         u.id === userId ? {...u, roles: [{name: `ROLE_${newRole.toUpperCase()}`}]} : u
                     )
                 );
+                dispatch(showSnackbar({severity: "success", message: "Role updated"}));
             })
             .catch(err => console.error(err));
     };
@@ -84,7 +90,16 @@ const UserRoleManagement = ({open, handleClose}) => {
                             <TableBody>
                                 {users.map(user => (
                                     <TableRow key={user.id}>
-                                        <TableCell>{user.name}</TableCell>
+                                        <TableCell>
+                                            <Stack direction="row" spacing={1} alignItems="center">
+                                                <CreateAvatar
+                                                    name={user.name}
+                                                    imageUrl={`${BASE_URL}/${user.imageUrl}`}
+                                                    size={40}
+                                                />
+                                                <Typography>{user.name}</Typography>
+                                            </Stack>
+                                        </TableCell>
                                         <TableCell>{user.email}</TableCell>
                                         <TableCell>
                                             <Select

@@ -9,17 +9,17 @@ import {DocMsg, LinkMsg, MediaMsg} from "./Conversation";
 import axios from "../../utils/axios";
 
 const Media = () => {
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-  const theme = useTheme();
+    const theme = useTheme();
 
-  const isDesktop = useResponsive("up", "md");
+    const isDesktop = useResponsive("up", "md");
 
-  const [value, setValue] = React.useState(0);
+    const [value, setValue] = React.useState(0);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
     const [sharedMessages, setSharedMessages] = useState([]);
     const {room_id} = useSelector((state) => state.app);
     const token = useSelector((state) => state.auth.accessToken);
@@ -31,9 +31,9 @@ const Media = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                console.log("Shared messages response:", res.data);
                 setSharedMessages(res.data);
-            } catch (err) {
+            }
+            catch (err) {
                 console.error("Eroare la fetch shared messages", err);
             }
         };
@@ -47,78 +47,78 @@ const Media = () => {
 
 
     return (
-    <Box sx={{ width: !isDesktop ? "100vw" : 320, maxHeight: "100vh" }}>
-      <Stack sx={{ height: "100%" }}>
-        <Box
-          sx={{
-            boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
-            width: "100%",
-            backgroundColor:
-              theme.palette.mode === "light"
-                ? "#F8FAFF"
-                : theme.palette.background,
-          }}
-        >
-          <Stack
-            sx={{ height: "100%", p: 2 }}
-            direction="row"
-            alignItems={"center"}
-            spacing={3}
-          >
-            <IconButton
-               onClick={() => {
-                dispatch(UpdateSidebarType("CONTACT"));
-              }}
-            >
-              <ArrowLeft />
-            </IconButton>
-            <Typography variant="subtitle2">Shared</Typography>
-          </Stack>
+        <Box sx={{width: !isDesktop ? "100vw" : 320, maxHeight: "100vh"}}>
+            <Stack sx={{height: "100%"}}>
+                <Box
+                    sx={{
+                        boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
+                        width: "100%",
+                        backgroundColor:
+                            theme.palette.mode === "light"
+                                ? "#F8FAFF"
+                                : theme.palette.background,
+                    }}
+                >
+                    <Stack
+                        sx={{height: "100%", p: 2}}
+                        direction="row"
+                        alignItems={"center"}
+                        spacing={3}
+                    >
+                        <IconButton
+                            onClick={() => {
+                                dispatch(UpdateSidebarType("CONTACT"));
+                            }}
+                        >
+                            <ArrowLeft/>
+                        </IconButton>
+                        <Typography variant="subtitle2">Shared</Typography>
+                    </Stack>
+                </Box>
+
+                <Tabs value={value} onChange={handleChange} centered>
+                    <Tab label="Media"/>
+                    <Tab label="Links"/>
+                    <Tab label="Docs"/>
+                </Tabs>
+                <Stack
+                    sx={{
+                        height: "100%",
+                        position: "relative",
+                        flexGrow: 1,
+                        overflow: "scroll",
+                    }}
+                    spacing={3}
+                    padding={value === 1 ? 1 : 3}
+                >
+                    {(() => {
+                        switch (value) {
+                            case 0:
+                                return (
+                                    <Grid container spacing={2}>
+                                        {mediaMessages.map((msg) => (
+                                            <Grid item xs={12} sm={6} md={6} key={msg.id}>
+                                                <MediaMsg el={msg}/>
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+
+                                );
+
+                            case 1:
+                                return linkMessages.map((msg) => <LinkMsg el={msg}/>);
+
+                            case 2:
+                                return docMessages.map((msg) => <DocMsg el={msg}/>);
+
+                            default:
+                                break;
+                        }
+                    })()}
+                </Stack>
+            </Stack>
         </Box>
-
-        <Tabs value={value} onChange={handleChange} centered>
-          <Tab label="Media" />
-          <Tab label="Links" />
-          <Tab label="Docs" />
-        </Tabs>
-        <Stack
-          sx={{
-            height: "100%",
-            position: "relative",
-            flexGrow: 1,
-            overflow: "scroll",
-          }}
-          spacing={3}
-          padding={value === 1 ? 1 : 3}
-        >
-          {(() => {
-            switch (value) {
-                case 0:
-                    return (
-                        <Grid container spacing={2}>
-                            {mediaMessages.map((msg) => (
-                                <Grid item xs={12} sm={6} md={6} key={msg.id}>
-                                    <MediaMsg el={msg}/>
-                                </Grid>
-                            ))}
-                        </Grid>
-
-                    );
-
-                case 1:
-                    return linkMessages.map((msg) => <LinkMsg el={msg}/>);
-
-                case 2:
-                    return docMessages.map((msg) => <DocMsg el={msg}/>);
-
-                default:
-                break;
-            }
-          })()}
-        </Stack>
-      </Stack>
-    </Box>
-  );
+    );
 };
 
 export default Media;
