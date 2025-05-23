@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react";
-import {Box, IconButton, Stack, Typography,} from "@mui/material";
+import {Box, Stack, Typography,} from "@mui/material";
 import {useTheme} from "@mui/material/styles";
-import {MagnifyingGlass} from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import {ToggleSidebar} from "../../redux/slices/app";
 import {useDispatch, useSelector} from "react-redux";
 import CreateAvatar from "../../utils/createAvatar";
+import {BASE_URL} from "../../config";
 
 const ChatHeader = () => {
     const dispatch = useDispatch();
@@ -53,7 +53,7 @@ const ChatHeader = () => {
                 >
                     <CreateAvatar
                         name={conversation?.name}
-                        imageUrl={`http://localhost:8080/${conversation?.img}`}
+                        imageUrl={`${BASE_URL}/${conversation?.img}`}
                         size={56}
                     />
                     <Stack>
@@ -61,17 +61,6 @@ const ChatHeader = () => {
                             {conversation?.name}
                         </Typography>
                     </Stack>
-                </Stack>
-                <Stack
-                    direction={"row"}
-                    alignItems="center"
-                    spacing={isMobile ? 1 : 3}
-                >
-                    {!isMobile && (
-                        <IconButton>
-                            <MagnifyingGlass/>
-                        </IconButton>
-                    )}
                 </Stack>
             </Stack>
         </Box>

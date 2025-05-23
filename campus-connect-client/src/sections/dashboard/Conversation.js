@@ -468,7 +468,6 @@ const LinkMsg = ({el}) => {
     );
 };
 
-
 const ReplyMsg = ({el, menu}) => {
     const theme = useTheme();
     const isIncoming = !el.outgoing;

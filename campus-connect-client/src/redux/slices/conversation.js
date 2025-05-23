@@ -263,7 +263,8 @@ const slice = createSlice({
                         about: el?.about,
                         starred: el.starred || false,
                         online: el?.status === "Online",
-                        img: el.img
+                        img: el.img,
+                        media: el?.media
                     }
                 }
             );
@@ -288,7 +289,8 @@ const slice = createSlice({
                         about: el?.about,
                         starred: el.starred || false,
                         online: el?.status === "Online",
-                        img: el?.img
+                        img: el?.img,
+                        media: el?.media
                     }
                 }
             );

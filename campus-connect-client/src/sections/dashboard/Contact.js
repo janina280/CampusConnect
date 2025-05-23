@@ -21,7 +21,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {SelectRoomId, showSnackbar, ToggleSidebar, UpdateSidebarType} from "../../redux/slices/app";
 import axios from "../../utils/axios";
 import {SetCurrentConversation, UpdatePinnedStatus} from "../../redux/slices/conversation";
-import {useWebSocket} from "../../contexts/WebSocketContext";
 import {BASE_URL} from "../../config";
 import Last3Images from "../../components/Last3Images";
 import {varHover} from "../../components/animate";
@@ -87,63 +86,6 @@ const PinDialog = ({
     );
 };
 
-const DeleteChatDialog = ({open, handleClose, onDeleteSuccess}) => {
-    const [loading, setLoading] = useState(false);
-    const chatId = useSelector((state) => state.conversation.direct_chat.current_conversation.id);
-    const token = useSelector((state) => state.auth.accessToken);
-    const {socket} = useWebSocket();
-    const dispatch = useDispatch();
-    const handleDelete = () => {
-        setLoading(true);
-
-        fetch(`${BASE_URL}/${chatId}`, {
-            method: 'DELETE', headers: {
-                "Content-Type": "application/json", Authorization: `Bearer ${token}`,
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    socket.emit("/app/chats", "Bearer " + token)
-                    onDeleteSuccess();
-                    dispatch(
-                        showSnackbar({
-                            severity: "success",
-                            message: "Chat deleted successfully!",
-                        })
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error('Error deleting chat:', error);
-            })
-            .finally(() => {
-                setLoading(false);
-                handleClose();
-            });
-    };
-    return (<Dialog
-        open={open}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
-    >
-        <DialogTitle>Delete this chat</DialogTitle>
-        <DialogContent>
-            <DialogContentText id="alert-dialog-slide-description">
-                Are you sure you want to delete this chat?
-            </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleDelete} disabled={loading}>
-                {loading ? "Deleting..." : "Yes"}
-            </Button>
-        </DialogActions>
-    </Dialog>);
-};
-
 const Contact = () => {
     const dispatch = useDispatch();
 
@@ -155,8 +97,6 @@ const Contact = () => {
 
     const [openPinned, setOpenPinned] = useState(false);
     const [openUnpinned, setOpenUnpinned] = useState(false);
-
-    const [openDelete, setOpenDelete] = useState(false);
 
     const [commonGroups, setCommonGroups] = useState([]);
     const [conversation, setConversation] = useState(null);
@@ -211,15 +151,6 @@ const Contact = () => {
             fetchSharedMediaCount();
         }
     }, [current_conversation]);
-
-
-    const handleDeleteSuccess = () => {
-        setOpenDelete(false);
-        dispatch(SelectRoomId({room_id: null}));
-        dispatch(SetCurrentConversation({room_id: null}));
-        dispatch(ToggleSidebar());
-        dispatch(showSnackbar({severity: "success", message: "Leaved successfully!"}));
-    };
 
     return (
         <Box sx={{width: !isDesktop ? "100vw" : 320, maxHeight: "100vh"}}>
@@ -355,8 +286,6 @@ const Contact = () => {
                     </motion.div>
                 </Stack>
             </Stack>
-            {openDelete && <DeleteChatDialog open={openDelete} handleClose={() => setOpenDelete(false)}
-                                             onDeleteSuccess={handleDeleteSuccess}/>}
             {(openPinned || openUnpinned) && (
 
                 <PinDialog

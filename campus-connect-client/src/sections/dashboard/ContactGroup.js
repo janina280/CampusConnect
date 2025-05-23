@@ -126,7 +126,7 @@ const LeaveChatDialog = ({open, handleClose, onLeaveSuccess}) => {
     const handleLeaveGroup = () => {
         setLoading(true);
 
-        fetch(`${chatId}`, {
+        fetch(`${BASE_URL}/${chatId}`, {
             method: 'DELETE',
             headers: {
                 "Content-Type": "application/json",
