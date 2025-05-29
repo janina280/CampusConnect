@@ -328,8 +328,7 @@ const ContactGroup = () => {
     };
 
     const fetchGroupMembers = () => {
-        axios
-            .get(`${groupId}/users`, {
+        axios.get(`${groupId}/users`, {
                 headers: {Authorization: `Bearer ${token}`},
             })
             .then((response) => {
@@ -416,8 +415,11 @@ const ContactGroup = () => {
         formData.append("image", file);
 
         try {
-            const response = await axios.put(`${current_group_conversation.id}/image`, formData, {
-                headers: {
+            const response = await axios.put(
+                `${current_group_conversation.id}/image`,
+                formData,
+                {
+                    headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${token}`,
                 },
@@ -434,8 +436,6 @@ const ContactGroup = () => {
                     })
                 );
             }
-
-
         }
         catch (error) {
             dispatch(
@@ -521,7 +521,6 @@ const ContactGroup = () => {
                                 </>
                             )}
                         </Box>
-
                         <Stack spacing={0.5}>
                             <Typography variant="article" fontWeight={600}>
                                 {current_group_conversation?.name}
@@ -585,7 +584,6 @@ const ContactGroup = () => {
                                                           size={40}/>
                                             <Typography variant="body2">{user.name}</Typography>
                                         </Stack>
-
                                         {isAdmin && (
                                             <motion.div variants={varHover(1.05)} whileHover="hover">
                                                 <Button onClick={() => handleOpenRemoveDialog(user)}>
@@ -603,28 +601,32 @@ const ContactGroup = () => {
 
                     <Divider/>
 
-                    <Stack direction="row" alignItems={"center"} spacing={0.5}>
-                        {adminOrTutor && (
+                    <Stack spacing={1} alignItems="center">
+                        <Stack direction="row" spacing={1}>
+                            {adminOrTutor && (
+                                <motion.div variants={varHover(1.05)} whileHover="hover">
+                                    <Button
+                                        onClick={() => setOpenAddUser(true)}
+                                        startIcon={<Plus/>}
+                                        variant="outlined"
+                                        sx={{minWidth: "120px"}}
+                                    >
+                                        Add
+                                    </Button>
+                                </motion.div>
+                            )}
                             <motion.div variants={varHover(1.05)} whileHover="hover">
                                 <Button
-                                    onClick={() => setOpenAddUser(true)}
-                                    startIcon={<Plus/>}
+                                    onClick={() => setOpenLeave(true)}
+                                    startIcon={<SignOut/>}
                                     variant="outlined"
-                                    sx={{width: "100%"}}
+                                    sx={{minWidth: "120px"}}
                                 >
-                                    Add
+                                    Leave
                                 </Button>
-                            </motion.div>)}
-                        <motion.div variants={varHover(1.05)} whileHover="hover">
-                            <Button
-                                onClick={() => setOpenLeave(true)}
-                                startIcon={<SignOut/>}
-                                variant="outlined"
-                                sx={{width: "100%"}}
-                            >
-                                Leave
-                            </Button>
-                        </motion.div>
+                            </motion.div>
+                        </Stack>
+
                         {adminOrTutor && (
                             <motion.div variants={varHover(1.05)} whileHover="hover">
                                 <Button
@@ -637,13 +639,13 @@ const ContactGroup = () => {
                                     }}
                                     startIcon={current_group_conversation?.pinned ? <PushPin/> : <PushPin/>}
                                     variant="outlined"
-                                    sx={{width: "100%"}}
+                                    sx={{minWidth: "150px"}}
                                 >
                                     {current_group_conversation?.pinned ? 'Unpin' : 'Pin'}
                                 </Button>
-                            </motion.div>)}
+                            </motion.div>
+                        )}
                     </Stack>
-
 
                 </Stack>
             </Stack>
@@ -680,8 +682,6 @@ const ContactGroup = () => {
                 onConfirm={handleRemoveMember}
                 member={selectedMember}
             />
-
-
         </Box>
     );
 };

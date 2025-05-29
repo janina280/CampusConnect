@@ -62,7 +62,7 @@ function Settings() {
     {
       key: 3,
       icon: <ManageAccountsIcon size={20}/>,
-      title: "Manage Roles",
+      title: "User Role Management",
       onclick: () => setOpenRole(true),
       show: isAdmin,
     }

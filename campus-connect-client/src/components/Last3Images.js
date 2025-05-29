@@ -1,9 +1,8 @@
-// src/components/Last3Images.js
 import React, {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import {ImageList, ImageListItem, Typography} from "@mui/material";
 import {fetchLast3Images} from "../api/messageApi";
-import {BASE_URL} from "../config"; // sau cum ai tu structurat
+import {BASE_URL} from "../config";
 
 const Last3Images = ({chatId}) => {
     const [images, setImages] = useState([]);
@@ -26,7 +25,7 @@ const Last3Images = ({chatId}) => {
                 <ImageListItem key={img.id}>
                     <img
                         src={`${BASE_URL}/${img.mediaFilePath.replace(/\\/g, '/')}`}
-                        alt={`Image ${img.id}`}
+                        alt={`Photo ${img.id}`}
                         loading="lazy"
                     />
                 </ImageListItem>

@@ -49,12 +49,14 @@ const LoginForm = () => {
 
             if (result && result.success === false) {
                 setError(result.error);
+                reset({email: "", password: ""});
             }
 
         }
         catch (error) {
             console.error("Login error:", error);
             setError("Something went wrong. Please try again.");
+            reset({email: "", password: ""});
         }
     };
 

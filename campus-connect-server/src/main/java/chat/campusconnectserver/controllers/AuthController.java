@@ -87,7 +87,7 @@ public class AuthController {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role roleUser = roleRepository.findByName(Role.RoleName.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Rolul ROLE_USER nu a fost găsit!"));
+                .orElseThrow(() -> new RuntimeException("Role ROLE_USER not found!"));
         user.setRoles(Collections.singleton(roleUser));
 
 

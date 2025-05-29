@@ -59,14 +59,15 @@ const GeneralApp = () => {
 
                     case "SHARED":
                         return chat_type === "individual" ? (
-                            <Media/>) : (
+                            <Media/>
+                        ) : (
                             <MediaGroup/>
                         )
 
                     case "STARRED":
                         return chat_type === "individual" ? (
-                                <StarredMessages/>) :
-                            (
+                            <StarredMessages/>
+                        ) : (
                                 <StarredMessagesGroup/>
                             );
 
