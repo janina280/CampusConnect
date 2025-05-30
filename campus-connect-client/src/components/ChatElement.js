@@ -7,10 +7,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {SelectRoomId} from "../redux/slices/app";
 import {fSmartTime} from "../utils/formatTime";
 import {BASE_URL} from "../config";
+import truncateString from "../utils/truncate";
 
-const truncateText = (string, n) => {
-    return string?.length > n ? `${string?.slice(0, n)}...` : string;
-};
 
 const StyledChatBox = styled(Box)(({theme}) => ({
     "&:hover": {
@@ -32,11 +30,11 @@ const ChatElement = ({img, name, msg, time, unread, id, lastMessageType}) => {
     const message = "You can start messaging with...";
 
     const formatLastMessage = () => {
-        if (lastMessageType === "text") return truncateText(msg, 20);
+        if (lastMessageType === "text") return truncateString(msg, 20);
         if (lastMessageType === "image") return "📷 Image";
         if (lastMessageType === "document") return "📄 Document";
         if (lastMessageType === "link") return "🔗 Link";
-        return truncateText(message, 20);
+        return truncateString(message, 20);
     };
 
     return (

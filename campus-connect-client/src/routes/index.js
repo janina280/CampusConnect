@@ -8,7 +8,6 @@ import DashboardLayout from "../layouts/dashboard";
 import {DEFAULT_PATH} from "../config";
 import LoadingScreen from "../components/LoadingScreen";
 import AuthLayout from "../layouts/auth";
-import OAuth2RedirectHandler from "../sections/auth/OAuth2RedirectHandler";
 
 const Loadable = (Component) => (props) => {
   return (
@@ -31,10 +30,6 @@ export default function Router() {
         {
           element: <RegisterPage />,
           path: "register",
-        },
-        {
-          path: "oauth2/redirect",
-          element: <OAuth2RedirectHandler/>,
         },
       ],
     },
@@ -73,6 +68,3 @@ const LoginPage = Loadable(lazy(() => import("../pages/auth/Login")));
 const ProfilePage = Loadable(lazy(()=> import("../pages/dashboard/Profile")));
 const RegisterPage = Loadable(lazy(() => import("../pages/auth/Register")));
 const Page404 = Loadable(lazy(() => import("../pages/Page404")));
-const OAuth2Redirect = Loadable(
-    lazy(() => import("../sections/auth/OAuth2RedirectHandler"))
-);

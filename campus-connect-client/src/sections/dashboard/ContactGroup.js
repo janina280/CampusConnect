@@ -329,8 +329,8 @@ const ContactGroup = () => {
 
     const fetchGroupMembers = () => {
         axios.get(`${groupId}/users`, {
-                headers: {Authorization: `Bearer ${token}`},
-            })
+            headers: {Authorization: `Bearer ${token}`},
+        })
             .then((response) => {
                 setGroupMembers(response.data);
             })
@@ -420,10 +420,10 @@ const ContactGroup = () => {
                 formData,
                 {
                     headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
             if (response.status === 200) {
                 dispatch(UpdateGroupImage({
                     groupId: current_group_conversation.id,

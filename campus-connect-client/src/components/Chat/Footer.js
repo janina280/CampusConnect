@@ -6,7 +6,6 @@ import useResponsive from "../../hooks/useResponsive";
 import axios from "../../utils/axios";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
-
 import {useSelector} from "react-redux";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 import {showSnackbar} from "../../redux/slices/app";
@@ -109,11 +108,6 @@ const ChatInput = ({ openPicker, setOpenPicker, setValue, value, inputRef, onFil
     );
 };
 
-function linkify(text) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlRegex, (url) => `<a href="${url}" target="_blank">${url}</a>`);
-}
-
 function containsUrl(text) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     return urlRegex.test(text);
@@ -121,7 +115,6 @@ function containsUrl(text) {
 
 const Footer = () => {
     const theme = useTheme();
-    const user_id = window.localStorage.getItem("user_id");
     const { socket } = useWebSocket();
     const isMobile = useResponsive("between", "md", "xs", "sm");
 

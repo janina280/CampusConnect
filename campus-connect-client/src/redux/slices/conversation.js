@@ -181,6 +181,7 @@ const slice = createSlice({
 
         setCurrentConversation(state, action) {
             state.direct_chat.current_conversation = action.payload;
+            state.direct_chat.current_messages = [];
         },
 
         fetchCurrentMessages(state, action) {
@@ -302,9 +303,9 @@ const slice = createSlice({
             addMessageToStateGroup(state, action.payload.message);
         },
 
-
         setCurrentGroup(state, action) {
             state.group_chat.current_group_conversation = action.payload;
+            state.group_chat.current_messages_group = [];
         },
 
         addDirectGroupConversation(state, action) {

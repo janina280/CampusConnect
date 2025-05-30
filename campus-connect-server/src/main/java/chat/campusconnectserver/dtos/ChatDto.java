@@ -1,6 +1,5 @@
 package chat.campusconnectserver.dtos;
 
-
 import chat.campusconnectserver.modal.Chat;
 import chat.campusconnectserver.modal.Message;
 import chat.campusconnectserver.modal.User;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ChatDto {
     private Long id;
-
     private String name;
     private String img;
     private String time;

@@ -38,12 +38,13 @@ public class UserController {
     private final FileService fileService;
     private final UserService userService;
     private final RoleRepository roleRepository;
+
     @Autowired
     public UserController(UserRepository userRepository, MessageRepository messageRepository, FileService fileService, UserService userService, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
         this.fileService = fileService;
-        this.userService=userService;
+        this.userService = userService;
         this.roleRepository = roleRepository;
     }
 

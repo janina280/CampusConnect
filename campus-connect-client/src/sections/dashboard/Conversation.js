@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Box, Divider, IconButton, Menu, MenuItem, Stack, Typography,} from "@mui/material";
+import {Box, IconButton, Menu, MenuItem, Stack, Typography,} from "@mui/material";
 import {alpha, useTheme} from "@mui/material/styles";
 import {DotsThreeVertical, DownloadSimple, FileText as FileIcon} from "phosphor-react";
 import StarIcon from "@mui/icons-material/Star";
@@ -468,73 +468,5 @@ const LinkMsg = ({el}) => {
     );
 };
 
-const ReplyMsg = ({el, menu}) => {
-    const theme = useTheme();
-    const isIncoming = !el.outgoing;
-    return (
-        <Stack direction="row" justifyContent={isIncoming ? "start" : "end"}>
-            {isIncoming && el.sender?.name && (
-                <Typography
-                    variant="caption"
-                    sx={{color: theme.palette.text.secondary, pl: 1, pb: 0.5}}
-                >
-                    {el.sender.name}
-                </Typography>
-            )}
-            <Box
-                px={1.5}
-                py={1.5}
-                sx={{
-                    backgroundColor: isIncoming
-                        ? alpha(theme.palette.background.paper, 1)
-                        : theme.palette.primary.main,
-                    borderRadius: 1.5,
-                    width: "max-content",
-                }}
-            >
-                <Stack spacing={2}>
-                    <Stack
-                        p={2}
-                        direction="column"
-                        spacing={3}
-                        alignItems="center"
-                        sx={{
-                            backgroundColor: alpha(theme.palette.background.paper, 1),
 
-                            borderRadius: 1,
-                        }}
-                    >
-                        <Typography variant="body2" color={theme.palette.text}>
-                            {el.message}
-                        </Typography>
-                    </Stack>
-                    <Typography
-                        variant="body2"
-                        color={isIncoming ? theme.palette.text : "#fff"}
-                    >
-                        {el.reply}
-                    </Typography>
-                </Stack>
-            </Box>
-            {menu && <MessageOption/>}
-        </Stack>
-    );
-};
-
-const Timeline = ({el}) => {
-    const theme = useTheme();
-    const messageTime = fSmartTime(el.createdAt);
-    return (
-
-        <Stack direction="row" alignItems={"center"} justifyContent="space-between">
-            <Divider width="46%"/>
-            <Typography variant="caption" sx={{color: theme.palette.text}}>
-                {messageTime}
-            </Typography>
-            <Divider width="46%"/>
-        </Stack>
-
-    );
-};
-
-export {Timeline, MediaMsg, LinkMsg, DocMsg, TextMsg, ReplyMsg};
+export {MediaMsg, LinkMsg, DocMsg, TextMsg};

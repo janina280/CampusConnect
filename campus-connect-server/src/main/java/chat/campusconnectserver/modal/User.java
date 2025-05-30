@@ -32,7 +32,7 @@ public class User {
 
     @JsonIgnore
     private String password;
-    
+
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
@@ -55,6 +55,7 @@ public class User {
         User user = (User) o;
         return id != null && id.equals(user.id);
     }
+
     @Override
     public int hashCode() {
         return getClass().hashCode();

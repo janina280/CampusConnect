@@ -34,7 +34,6 @@ public class ChatController {
     private final ChatService chatService;
     private final UserService userService;
     private final TokenProvider tokenProvider;
-
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final FileService fileService;
 
@@ -52,9 +51,9 @@ public class ChatController {
     public ChatDto createChatHandle(@RequestBody SingleChatRequest singleChatRequest) throws UserException {
         var currentUserId = tokenProvider.getUserIdFromToken(singleChatRequest.getJwtString().substring(7));
 
-        var chat= chatService.createChat(currentUserId, singleChatRequest.getUserId());
+        var chat = chatService.createChat(currentUserId, singleChatRequest.getUserId());
 
-        for(var c: chat.getUsers()) {
+        for (var c : chat.getUsers()) {
             simpMessagingTemplate.convertAndSendToUser(c.getId().toString(), "/chat/chat-create-response", chat);
         }
         return chat;
@@ -114,7 +113,6 @@ public class ChatController {
 
     @Transactional
     @MessageMapping("/user-add")
-    //@SendTo("/group/user-add-response")
     public ChatDto addUserToGroup(AddUserInGroupRequest request) throws UserException, ChatException {
         User reqUser = userService.findUserProfile(request.getJwt());
         var group = chatService.addUserToGroup(request.getUserId(), request.getGroupId(), reqUser);
@@ -187,6 +185,7 @@ public class ChatController {
         ApiResponse response = new ApiResponse("Chat pinned successfully", true);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @PatchMapping("/{chatId}/unpin")
     public ResponseEntity<ApiResponse> unpinChat(
             @PathVariable Long chatId,
@@ -250,7 +249,6 @@ public class ChatController {
         headers.setContentType(MediaType.IMAGE_PNG);
         return new ResponseEntity<>(file, headers, HttpStatus.OK);
     }
-
 
 
 }

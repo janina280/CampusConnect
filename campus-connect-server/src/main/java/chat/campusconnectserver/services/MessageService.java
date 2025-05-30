@@ -5,16 +5,14 @@ import chat.campusconnectserver.exception.MessageException;
 import chat.campusconnectserver.exception.UserException;
 import chat.campusconnectserver.modal.*;
 import chat.campusconnectserver.payload.request.MessageRequest;
-import chat.campusconnectserver.repositories.ChatRepository;
 import chat.campusconnectserver.repositories.MessageRepository;
 import chat.campusconnectserver.util.FileService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,23 +24,17 @@ import java.util.Optional;
 public class MessageService {
 
     private final MessageRepository messageRepository;
-    private final UserService userService;
-    private final MessageMapper mapper;
     private final ChatService chatService;
-    private final ChatRepository chatRepository;
-     private final FileService fileService;
+    private final FileService fileService;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository, UserService userService, MessageMapper mapper, ChatService chatService, ChatRepository chatRepository, FileService fileService) {
+    public MessageService(MessageRepository messageRepository, ChatService chatService, FileService fileService) {
         this.messageRepository = messageRepository;
-        this.userService = userService;
-        this.mapper = mapper;
         this.chatService = chatService;
-        this.chatRepository = chatRepository;
-         this.fileService = fileService;
+        this.fileService = fileService;
     }
 
-    public Message sendMessage(MessageRequest req, User user) throws UserException, ChatException {
+    public Message sendMessage(MessageRequest req, User user) throws  ChatException {
         Chat chat = chatService.findChatById(req.getChatId());
 
         Message message = new Message();
@@ -123,7 +115,7 @@ public class MessageService {
 
 
     public Message markMessageAsStarred(Long messageId) {
-        Message message =messageRepository.findById(messageId).orElseThrow(() ->
+        Message message = messageRepository.findById(messageId).orElseThrow(() ->
                 new RuntimeException("Message not found"));
         if (!message.isStarred()) {
             message.setStarred(true);
@@ -144,9 +136,6 @@ public class MessageService {
         Pageable pageable = PageRequest.of(0, 3);
         return messageRepository.findByChatIdAndTypeOrderByTimestampDesc(chatId, MessageType.image, pageable);
     }
-
-
-
 
 }
 

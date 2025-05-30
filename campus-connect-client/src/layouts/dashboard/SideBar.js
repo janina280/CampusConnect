@@ -60,7 +60,7 @@ const SideBar = () => {
         setAnchorEl(null);
     };
 
-    const { user } = useSelector((state) => state.app);
+    const {user} = useSelector((state) => state.app);
 
     useEffect(() => {
         dispatch(FetchUserProfile())
@@ -138,7 +138,7 @@ const SideBar = () => {
                                 >
                                     <motion.div variants={varHover(1.05)} whileHover="hover">
                                         <IconButtonAnimate sx={{width: "max-content", color: "#fff"}}>
-                                        {el.icon}
+                                            {el.icon}
                                         </IconButtonAnimate>
                                     </motion.div>
                                 </Box>

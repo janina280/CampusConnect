@@ -24,8 +24,6 @@ const MainLayout = () => {
                     </Stack>
                 </Stack>
 
-                {/*<div>Main Layout</div>*/}
-
                 <Outlet/>
             </Container>
         </>

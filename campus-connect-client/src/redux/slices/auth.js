@@ -27,12 +27,6 @@ const slice = createSlice({
             state.user_id = action.payload.user_id;
             state.roles = action.payload.roles;
         },
-        signOut(state, action) {
-            state.isLoggedIn = false;
-            state.accessToken = "";
-            state.user_id = null;
-            state.roles = [];
-        },
         search(state, action) {
             state.availableChats = action.payload.availableChats;
         },
@@ -47,7 +41,6 @@ export default slice.reducer;
 
 //Log in
 export function LoginUser(fromValues) {
-    //fromValues=>{email, password}
     return async (dispatch, getState) => {
         dispatch(slice.actions.updateIsLoading({isLoading: true, error: false}));
 
@@ -152,13 +145,20 @@ export function searchGroup(data) {
     }
 }
 
+export const LOGOUT = "LOGOUT";
+
+
 //Log Out
 export function LogoutUser() {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
+        const {persistor} = await import("../store");
+        await persistor.purge();
         window.localStorage.removeItem("user_id");
-        dispatch(slice.actions.signOut());
+        dispatch({type: LOGOUT});
+        dispatch(showSnackbar({severity: "info", message: "Logged out successfully"}));
     };
 }
+
 
 export function RegisterUser(formValues, navigate) {
     return async (dispatch, getState) => {
