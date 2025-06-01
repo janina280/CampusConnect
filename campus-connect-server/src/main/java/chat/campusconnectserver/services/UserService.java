@@ -51,10 +51,6 @@ public class UserService {
         return user.get();
     }
 
-    public User updateProfile(User user) {
-        return userRepository.save(user);
-    }
-
     public List<UserDto> searchUser(String query) {
         List<User> users = userRepository.searchUser(query);
         return users.stream()

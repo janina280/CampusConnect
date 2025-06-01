@@ -6,7 +6,7 @@ import useResponsive from "../../hooks/useResponsive";
 import {useDispatch, useSelector} from "react-redux";
 import {UpdateSidebarType} from "../../redux/slices/app";
 
-import {TextMsg, Timeline} from "./Conversation";
+import {TextMsg} from "./Conversation";
 
 const StarredMessagesGroup = () => {
     const dispatch = useDispatch();
@@ -76,12 +76,6 @@ const ConversationStarredGroup = ({isMobile, menu}) => {
             <Stack spacing={3}>
                 {starredMessagesGroup?.map((el, idx) => {
                     switch (el.type) {
-                        case "divider":
-                            return (
-                                // Timeline
-                                <Timeline el={el}/>
-                            );
-
                         case "msg":
                             switch (el.subtype) {
                                 default:

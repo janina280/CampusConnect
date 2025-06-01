@@ -1,6 +1,5 @@
 package chat.campusconnectserver.config;
 
-import chat.campusconnectserver.security.CustomUserDetailsService;
 import chat.campusconnectserver.security.RestAuthenticationEntryPoint;
 import chat.campusconnectserver.security.TokenAuthenticationFilter;
 import chat.campusconnectserver.security.oauth2.CustomOAuth2UserService;
@@ -31,9 +30,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     @Autowired
-    private CustomUserDetailsService customUserDetailsService;
-
-    @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
 
     @Autowired
@@ -43,10 +39,6 @@ public class SecurityConfig {
     @Autowired
     @Lazy
     private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-
-    @Autowired
-    @Lazy
-    private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {

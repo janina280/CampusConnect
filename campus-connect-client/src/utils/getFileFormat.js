@@ -1,6 +1,7 @@
 // components
-import Image from '../components/Image';
 import Iconify from '../components/Iconify';
+import {getIcon} from "@iconify/react";
+import {Image} from "phosphor-react";
 
 // ----------------------------------------------------------------------
 
@@ -60,13 +61,6 @@ export function getFileFormat(fileUrl) {
   return format;
 }
 
-const getIcon = (name) => (
-  <Image
-    src={`https://codingmonk/assets/icons/file/${name}.svg`}
-    alt={name}
-    sx={{ width: 28, height: 28 }}
-  />
-);
 
 export function getFileThumb(fileUrl) {
   let thumb;

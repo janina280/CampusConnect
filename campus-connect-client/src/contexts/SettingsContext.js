@@ -1,39 +1,20 @@
 // provider === component
-import { createContext, useEffect } from "react";
-import { defaultSettings } from "../config";
+import {createContext, useEffect} from "react";
+import {defaultSettings} from "../config";
 import useLocalStorage from "../hooks/useLocalStorage";
-import getColorPresets, {
-  defaultPreset,
-  colorPresets,
-} from "../utils/getColorPresets";
+import getColorPresets, {colorPresets, defaultPreset,} from "../utils/getColorPresets";
 
 const initialState = {
   ...defaultSettings,
 
-  // Mode
-  onToggleMode: () => {},
-  onChangeMode: () => {},
-
   // Direction
-  onToggleDirection: () => {},
   onChangeDirection: () => {},
   onChangeDirectionByLang: () => {},
-
-  // Layout
-  onToggleLayout: () => {},
-  onChangeLayout: () => {},
-
-  // Contrast
-  onToggleContrast: () => {},
-  onChangeContrast: () => {},
 
   // Color
   onChangeColor: () => {},
   setColor: defaultPreset,
   colorOption: [],
-
-  // Stretch
-  onToggleStretch: () => {},
 
   // Reset
   onResetSetting: () => {},

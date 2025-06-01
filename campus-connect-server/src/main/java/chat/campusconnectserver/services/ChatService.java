@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class ChatService {
 
     private final ChatRepository chatRepository;
-    private final UserRepository  userRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
 
     @Autowired
@@ -222,6 +222,7 @@ public class ChatService {
                 .filter(user2Groups::contains)
                 .toList();
     }
+
     public Set<User> getUsersInGroup(Long chatId) throws ChatException {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new ChatException("Chat not found"));
@@ -271,7 +272,6 @@ public class ChatService {
                 .map(ChatDto::new)
                 .collect(Collectors.toList());
     }
-
 
 
 }

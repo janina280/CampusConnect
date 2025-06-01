@@ -34,7 +34,8 @@ const MediaGroup = () => {
                 });
                 console.log("Shared messages response:", res.data);
                 setSharedMessages(res.data);
-            } catch (err) {
+            }
+            catch (err) {
                 console.error("Eroare la fetch shared messages", err);
             }
         };

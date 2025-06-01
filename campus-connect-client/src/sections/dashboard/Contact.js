@@ -265,24 +265,24 @@ const Contact = () => {
                     </Stack>
                     <Divider/>
                     <motion.div variants={varHover(1.05)} whileHover="hover">
-                    <Stack direction="row" alignItems={"center"} spacing={2}>
+                        <Stack direction="row" alignItems={"center"} spacing={2}>
 
-                    <Button
-                            onClick={() => {
-                                if (conversation?.pinned) {
-                                    setOpenUnpinned(true);
-                                } else {
-                                    setOpenPinned(true);
-                                }
-                            }}
-                            startIcon={conversation?.pinned ? <PushPin/> : <PushPin/>}
-                            variant="outlined"
-                            sx={{width: "100%"}}
-                        >
-                            {conversation?.pinned ? 'Unpin' : 'Pin'}
-                        </Button>
+                            <Button
+                                onClick={() => {
+                                    if (conversation?.pinned) {
+                                        setOpenUnpinned(true);
+                                    } else {
+                                        setOpenPinned(true);
+                                    }
+                                }}
+                                startIcon={conversation?.pinned ? <PushPin/> : <PushPin/>}
+                                variant="outlined"
+                                sx={{width: "100%"}}
+                            >
+                                {conversation?.pinned ? 'Unpin' : 'Pin'}
+                            </Button>
 
-                    </Stack>
+                        </Stack>
                     </motion.div>
                 </Stack>
             </Stack>

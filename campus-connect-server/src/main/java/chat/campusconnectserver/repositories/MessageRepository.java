@@ -20,7 +20,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Modifying
     void setMessagesToSeenByChatId(@Param("chatId") Long chatId, @Param("newState") MessageState state);
 
-
     @Query("SELECT new chat.campusconnectserver.dtos.UserMessageCountDto(" +
             "u.id, u.name, u.imageUrl, COUNT(m)) " +
             "FROM Message m JOIN m.user u " +

@@ -38,6 +38,7 @@ public class AuthController {
 
     @Autowired
     private TokenProvider tokenProvider;
+
     @Autowired
     private RoleRepository roleRepository;
 
@@ -78,7 +79,6 @@ public class AuthController {
                     .body(new ApiResponse("Email address already in use.", false));
         }
 
-        // Creating user's account
         User user = new User();
         user.setName(signUpRequest.getName());
         user.setEmail(signUpRequest.getEmail());
@@ -98,13 +98,13 @@ public class AuthController {
                 .buildAndExpand(result.getId()).toUri();
 
         return ResponseEntity.created(location)
-                .body(new ApiResponse( "User registered successfully!",true));
+                .body(new ApiResponse("User registered successfully!", true));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser() {
         SecurityContextHolder.clearContext();
-        return ResponseEntity.ok(new ApiResponse( "User logged out successfully.",true));
+        return ResponseEntity.ok(new ApiResponse("User logged out successfully.", true));
     }
 
 }

@@ -94,16 +94,16 @@ const Group = () => {
                         </Search>
                     </Stack>
                     {canCreateGroup && (
-                    <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                    >
-                        <Typography variant="subtitle2">Create New Group</Typography>
-                        <IconButtonAnimate onClick={() => setOpenDialog(true)}>
-                            <Plus style={{color: theme.palette.primary.main}}/>
-                        </IconButtonAnimate>
-                    </Stack>)}
+                        <Stack
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                        >
+                            <Typography variant="subtitle2">Create New Group</Typography>
+                            <IconButtonAnimate onClick={() => setOpenDialog(true)}>
+                                <Plus style={{color: theme.palette.primary.main}}/>
+                            </IconButtonAnimate>
+                        </Stack>)}
                     <Divider/>
                     <Stack
                         spacing={2}
@@ -126,11 +126,11 @@ const Group = () => {
                                             .filter((group) => group.pinned)
                                             .map((group) => (
                                                 <motion.div variants={varHover(1.05)} whileHover="hover">
-                                                <ChatElement
-                                                    key={group.id}
-                                                    {...group}
-                                                    onClick={() => handleGroupSelect(group.id)}
-                                                />
+                                                    <ChatElement
+                                                        key={group.id}
+                                                        {...group}
+                                                        onClick={() => handleGroupSelect(group.id)}
+                                                    />
                                                 </motion.div>
                                             ))
                                     ) : (""
@@ -151,11 +151,11 @@ const Group = () => {
                                             : availableGroups
                                     ).map((group) => (
                                         <motion.div variants={varHover(1.05)} whileHover="hover">
-                                        <ChatElement
-                                            key={group.id}
-                                            {...group}
-                                            onClick={() => handleGroupSelect(group.id)}
-                                        />
+                                            <ChatElement
+                                                key={group.id}
+                                                {...group}
+                                                onClick={() => handleGroupSelect(group.id)}
+                                            />
                                         </motion.div>
                                     ))
                                 ) : ("")}

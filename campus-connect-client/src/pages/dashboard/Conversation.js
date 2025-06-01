@@ -5,7 +5,7 @@ import {SimpleBarStyle} from "../../components/Scrollbar";
 
 import {ChatFooter, ChatHeader} from "../../components/Chat";
 import useResponsive from "../../hooks/useResponsive";
-import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline,} from "../../sections/dashboard/Conversation";
+import {DocMsg, LinkMsg, MediaMsg, TextMsg} from "../../sections/dashboard/Conversation";
 import {useDispatch, useSelector} from "react-redux";
 import {SetCurrentConversation,} from "../../redux/slices/conversation";
 import {useWebSocket} from "../../contexts/WebSocketContext";
@@ -44,12 +44,6 @@ const Conversation = ({isMobile, menu}) => {
                 <Stack spacing={3}>
                     {current_messages?.map((el, idx) => {
                         switch (el.type) {
-                            case "divider":
-                                return (
-                                    // Timeline
-                                    <Timeline el={el}/>
-                                );
-
                             case "msg":
                                 switch (el.subtype) {
                                     case "image":
@@ -67,12 +61,6 @@ const Conversation = ({isMobile, menu}) => {
                                         return (
                                             //  Link Message
                                             <LinkMsg el={el} menu={menu}/>
-                                        );
-
-                                    case "reply":
-                                        return (
-                                            //  ReplyMessage
-                                            <ReplyMsg el={el} menu={menu}/>
                                         );
 
                                     default:

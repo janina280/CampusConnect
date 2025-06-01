@@ -4,15 +4,15 @@ import {useTheme} from "@mui/material/styles";
 import {SimpleBarStyle} from "../../components/Scrollbar";
 import {ChatFooter, ChatHeader} from "../../components/Chat";
 import useResponsive from "../../hooks/useResponsive";
-import {DocMsg, LinkMsg, MediaMsg, ReplyMsg, TextMsg, Timeline,} from "../../sections/dashboard/Conversation";
+import {DocMsg, LinkMsg, MediaMsg, TextMsg} from "../../sections/dashboard/Conversation";
 import {useDispatch, useSelector} from "react-redux";
 import {SetCurrentGroup,} from "../../redux/slices/conversation";
 import {useWebSocket} from "../../contexts/WebSocketContext";
 
 const ConversationGroup = ({isMobile, menu}) => {
     const dispatch = useDispatch();
-    const { groups, current_messages_group } = useSelector((state) => state.conversation.group_chat);
-    const { room_id } = useSelector((state) => state.app);
+    const {groups, current_messages_group} = useSelector((state) => state.conversation.group_chat);
+    const {room_id} = useSelector((state) => state.app);
     const {socket} = useWebSocket();
     const token = useSelector((state) => state.auth.accessToken);
 
@@ -29,41 +29,29 @@ const ConversationGroup = ({isMobile, menu}) => {
             <Stack spacing={3}>
                 {current_messages_group.map((el, idx) => {
                     switch (el.type) {
-                        case "divider":
-                            return (
-                                // Timeline
-                                <Timeline el={el} />
-                            );
-
                         case "msg":
                             switch (el.subtype) {
                                 case "image":
                                     return (
                                         // Media Message
-                                        <MediaMsg el={el} menu={menu} />
+                                        <MediaMsg el={el} menu={menu}/>
                                     );
 
                                 case "document":
                                     return (
                                         // Doc Message
-                                        <DocMsg el={el} menu={menu} />
+                                        <DocMsg el={el} menu={menu}/>
                                     );
                                 case "link":
                                     return (
                                         //  Link Message
-                                        <LinkMsg el={el} menu={menu} />
-                                    );
-
-                                case "reply":
-                                    return (
-                                        //  ReplyMessage
-                                        <ReplyMsg el={el} menu={menu} />
+                                        <LinkMsg el={el} menu={menu}/>
                                     );
 
                                 default:
                                     return (
                                         // Text Message
-                                        <TextMsg el={el} menu={menu} />
+                                        <TextMsg el={el} menu={menu}/>
                                     );
                             }
 
@@ -82,7 +70,7 @@ const ChatGroupComponent = () => {
 
     const messageListRef = useRef(null);
 
-    const { current_messages_group } = useSelector(
+    const {current_messages_group} = useSelector(
         (state) => state.conversation.group_chat
     );
 
@@ -97,7 +85,7 @@ const ChatGroupComponent = () => {
             width={isMobile ? "100vw" : "auto"}
         >
             {/*  */}
-            <ChatHeader />
+            <ChatHeader/>
             <Box
                 ref={messageListRef}
                 width={"100%"}
@@ -115,16 +103,16 @@ const ChatGroupComponent = () => {
                 }}
             >
                 <SimpleBarStyle timeout={500} clickOnTrack={false}>
-                    <ConversationGroup menu={true} isMobile={isMobile} isGroup={true} />
+                    <ConversationGroup menu={true} isMobile={isMobile} isGroup={true}/>
                 </SimpleBarStyle>
             </Box>
 
             {/*  */}
-            <ChatFooter />
+            <ChatFooter/>
         </Stack>
     );
 };
 
 export default ChatGroupComponent;
 
-export { ConversationGroup };
+export {ConversationGroup};

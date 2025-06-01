@@ -1,6 +1,5 @@
 package chat.campusconnectserver.dtos;
 
-
 import chat.campusconnectserver.modal.Message;
 import lombok.*;
 
