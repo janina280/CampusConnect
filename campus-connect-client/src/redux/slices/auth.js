@@ -162,7 +162,6 @@ export function LogoutUser() {
 
 export function RegisterUser(formValues, navigate) {
     return async (dispatch, getState) => {
-
         dispatch(slice.actions.updateIsLoading({isLoading: true, error: false}));
         await axios
             .post(

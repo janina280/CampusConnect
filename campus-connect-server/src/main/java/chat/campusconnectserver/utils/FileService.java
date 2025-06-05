@@ -1,4 +1,4 @@
-package chat.campusconnectserver.util;
+package chat.campusconnectserver.utils;
 
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;

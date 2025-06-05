@@ -1,4 +1,4 @@
-package chat.campusconnectserver.modal;
+package chat.campusconnectserver.models;
 
 import jakarta.persistence.*;
 import lombok.*;

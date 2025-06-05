@@ -1,6 +1,6 @@
 package chat.campusconnectserver.services;
 
-import chat.campusconnectserver.modal.Role;
+import chat.campusconnectserver.models.Role;
 import chat.campusconnectserver.repositories.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

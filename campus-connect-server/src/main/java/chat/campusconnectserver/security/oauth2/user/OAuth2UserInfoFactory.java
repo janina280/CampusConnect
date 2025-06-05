@@ -1,7 +1,7 @@
 package chat.campusconnectserver.security.oauth2.user;
 
 import chat.campusconnectserver.exception.OAuth2AuthenticationProcessingException;
-import chat.campusconnectserver.modal.AuthProvider;
+import chat.campusconnectserver.models.AuthProvider;
 
 import java.util.Map;
 

@@ -1,9 +1,9 @@
-package chat.campusconnectserver.modal;
+package chat.campusconnectserver.models;
 
 import chat.campusconnectserver.exception.UserException;
-import chat.campusconnectserver.payload.response.MessageResponse;
+import chat.campusconnectserver.payloads.response.MessageResponse;
 import chat.campusconnectserver.services.UserService;
-import chat.campusconnectserver.util.FileUtils;
+import chat.campusconnectserver.utils.FileUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

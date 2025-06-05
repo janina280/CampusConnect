@@ -1,7 +1,7 @@
 package chat.campusconnectserver.security;
 
 import chat.campusconnectserver.config.AppProperties;
-import chat.campusconnectserver.modal.User;
+import chat.campusconnectserver.models.User;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

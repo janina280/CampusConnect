@@ -1,6 +1,6 @@
 package chat.campusconnectserver.user;
 
-import chat.campusconnectserver.modal.User;
+import chat.campusconnectserver.models.User;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;

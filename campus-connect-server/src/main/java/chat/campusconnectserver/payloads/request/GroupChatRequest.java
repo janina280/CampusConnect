@@ -1,4 +1,4 @@
-package chat.campusconnectserver.payload.request;
+package chat.campusconnectserver.payloads.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

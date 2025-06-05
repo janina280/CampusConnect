@@ -1,4 +1,4 @@
-package chat.campusconnectserver.modal;
+package chat.campusconnectserver.models;
 
 import chat.campusconnectserver.common.BaseAuditingEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;

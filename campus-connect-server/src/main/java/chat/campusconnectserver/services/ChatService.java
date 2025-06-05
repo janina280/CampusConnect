@@ -3,10 +3,10 @@ package chat.campusconnectserver.services;
 import chat.campusconnectserver.dtos.ChatDto;
 import chat.campusconnectserver.exception.ChatException;
 import chat.campusconnectserver.exception.UserException;
-import chat.campusconnectserver.modal.Chat;
-import chat.campusconnectserver.modal.Role;
-import chat.campusconnectserver.modal.User;
-import chat.campusconnectserver.payload.request.GroupChatRequest;
+import chat.campusconnectserver.models.Chat;
+import chat.campusconnectserver.models.Role;
+import chat.campusconnectserver.models.User;
+import chat.campusconnectserver.payloads.request.GroupChatRequest;
 import chat.campusconnectserver.repositories.ChatRepository;
 import chat.campusconnectserver.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -93,36 +93,29 @@ public class ChatService {
     public ChatDto createGroup(GroupChatRequest req, User reqUser) throws UserException {
         boolean isTutorOrAdmin = reqUser.getRoles().stream()
                 .anyMatch(role -> role.getName() == Role.RoleName.ROLE_TUTOR || role.getName() == Role.RoleName.ROLE_ADMIN);
-
         if (!isTutorOrAdmin) {
             throw new UserException("You do not have permission to create a group. Only tutors or admins can create groups.");
         }
-
         Chat group = new Chat();
         group.setGroup(true);
         group.setImg(req.getChat_image());
         group.setName(req.getChat_name());
         group.setCreatedBy(reqUser);
         group.getAdmins().add(reqUser);
-
         if (req.getUserIds() == null || req.getUserIds().isEmpty()) {
             throw new UserException("At least one user must be added to the group.");
         }
-
         group.getUsers().add(reqUser);
-
         for (Long userId : req.getUserIds()) {
             User user = userService.findUserById(userId);
             group.getUsers().add(user);
         }
-
         try {
             chatRepository.save(group);
         } catch (Exception e) {
             System.err.println("Error saving group: " + e.getMessage());
             throw new RuntimeException("Failed to create group", e);
         }
-
         return new ChatDto(group);
     }
 

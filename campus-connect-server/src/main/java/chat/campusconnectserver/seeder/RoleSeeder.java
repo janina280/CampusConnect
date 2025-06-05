@@ -1,6 +1,6 @@
 package chat.campusconnectserver.seeder;
 
-import chat.campusconnectserver.modal.Role;
+import chat.campusconnectserver.models.Role;
 import chat.campusconnectserver.repositories.RoleRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

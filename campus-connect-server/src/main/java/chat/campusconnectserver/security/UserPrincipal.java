@@ -1,7 +1,7 @@
 package chat.campusconnectserver.security;
 
-import chat.campusconnectserver.modal.Role;
-import chat.campusconnectserver.modal.User;
+import chat.campusconnectserver.models.Role;
+import chat.campusconnectserver.models.User;
 import chat.campusconnectserver.services.RoleService;
 import lombok.Getter;
 import lombok.Setter;
