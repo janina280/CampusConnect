@@ -134,8 +134,7 @@ const Footer = () => {
             type: containsUrl(value) ? "link" : "text",
 
         };
-
-        socket.emit("/app/send-message", messageData);
+         socket.emit("/app/send-message", messageData);
         setValue("");
     };
 
