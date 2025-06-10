@@ -27,7 +27,7 @@
 - Spring Security (with JWT)
 - Spring WebSocket
 - Spring Data JPA (Hibernate)
-- MySQL
+- PostgreSQL
 - Maven
 
 ## 🧪 Functional Overview
@@ -47,24 +47,32 @@
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic");
-        registry.setApplicationDestinationPrefixes("/app");
-    }
-
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
+   @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry){
         registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
+    }
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry){
+        registry.setApplicationDestinationPrefixes("/app");
+        registry.enableSimpleBroker("/group", "/user", "/chat");
+        registry.setUserDestinationPrefix("/user");
+    }
+    @Override
+    public void configureWebSocketTransport(org.springframework.web.socket.config.annotation.WebSocketTransportRegistration registration) {
+        registration.setMessageSizeLimit(10 * 1024 * 1024);       // 10MB
+        registration.setSendBufferSizeLimit(10 * 1024 * 1024);    // 10MB
+        registration.setSendTimeLimit(60000);                     // 60 sec
+
     }
 }
 ```
 ## 🧱 Project Structure
 
+```plaintext
 CampusConnect/
-├── campus-conncet-server/                # Spring Boot backend (API, DB, WebSocket)
+├── campus-connect-server/     # Spring Boot backend (API, DB, WebSocket)
 │   └── src/main/java/...
-├── campus-connect-client/               # React + Redux frontend
+├── campus-connect-client/     # React + Redux frontend
 │   └── src/...
-├── documentation/                   # Documentation files (PDF, diagrams, etc.)
+├── documentation/             # Documentation files (PDF, diagrams, etc.)
 └── README.md
