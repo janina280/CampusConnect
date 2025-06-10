@@ -43,7 +43,6 @@ const LoginForm = () => {
 
     const onSubmit = async (data) => {
         setError("");
-
         try {
             const result = await dispatch(LoginUser(data));
 
@@ -59,7 +58,6 @@ const LoginForm = () => {
             reset({email: "", password: ""});
         }
     };
-
 
     return (
         <motion.div

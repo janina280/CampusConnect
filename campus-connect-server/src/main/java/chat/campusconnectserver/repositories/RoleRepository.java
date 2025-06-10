@@ -1,6 +1,6 @@
 package chat.campusconnectserver.repositories;
 
-import chat.campusconnectserver.modal.Role;
+import chat.campusconnectserver.models.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,12 +1,12 @@
 package chat.campusconnectserver.controllers;
 
-import chat.campusconnectserver.modal.AuthProvider;
-import chat.campusconnectserver.modal.Role;
-import chat.campusconnectserver.modal.User;
-import chat.campusconnectserver.payload.response.ApiResponse;
-import chat.campusconnectserver.payload.response.AuthResponse;
-import chat.campusconnectserver.payload.request.LoginRequest;
-import chat.campusconnectserver.payload.request.SignUpRequest;
+import chat.campusconnectserver.models.AuthProvider;
+import chat.campusconnectserver.models.Role;
+import chat.campusconnectserver.models.User;
+import chat.campusconnectserver.payloads.response.ApiResponse;
+import chat.campusconnectserver.payloads.response.AuthResponse;
+import chat.campusconnectserver.payloads.request.LoginRequest;
+import chat.campusconnectserver.payloads.request.SignUpRequest;
 import chat.campusconnectserver.repositories.RoleRepository;
 import chat.campusconnectserver.repositories.UserRepository;
 import chat.campusconnectserver.security.TokenProvider;
@@ -49,18 +49,14 @@ public class AuthController {
                     .badRequest()
                     .body(new ApiResponse("The email must be of the type @campusconnect.com.", false));
         }
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         String token = tokenProvider.createToken(authentication);
-
         var user = userRepository.findByEmail(loginRequest.getEmail());
         return ResponseEntity.ok(new AuthResponse(user.getId(), token));
     }

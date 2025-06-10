@@ -1,7 +1,7 @@
 package chat.campusconnectserver.security;
 
 import chat.campusconnectserver.exception.ResourceNotFoundException;
-import chat.campusconnectserver.modal.User;
+import chat.campusconnectserver.models.User;
 import chat.campusconnectserver.repositories.UserRepository;
 import chat.campusconnectserver.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;

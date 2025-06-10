@@ -1,7 +1,7 @@
 package chat.campusconnectserver.repositories;
 
-import chat.campusconnectserver.modal.Chat;
-import chat.campusconnectserver.modal.User;
+import chat.campusconnectserver.models.Chat;
+import chat.campusconnectserver.models.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

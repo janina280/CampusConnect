@@ -1,4 +1,4 @@
-package chat.campusconnectserver.payload.response;
+package chat.campusconnectserver.payloads.response;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,9 +1,9 @@
 package chat.campusconnectserver.repositories;
 
 import chat.campusconnectserver.dtos.UserMessageCountDto;
-import chat.campusconnectserver.modal.Message;
-import chat.campusconnectserver.modal.MessageState;
-import chat.campusconnectserver.modal.MessageType;
+import chat.campusconnectserver.models.Message;
+import chat.campusconnectserver.models.MessageState;
+import chat.campusconnectserver.models.MessageType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

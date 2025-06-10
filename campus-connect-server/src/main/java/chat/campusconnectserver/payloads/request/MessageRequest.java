@@ -1,6 +1,6 @@
-package chat.campusconnectserver.payload.request;
+package chat.campusconnectserver.payloads.request;
 
-import chat.campusconnectserver.modal.MessageType;
+import chat.campusconnectserver.models.MessageType;
 import lombok.*;
 
 @Setter

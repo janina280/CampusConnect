@@ -1,4 +1,4 @@
-package chat.campusconnectserver.util;
+package chat.campusconnectserver.utils;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

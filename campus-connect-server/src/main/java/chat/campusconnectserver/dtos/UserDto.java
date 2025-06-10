@@ -1,7 +1,7 @@
 package chat.campusconnectserver.dtos;
 
-import chat.campusconnectserver.modal.AuthProvider;
-import chat.campusconnectserver.modal.User;
+import chat.campusconnectserver.models.AuthProvider;
+import chat.campusconnectserver.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

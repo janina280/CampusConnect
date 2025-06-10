@@ -1,4 +1,4 @@
-package chat.campusconnectserver.util;
+package chat.campusconnectserver.utils;
 
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;

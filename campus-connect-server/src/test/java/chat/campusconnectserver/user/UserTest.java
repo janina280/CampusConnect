@@ -1,6 +1,6 @@
 package chat.campusconnectserver.user;
 
-import chat.campusconnectserver.modal.User;
+import chat.campusconnectserver.models.User;
 import chat.campusconnectserver.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

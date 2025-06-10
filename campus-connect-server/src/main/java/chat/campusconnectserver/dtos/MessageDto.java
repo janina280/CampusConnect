@@ -1,6 +1,6 @@
 package chat.campusconnectserver.dtos;
 
-import chat.campusconnectserver.modal.Message;
+import chat.campusconnectserver.models.Message;
 import lombok.*;
 
 import java.time.LocalDateTime;

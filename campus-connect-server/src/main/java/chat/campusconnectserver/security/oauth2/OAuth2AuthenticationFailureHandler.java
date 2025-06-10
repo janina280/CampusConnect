@@ -1,6 +1,6 @@
 package chat.campusconnectserver.security.oauth2;
 
-import chat.campusconnectserver.util.CookieUtils;
+import chat.campusconnectserver.utils.CookieUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
